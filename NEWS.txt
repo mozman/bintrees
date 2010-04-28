@@ -1,0 +1,3 @@
+Version 0.1.0 - ?? Mai 2010
+  * Alpha status
+  * Initial release
