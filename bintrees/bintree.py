@@ -79,6 +79,3 @@ class BinaryTree(BaseTree):
                 child = self._smallest_node(node.right)
             self._replace(node, child)
         node.free()
-
-_BLACK = 0
-_RED = 1

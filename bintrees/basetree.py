@@ -15,7 +15,7 @@ class BaseTree(object):
 
     def __repr__(self):
         def _tostr(node):
-            if (node is not None) and (not node.is_nil):
+            if node is not None:
                 result = []
                 left = _tostr(node.left)
                 right = _tostr(node.right)
@@ -107,7 +107,7 @@ class BaseTree(object):
     def __cmp__(self, other):
         if other is None:
             return 1
-        if isinstance(other, _Tree):
+        if isinstance(other, BaseTree):
             for key in self.iterkeys():
                 value1 = self.__getitem__(key)
                 try:
@@ -126,9 +126,9 @@ class BaseTree(object):
     def setdefault(self, key, default=None):
         node = self._find_node(self.root, key)
         if node is None:
-            self.insert(default)
+            self.insert(key, default)
             return default
-        return node.data
+        return node.value
 
     def foreach(self, func, order='inorder'):
         """Visit all tree nodes and process node-value.
