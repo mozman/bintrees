@@ -64,10 +64,6 @@ class TreeNode(object):
         self.key = None
         self.value = None
 
-    @property
-    def is_nil(self):
-        return False
-
     def update_height(self):
         """Update the "height" variable of a node, from the heights of its
         children.  This does not update the height variable of any parent nodes.
