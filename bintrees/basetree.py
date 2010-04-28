@@ -57,14 +57,14 @@ class BaseTree(object):
             self.foreach(_count)
 
     def is_empty(self):
-        return (self.root is None) or (self.root.is_nil)
+        return self.root is None
 
     def keys(self):
         return list(self.iterkeys())
 
     def iterkeys(self):
         def _iterkeys(node):
-            if (node is not None) and (not node.is_nil):
+            if node is not None:
                 for key in _iterkeys(node.left):
                     yield key
                 yield node.key
@@ -78,7 +78,7 @@ class BaseTree(object):
 
     def itervalues(self):
         def _itervalues(node):
-            if (node is not None) and (not node.is_nil):
+            if node is not None:
                 for value in _itervalues(node.left):
                     yield value
                 yield node.value
@@ -138,19 +138,19 @@ class BaseTree(object):
         order -- 'inorder', 'preorder', 'postorder'
         """
         def _traverse_inorder(node):
-            if (node is None) or (node.is_nil): return
+            if node is None: return
             _traverse_inorder(node.left)
             func(node.value)
             _traverse_inorder(node.right)
 
         def _traverse_preorder(node):
-            if (node is None) or (node.is_nil): return
+            if node is None: return
             func(node.value)
             _traverse_preorder(node.left)
             _traverse_preorder(node.right)
 
         def _traverse_postorder(node):
-            if (node is None) or (node.is_nil): return
+            if node is None: return
             _traverse_postorder(node.left)
             _traverse_postorder(node.right)
             func(node.value)
@@ -171,7 +171,7 @@ class BaseTree(object):
         """
         compare = self.compare
         while True:
-            if (node is None) or (node.is_nil):
+            if node is None:
                 return None
             cval = compare(key, node.key)
             if cval == 0:
@@ -212,13 +212,13 @@ class BaseTree(object):
 
     @staticmethod
     def _smallest_node(node):
-        while (node.left is not None) and (not node.left.is_nil):
+        while node.left is not None:
             node = node.left
         return node
 
     @staticmethod
     def _biggest_node(node):
-        while (node.right is not None) and (not node.right.is_nil):
+        while node.right is not None:
             node = node.right
         return node
 
@@ -261,9 +261,9 @@ class BaseTree(object):
     def _get_leaf(self):
         node = self.root
         while True:
-            if (node.left is not None) and (not node.left.is_nil):
+            if node.left is not None:
                 node = node.left
-            elif (node.right is not None) and (not node.right.is_nil):
+            elif node.right is not None:
                 node = node.right
             else:
                 return node

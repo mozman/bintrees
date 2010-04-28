@@ -27,7 +27,7 @@ __all__ = ['AVLTree']
 AVL_TREE_NODE_LEFT = 0
 AVL_TREE_NODE_RIGHT = 1
 
-class _AVLTreeNode(object):
+class TreeNode(object):
     __slots__ = ['left', 'right', 'parent', 'height', 'key', 'value']
 
     def __init__(self, key=None, value=None, parent=None):
@@ -246,7 +246,7 @@ class AVLTree(BaseTree):
                 return
 
         # Create a new node.  Use the last node visited as the parent link.
-        new_node = _AVLTreeNode(key, value, previous_node)
+        new_node = TreeNode(key, value, previous_node)
         # Keep track of the number of entries
         self._count += 1
 

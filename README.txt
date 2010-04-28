@@ -1,5 +1,5 @@
-trees
-=====
+bintrees
+========
 
 Abstract
 ========
@@ -14,8 +14,8 @@ from source::
 
 Documentation
 =============
-http://bitbucket.org/mozman/trees/wiki/Home
+http://bitbucket.org/mozman/bintrees/wiki/Home
 
 trees can be found on bitbucket.org at:
 
-http://bitbucket.org/mozman/trees
+http://bitbucket.org/mozman/bintrees

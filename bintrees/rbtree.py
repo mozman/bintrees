@@ -11,7 +11,7 @@ __all__ = ['RBTree']
 _BLACK = 0
 _RED = 1
 
-class Node(object):
+class TreeNode(object):
     __slots__ = ['key', 'value', 'parent', 'color', 'left', 'right']
     def __init__(self, key, value, parent, color):
         self.key = key
@@ -27,10 +27,6 @@ class Node(object):
         self.parent = None
         self.key = None
         self.value = None
-
-    @property
-    def is_nil(self):
-        return False
 
     @property
     def grandparent(self):
@@ -71,10 +67,10 @@ class RBTree(BaseTree):
 
     def new_node(self, key, value, parent, color):
         self._count += 1
-        return Node(key, value, parent, color)
+        return TreeNode(key, value, parent, color)
 
     def insert(self, key, value):
-        if (self.root is None) or (self.root.is_nil):
+        if (self.root is None):
             self.root = self.new_node(key, value, None, _BLACK)
         else:
             self._insert(self.root, key, value)
@@ -84,13 +80,13 @@ class RBTree(BaseTree):
         if cval == 0:
             node.value = value
         elif cval < 0:
-            if node.left.is_nil:
+            if node.left is None:
                 node.left = self.new_node(key, value, node, _RED)
                 self._balance_after_insert(node.left)
             else:
                 self._insert(node.left, key, value)
         else:
-            if node.right.is_nil:
+            if node.right is None:
                 node.right = self.new_node(key, value, node, _RED)
                 self._balance_after_insert(node.right)
             else:
@@ -158,8 +154,8 @@ class RBTree(BaseTree):
 
         s.right = w
         w.left = u
-
-        u.parent = w
+        if u is not None:
+            u.parent = w
         w.parent = s
         s.parent = root
 
@@ -186,8 +182,8 @@ class RBTree(BaseTree):
 
         s.right = u
         w.left = s
-
-        u.parent = s
+        if u is not None:
+            u.parent = s
         s.parent = w
         w.parent = root
 
@@ -196,14 +192,14 @@ class RBTree(BaseTree):
         if node is None:
             raise KeyError(unicode(key))
         else:
-            if node.left.is_nil:
+            if node.left is None:
                 child = node.right
-            elif node.right.is_nil:
+            elif node.right is None:
                 child = node.left
             else: #left and right not nil
                 child = self._smallest_node(node.right)
             self._replace(node, child)
-            if node.color == _BLACK:
+            if (node.color == _BLACK) and (child is not None):
                 if child.color == _RED:
                     child.color == _BLACK
                 else:
