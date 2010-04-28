@@ -19,10 +19,6 @@ class TreeNode(object):
         self.left = None
         self.right = None
 
-    @property
-    def is_nil(self):
-        return False
-
     def free(self):
         self.left = None
         self.right = None
