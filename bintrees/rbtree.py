@@ -188,7 +188,7 @@ class RBTree(BaseTree):
         w.parent = root
 
     def remove(self, key):
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             raise KeyError(unicode(key))
         else:

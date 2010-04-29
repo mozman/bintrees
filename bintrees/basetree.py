@@ -31,7 +31,7 @@ class BaseTree(object):
         return "{{{0}}}".format(", ".join(_tostr(self.root)))
 
     def has_key(self, key):
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         return node is not None
     __contains__ = has_key
 
@@ -93,7 +93,7 @@ class BaseTree(object):
         return list(self.iteritems())
 
     def __getitem__(self, key):
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             raise KeyError(unicode(key))
         return node.value
@@ -124,7 +124,7 @@ class BaseTree(object):
             raise ValueError('<self> is not comparable with <other>')
 
     def setdefault(self, key, default=None):
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             self.insert(key, default)
             return default
@@ -164,11 +164,10 @@ class BaseTree(object):
         else:
             raise ValueError("foreach(): unknown order '{0}'.".format(order))
 
-    def _find_node(self, node, key):
+    def _find_node(self,  key):
         """Find node by <key>, returns <None> if not found.
-
-        node -- start node (in most cases == self.root)
         """
+        node = self.root
         compare = self.compare
         while True:
             if node is None:
@@ -230,7 +229,7 @@ class BaseTree(object):
         return tree
 
     def get(self, key, default=None):
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             return default
         else:
@@ -240,7 +239,7 @@ class BaseTree(object):
         if len(args) > 1:
             raise TypeError("pop expected at most 2 arguments, got {0}".format(
                               1+len(args)))
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             if len(args) == 0:
                 raise KeyError(unicode(key))

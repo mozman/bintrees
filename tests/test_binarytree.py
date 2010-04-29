@@ -32,22 +32,31 @@ class TestBinaryTree(unittest.TestCase):
     def test_remove_inner_node(self):
         tree = BinaryTree(self.default_values1)
         tree.remove(34)
-        node = tree._find_node(tree.root, 35)
+        node = tree._find_node(35)
         self.assertEqual(node.left.value, 16)
         self.assertEqual(node.right.value, 45)
+        self.assertTrue(12 in tree)
+        self.assertTrue(16 in tree)
+        self.assertTrue(35 in tree)
+        self.assertTrue(45 in tree)
+        self.assertTrue(57 in tree)
         self.assertEqual(len(tree), 5)
 
     def test_remove_root(self):
         tree = BinaryTree(self.default_values1)
         tree.remove(12)
-        self.assertEqual(tree.root.value, 34)
-        self.assertEqual(tree.root.parent, None)
+        self.assertFalse(12 in tree)
+        self.assertTrue(16 in tree)
+        self.assertTrue(34 in tree)
+        self.assertTrue(35 in tree)
+        self.assertTrue(45 in tree)
+        self.assertTrue(57 in tree)
         self.assertEqual(len(tree), 5)
 
     def test_remove_leaf_node(self):
         tree = BinaryTree(self.default_values1)
         tree.remove(57)
-        node = tree._find_node(tree.root, 45)
+        node = tree._find_node(45)
         self.assertEqual(node.left.value, 35)
         self.assertEqual(node.right, None)
         self.assertEqual(len(tree), 5)
@@ -55,7 +64,7 @@ class TestBinaryTree(unittest.TestCase):
     def test_delete_node(self):
         tree = BinaryTree(self.default_values1)
         del tree[57]
-        node = tree._find_node(tree.root, 45)
+        node = tree._find_node(45)
         self.assertEqual(node.left.value, 35)
         self.assertEqual(node.right, None)
         self.assertEqual(len(tree), 5)

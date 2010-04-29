@@ -24,8 +24,8 @@ from basetree import BaseTree
 
 __all__ = ['AVLTree']
 
-AVL_TREE_NODE_LEFT = 0
-AVL_TREE_NODE_RIGHT = 1
+AVL_LEFT = 0
+AVL_RIGHT = 1
 
 class TreeNode(object):
     __slots__ = ['left', 'right', 'parent', 'height', 'key', 'value']
@@ -79,9 +79,9 @@ class TreeNode(object):
     def node_parent_side(self):
         """ Find what side a node is relative to its parent """
         if self.parent.left is self:
-            return AVL_TREE_NODE_LEFT
+            return AVL_LEFT
         else:
-            return AVL_TREE_NODE_RIGHT
+            return AVL_RIGHT
 
 def _subtree_height(node):
     """Get height for node, works also with None-nodes"""
@@ -111,10 +111,10 @@ class AVLTree(BaseTree):
     def _node_replace(self, node1, node2):
         """ Replace node1 with node2 at its parent. """
         # Set the node's parent pointer.
-        if (node2 is not None):
+        if node2 is not None:
             node2.parent = node1.parent
         # The root node?
-        if (node1.parent is None):
+        if node1.parent is None:
             self.root = node2
         else:
             side = node1.node_parent_side()
@@ -146,20 +146,22 @@ class AVLTree(BaseTree):
         """
         # The child of this node will take its place:
         # for a left rotation, it is the right child, and vice versa.
-        new_root = node[1-direction]
+        other_side = 1 - direction
+        new_root = node[other_side]
 
         # Make new_root the root, update parent pointers.
         self._node_replace(node, new_root)
 
         # Rearrange pointers
-        node[1-direction] = new_root[direction]
+        node[other_side] = new_root[direction]
         new_root[direction] = node
 
         # Update parent references
         node.parent = new_root
 
-        if node[1-direction] is not None:
-            node[1-direction].parent = node
+        child = node[other_side]
+        if child is not None:
+            child.parent = node
 
         # Update heights of the affected nodes
         new_root.update_height()
@@ -178,33 +180,31 @@ class AVLTree(BaseTree):
         # around to fix it
 
         diff = _subtree_height(right_subtree) - _subtree_height(left_subtree)
-        if (diff >= 2):
+        if diff >= 2:
             # Biased toward the right side too much.
             child = right_subtree
 
             if _subtree_height(child.right) < _subtree_height(child.left):
                 # If the right child is biased toward the left
-                # side, it must be rotated right first (double
-                # rotation)
-                self._rotate(right_subtree, AVL_TREE_NODE_RIGHT)
+                # side, it must be rotated right first (double rotation)
+                self._rotate(right_subtree, AVL_RIGHT)
 
                 # Perform a left rotation.  After this, the right child will
-                # take the place of this node.  Update the node pointer. */
-                node = self._rotate(node, AVL_TREE_NODE_LEFT);
+                # take the place of this node.  Update the node pointer.
+                node = self._rotate(node, AVL_LEFT);
 
-        elif (diff <= -2):
+        elif diff <= -2:
             # Biased toward the left side too much.
             child = node.left
             if _subtree_height(child.left) < _subtree_height(child.right):
                 # If the left child is biased toward the right
-                # side, it must be rotated right left (double
-                # rotation)
-                self._rotate(left_subtree, AVL_TREE_NODE_LEFT)
+                # side, it must be rotated right left (double rotation)
+                self._rotate(left_subtree, AVL_LEFT)
 
             # Perform a right rotation.  After this, the left child will
-            # take the place of this node.  Update the node pointer. */
+            # take the place of this node.  Update the node pointer.
 
-            node = self._rotate(node, AVL_TREE_NODE_RIGHT);
+            node = self._rotate(node, AVL_RIGHT)
         #Update the height of this node
         node.update_height()
         return node
@@ -233,10 +233,10 @@ class AVLTree(BaseTree):
             cmp_res = compare(key, rover.key)
             if cmp_res < 0:
                 rover = rover.left
-                ipos = AVL_TREE_NODE_LEFT
+                ipos = AVL_LEFT
             elif cmp_res > 0:
                 rover = rover.right
-                ipos = AVL_TREE_NODE_RIGHT
+                ipos = AVL_RIGHT
             else: # replace existing value
                 rover.value = value
                 return
@@ -274,15 +274,16 @@ class AVLTree(BaseTree):
         left_height = _subtree_height(left_subtree)
         right_height = _subtree_height(right_subtree)
 
-        if (left_height < right_height):
-            side = AVL_TREE_NODE_RIGHT
+        if left_height < right_height:
+            side = AVL_RIGHT
         else:
-            side = AVL_TREE_NODE_LEFT
+            side = AVL_LEFT
 
         # Search down the tree, back towards the center.
         result = node[side]
-        while (result[1-side] is not None):
-            result = result[1-side]
+        other_side = 1 - side
+        while (result[other_side] is not None):
+            result = result[other_side]
 
         # Unlink the result node, and hook in its remaining child
         # (if it has one) to replace it.
@@ -300,7 +301,7 @@ class AVLTree(BaseTree):
         # a node to swap with.
 
         swap_node = self._get_replacement(node)
-        if (swap_node is None):
+        if swap_node is None:
             # This is a leaf node and has no children, therefore
             # it can be immediately removed.
             # Unlink this node from its parent.
@@ -319,9 +320,10 @@ class AVLTree(BaseTree):
                 balance_startpoint = swap_node.parent
             # Copy references in the node into the swap node
             for i in (0, 1):
-                swap_node[i] = node[i]
-                if swap_node[i] is not None:
-                    swap_node[i].parent = swap_node
+                child = node[i]
+                swap_node[i] = child
+                if child is not None:
+                    child.parent = swap_node
             swap_node.height = node.height
 
             # Link the parent's reference to this node
@@ -335,7 +337,7 @@ class AVLTree(BaseTree):
     def remove(self, key):
         """ Remove item by key from tree"""
         # Find the node to remove
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             # Not found in tree
             raise KeyError(str(key))
