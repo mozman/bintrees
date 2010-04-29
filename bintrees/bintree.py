@@ -67,7 +67,7 @@ class BinaryTree(BaseTree):
                 self._insert(node.right, key, value)
 
     def remove(self, key):
-        node = self._find_node(self.root, key)
+        node = self._find_node(key)
         if node is None:
             raise KeyError(unicode(key))
         else:

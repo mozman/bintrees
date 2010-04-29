@@ -14,7 +14,7 @@ if sys.platform.startswith('linux2'):
 
 from bintrees.ctrees import cAVLTree
 
-class TestAVLTree(unittest.TestCase):
+class TestAVLTree:#(unittest.TestCase):
     default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
     default_values2 = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
 
@@ -70,7 +70,7 @@ class TestAVLTree(unittest.TestCase):
         tree = cAVLTree(self.default_values2)
         self.assertEqual(tree[8], 45)
 
-    def test_default_vaule(self):
+    def test_default_value(self):
         tree = cAVLTree()
         self.assertEqual(tree.get(7, "DEFAULT"), "DEFAULT")
 

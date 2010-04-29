@@ -62,20 +62,11 @@ cdef class Node:
             _sibiling = self.parent.right
         return _sibiling
 
-cdef object tree_to_str(Node node):
-    if node is None:
-        result = []
-        left = tree_to_str(node.left)
-        right = tree_to_str(node.right)
-        nodestr = repr(node.key)+': '+repr(node.value)
-        if left is not None:
-            result.extend(left)
-        result.append(nodestr)
-        if right is not None:
-            result.extend(right)
-        return result
-    else:
-        return None
+cdef void tree_to_str(Node node, result):
+    if node is not None:
+        tree_to_str(node.left, result)
+        tree_to_str(node.right, result)
+        result.append(repr(node.key)+': '+repr(node.value))
 
 cdef void clear_tree(Node node):
     if node is not None:
@@ -144,14 +135,17 @@ cdef class cBaseTree:
         self.update(items)
 
     def __repr__(self):
-        treestrings = tree_to_str(self.root)
-        return "{{{0}}}".format(", ".join(treestrings))
+        result = []
+        tree_to_str(self.root, result)
+        return "{{{0}}}".format(", ".join(result))
 
     def has_key(self, key):
         cdef Node node
         node = self.find_node(key)
         return node is not None
-    __contains__ = has_key
+
+    def __contains__(self, key):
+        return self.has_key(key)
 
     def clear(self):
         clear_tree(self.root)
@@ -164,13 +158,15 @@ cdef class cBaseTree:
         return (self.root is None)
 
     def keys(self):
-        result = list()
+        result = []
         add_keys(self.root, result)
         return result
 
     def iterkeys(self):
         return iter(self.keys())
-    __iter__ = iterkeys
+
+    def __iter__(self):
+        return iter(self.keys())
 
     def values(self):
         result = list()
@@ -188,7 +184,6 @@ cdef class cBaseTree:
 
     def __getitem__(self, key):
         cdef Node node
-
         node = self.find_node(key)
         if node is None:
             raise KeyError(unicode(key))
@@ -250,13 +245,13 @@ cdef class cBaseTree:
         if parent is None: #root
             self.root = newnode
         else:
-            if parent.left == oldnode:
+            if parent.left is oldnode:
                 parent.left = newnode
             else:
                 parent.right = newnode
 
-        if newnode is None:
-            if newnode == newnode.parent.left: # unlink newnode from old parent
+        if newnode is not None:
+            if newnode is newnode.parent.left: # unlink newnode from old parent
                 newnode.parent.left = None
             else:
                 newnode.parent.right = None
@@ -342,7 +337,7 @@ cdef class cBinaryTree(cBaseTree):
     def __len__(self):
         return self._count
 
-    def new_node(self, key, value, parent):
+    cdef Node new_node(self, key, value, Node parent):
         """Create a new tree node."""
         self._count += 1
         return Node(key, value, parent)
@@ -370,6 +365,7 @@ cdef class cBinaryTree(cBaseTree):
                 self._insert(node.right, key, value)
 
     def remove(self, key):
+        cdef Node node, child
         node = self.find_node(key)
         if node is None:
             raise KeyError(unicode(key))
@@ -491,7 +487,11 @@ cdef class cRBTree(cBaseTree):
     cdef void insert_case1(self, RBNode node):
         if node.parent is None:
             node.color = BLACK
-        elif node.parent.color == RED:
+        else:
+            self.insert_case2(node)
+
+    cdef void insert_case2(self, RBNode node):
+        if node.parent.color == RED:
             self.insert_case3(node)
 
     cdef void insert_case3(self, RBNode node):
@@ -649,17 +649,21 @@ cdef class cAVLTree(cBaseTree):
 
     cdef void node_replace(self, AVLNode node1, AVLNode node2):
         cdef int side
+
         if node2 is not None:
             node2.parent = node1.parent
         if node1.parent is None:
             self.root = node2
         else:
             side = node1.node_parent_side()
+
+            assert node1.parent is not None
+
             node1.parent.set_child(side, node2)
             node1.parent.update_height()
 
     cdef AVLNode rotate(self, AVLNode node, int direction):
-        cdef AVLNode new_root
+        cdef AVLNode new_root, child
         cdef int other_side
         other_side = 1 - direction
 
@@ -669,8 +673,9 @@ cdef class cAVLTree(cBaseTree):
         new_root.set_child(direction, node)
         node.parent = new_root
 
-        if node.get_child(other_side) is not None:
-            node.get_child(other_side).parent = node
+        child = node.get_child(other_side)
+        if child is not None:
+            child.parent = node
 
         new_root.update_height()
         node.update_height()
@@ -681,21 +686,23 @@ cdef class cAVLTree(cBaseTree):
         cdef AVLNode left_subtree, right_subtree
         cdef AVLNode child
         cdef int diff
+
+        assert node is not None
         left_subtree = node.left
         right_subtree = node.right
 
         diff = subtree_height(right_subtree) - subtree_height(left_subtree)
-        if (diff >= 2):
+        if diff >= 2:
             child = right_subtree
 
             if subtree_height(child.right) < subtree_height(child.left):
                 self.rotate(right_subtree, RIGHT)
-                node = self.rotate(node, LEFT);
-        elif (diff <= -2):
+                node = self.rotate(node, LEFT)
+        elif diff <= -2:
             child = node.left
             if subtree_height(child.left) < subtree_height(child.right):
                 self.rotate(left_subtree, LEFT)
-            node = self.rotate(node, RIGHT);
+            node = self.rotate(node, RIGHT)
         node.update_height()
         return node
 
@@ -742,7 +749,7 @@ cdef class cAVLTree(cBaseTree):
         if self.root is None:
             self.root = new_node
 
-    cdef AVLNode get_replacement(self, node):
+    cdef AVLNode get_replacement(self, AVLNode node):
         cdef AVLNode left_subtree
         cdef AVLNode right_subtree
         cdef AVLNode child
@@ -757,18 +764,20 @@ cdef class cAVLTree(cBaseTree):
         left_height = subtree_height(left_subtree)
         right_height = subtree_height(right_subtree)
 
-        if (left_height < right_height):
+        if left_height < right_height:
             side = RIGHT
         else:
             side = LEFT
 
         result = node.get_child(side)
         other_side = 1 - side
-        while (result.get_child(other_side) is not None):
+        while result.get_child(other_side) is not None:
             result = result.get_side(other_side)
 
         child = result.get_child(side)
         self.node_replace(result, child)
+
+        assert result.parent is not None
 
         result.parent.update_height()
         return result

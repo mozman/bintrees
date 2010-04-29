@@ -37,9 +37,14 @@ class TestAVLTree(unittest.TestCase):
 
     def test_remove_root(self):
         tree = AVLTree(self.default_values1)
-        root_data = tree.root.value
-        tree.remove(root_data)
-        self.assertFalse(root_data in tree)
+        tree.remove(12)
+        self.assertFalse(12 in tree)
+        self.assertTrue(16 in tree)
+        self.assertTrue(34 in tree)
+        self.assertTrue(35 in tree)
+        self.assertTrue(45 in tree)
+        self.assertTrue(57 in tree)
+        self.assertEqual(len(tree), 5)
 
     def test_delete_node(self):
         tree = AVLTree(self.default_values1)
