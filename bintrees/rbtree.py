@@ -244,22 +244,20 @@ class RBTree(BaseTree):
                 case5(node)
 
         def case5(node):
-            if node.is_leftnode and \
-               (node.sibling.color == _BLACK) and \
-               (node.sibling.left.color == _RED) and \
-               (node.sibling.right.color == _BLACK):
-
-                node.sibling.color = _RED
-                node.sibling.left.color = _BLACK
-                self._rotate_right(node.sibling)
-            elif node.is_rightnode and \
-              (node.sibling.color == _BLACK) and \
-              (node.sibling.right.color == _RED) and \
-              (node.sibling.left.color == _BLACK):
-                node.sibling.color = _RED
-                node.sibling.right.color = _BLACK
-                self._rotate_left(node.sibling)
-            case6(node)
+            if node.sibling.color == _BLACK:
+                if node.is_leftnode and \
+                   (node.sibling.left.color == _RED) and \
+                   (node.sibling.right.color == _BLACK):
+                    node.sibling.color = _RED
+                    node.sibling.left.color = _BLACK
+                    self._rotate_right(node.sibling)
+                elif node.is_rightnode and \
+                  (node.sibling.right.color == _RED) and \
+                  (node.sibling.left.color == _BLACK):
+                    node.sibling.color = _RED
+                    node.sibling.right.color = _BLACK
+                    self._rotate_left(node.sibling)
+                case6(node)
 
         def case6(node):
             node.sibling.color = node.parent.color
