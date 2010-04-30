@@ -72,10 +72,10 @@ class BinaryTree(BaseTree):
             raise KeyError(unicode(key))
         else:
             if node.left is None:
-                child = node.right
+                self._replace1(node, node.right)
             elif node.right is None:
-                child = node.left
+                self._replace1(node, node.left)
             else: #left and right != None
                 child = self._smallest_node(node.right)
-            self._replace(node, child)
+                self._replace2(node, child)
         node.free()

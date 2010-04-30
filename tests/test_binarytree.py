@@ -6,9 +6,31 @@
 
 import sys
 import unittest2 as unittest
-from random import randint
+from random import randint, shuffle
+
+import dxfwrite
 
 from bintrees.bintree import BinaryTree
+
+def draw_tree(tree, fname, key=-1):
+    def draw_node(node, pos, dx):
+        dwg.add(dxf.text(str(node.key), halign=dxfwrite.CENTER, insert=pos, alignpoint=pos, height=0.1))
+        if node.left is not None:
+            pos2 = (pos[0]-dx, pos[1]+dy)
+            dwg.add(dxf.line(pos, pos2))
+            draw_node(node.left, pos2, dx*fact)
+        if node.right is not None:
+            pos3 = (pos[0]+dx, pos[1]+dy)
+            dwg.add(dxf.line(pos, pos3))
+            draw_node(node.right, pos3, dx*fact)
+    dy = 1
+    fact = 0.45
+    dxf = dxfwrite.DXFEngine
+    dwg = dxf.drawing(fname)
+    if key != -1:
+        dwg.add(dxf.text('before remove key: ' + str(key), insert=(100, 95)))
+    draw_node(tree.root, (100, 100), 60)
+    return dwg
 
 class TestBinaryTree(unittest.TestCase):
     default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
@@ -29,59 +51,125 @@ class TestBinaryTree(unittest.TestCase):
         self.assertEqual(tree.get(34), 34)
         self.assertEqual(tree.get(12), 12)
 
-    def test_remove_inner_node(self):
-        tree = BinaryTree(self.default_values1)
-        tree.remove(34)
-        node = tree._find_node(35)
-        self.assertEqual(node.left.value, 16)
-        self.assertEqual(node.right.value, 45)
-        self.assertTrue(12 in tree)
-        self.assertTrue(16 in tree)
-        self.assertTrue(35 in tree)
-        self.assertTrue(45 in tree)
-        self.assertTrue(57 in tree)
-        self.assertEqual(len(tree), 5)
+    def test_remove_root_1(self):
+        keys = [50,]
+        tree = BinaryTree.fromkeys(keys)
+        tree.remove(50)
+        self.assertTrue(tree.is_empty)
 
-    def test_remove_root(self):
-        tree = BinaryTree(self.default_values1)
-        tree.remove(12)
-        self.assertFalse(12 in tree)
-        self.assertTrue(16 in tree)
-        self.assertTrue(34 in tree)
-        self.assertTrue(35 in tree)
-        self.assertTrue(45 in tree)
-        self.assertTrue(57 in tree)
-        self.assertEqual(len(tree), 5)
+    def check_integrity(self, keys, remove_key, tree):
+        if not tree._check_parent_links():
+            return False
+        for search_key in keys:
+            if search_key == remove_key:
+                if search_key in tree:
+                    return False
+            else:
+                if search_key not in tree:
+                    return False
+        return True
 
-    def test_remove_leaf_node(self):
-        tree = BinaryTree(self.default_values1)
-        tree.remove(57)
-        node = tree._find_node(45)
-        self.assertEqual(node.left.value, 35)
-        self.assertEqual(node.right, None)
-        self.assertEqual(len(tree), 5)
+    def test_remove_child_1(self):
+        keys = [50, 25]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 25
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
-    def test_delete_node(self):
-        tree = BinaryTree(self.default_values1)
-        del tree[57]
-        node = tree._find_node(45)
-        self.assertEqual(node.left.value, 35)
-        self.assertEqual(node.right, None)
-        self.assertEqual(len(tree), 5)
+    def test_remove_child_2(self):
+        keys = [50, 25, 12]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 25
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
-    def test_random_numbers(self):
-        tree = BinaryTree()
-        for x in xrange(1000):
-            val = randint(0, 10000)
-            tree[val] = val
-        self.assertGreater(len(tree), 0)
+    def test_remove_child_3(self):
+        keys = [50, 25, 12, 33]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 25
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_child_4(self):
+        keys = [50, 25, 12, 33, 40]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 25
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_child_5(self):
+        keys = [50, 25, 12, 33, 40, 37, 43]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 25
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_child_6(self):
+        keys = [50, 75, 100, 150, 60, 65, 64, 80, 66]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 75
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_root_2(self):
+        keys = [50, 25, 12, 33, 34]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 50
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_root_3(self):
+        keys = [50, 25, 12, 33, 34, 75]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 50
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_root_4(self):
+        keys = [50, 25, 12, 33, 34, 75, 60]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 50
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_root_5(self):
+        keys = [50, 25, 12, 33, 34, 75, 60, 61]
+        tree = BinaryTree.fromkeys(keys)
+        remove_key = 50
+        tree.remove(remove_key)
+        self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_remove_shuffeld(self):
+        keys = [50, 25, 20, 35, 22, 23, 27, 75, 65, 90, 60, 70, 85, 57, 83, 58]
+        remove_keys = keys[:]
+        for _ in range(10):
+            shuffle(remove_keys)
+            for remove_key in remove_keys:
+                tree = BinaryTree.fromkeys(keys)
+                tree.remove(remove_key)
+                for search_key in keys:
+                    if search_key == remove_key:
+                        self.assertFalse(search_key in tree)
+                    else:
+                        self.assertTrue(search_key in tree)
+
+    def test_remove_random_numbers(self):
+        keys = list(set([randint(0, 10000) for _ in xrange(1000)]))
+        shuffle(keys)
+        tree = BinaryTree.fromkeys(keys)
+        self.assertEqual(len(tree), len(keys))
+        for key in keys:
+            del tree[key]
+        self.assertEqual(len(tree), 0)
+
+    def test_order(self):
+        keys = set([randint(0, 10000) for _ in xrange(1000)])
+        tree = BinaryTree.fromkeys(keys)
         generator = iter(tree)
         a = generator.next()
         for b in generator:
             self.assertGreaterEqual(b, a)
-        count = tree._count
-        tree.count() # recount
-        self.assertEqual(count, len(tree))
+            a = b
 
     def test_index_operator(self):
         tree = BinaryTree(self.default_values1)
@@ -156,5 +244,6 @@ class TestBinaryTree(unittest.TestCase):
         self.assertEqual(value, 12)
         value = tree.setdefault(99, 77)
         self.assertEqual(value, 77)
+
 if __name__=='__main__':
     unittest.main()

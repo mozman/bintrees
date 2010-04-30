@@ -291,7 +291,8 @@ class AVLTree(BaseTree):
         self._node_replace(result, child)
 
         # Update the subtree height for the result node's old parent.
-        result.parent.update_height()
+        if result.parent is not None:
+            result.parent.update_height()
         return result
 
     def _remove_node(self, node):

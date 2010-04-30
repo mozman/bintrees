@@ -180,26 +180,6 @@ class BaseTree(object):
             else:
                 node = node.right
 
-    def _replace(self, oldnode, newnode):
-        self._count -= 1
-        parent = oldnode.parent
-        if parent is None: #root
-            self.root = newnode
-        else:
-            if parent.left is oldnode:
-                parent.left = newnode
-            else:
-                parent.right = newnode
-
-        if newnode is not None:
-            if newnode is newnode.parent.left: # unlink newnode from old parent
-                newnode.parent.left = None
-            else:
-                newnode.parent.right = None
-            newnode.parent = parent # link to newnode to new parent
-            newnode.left = oldnode.left
-            newnode.right = oldnode.right
-
     def update(self, items):
         try:
             generator = items.iteritems()
@@ -227,6 +207,26 @@ class BaseTree(object):
         for key in iterable:
             tree.insert(key, value)
         return tree
+
+    def _check_parent_links(self):
+        # used in tests to check the tree integrity
+        def check(node):
+            if node.left is not None:
+                if node.left.parent is not node:
+                    valid = False
+            if node.right is not None:
+                if node.right.parent is not node:
+                    valid = False
+        def do_check(node):
+            if node is not None:
+                check(node)
+                do_check(node.left)
+                do_check(node.right)
+
+        valid = True
+        if self.root is not None:
+            do_check(self.root)
+        return valid
 
     def get(self, key, default=None):
         node = self._find_node(key)
@@ -266,6 +266,52 @@ class BaseTree(object):
                 node = node.right
             else:
                 return node
+
+    @staticmethod
+    def _link_nodes(parent, child, left=True):
+        if parent is not None:
+            if left:
+                parent.left=child
+            else:
+                parent.right=child
+        if child is not None:
+            child.parent = parent
+
+    def _set_parent(self, oldnode, newnode):
+        parent = oldnode.parent
+        if parent is None: #root
+            self.root = newnode
+        else:
+            if parent.left is oldnode: # is left node
+                parent.left = newnode
+            else: # is right node
+                parent.right = newnode
+
+    def _replace1(self, oldnode, newnode):
+        """Replace node with one child."""
+        self._count -= 1
+        self._set_parent(oldnode, newnode)
+        if newnode is not None:
+            newnode.parent = oldnode.parent # link to newnode to new parent
+
+    def _replace2(self, oldnode, newnode):
+        """Replace node with two childs."""
+        # works only with newnode = smallest_node!
+
+        self._count -= 1
+        self._set_parent(oldnode, newnode)
+        if newnode is not None:
+            # remove newnode from tree
+            if newnode.parent.left is newnode: # is left node
+                left = True
+            else: # is right node
+                left = False
+            self._link_nodes(newnode.parent, newnode.right, left)
+
+            # replace oldnode with newnode
+            newnode.parent = oldnode.parent # link to newnode to new parent
+            self._link_nodes(newnode, oldnode.left, left=True)
+            self._link_nodes(newnode, oldnode.right, left=False)
 
     def insert(self, data, key):
         raise NotImplementedError
