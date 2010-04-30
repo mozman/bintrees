@@ -6,9 +6,31 @@
 
 import sys
 import unittest2 as unittest
-from random import randint
+from random import randint, shuffle
 
 from bintrees.rbtree import RBTree
+
+import dxfwrite
+
+def draw_tree(tree, fname, key=-1):
+    def draw_node(node, pos, dx):
+        dwg.add(dxf.text(str(node.key), halign=dxfwrite.CENTER, insert=pos, alignpoint=pos, height=0.1))
+        if node.left is not None:
+            pos2 = (pos[0]-dx, pos[1]+dy)
+            dwg.add(dxf.line(pos, pos2))
+            draw_node(node.left, pos2, dx*fact)
+        if node.right is not None:
+            pos3 = (pos[0]+dx, pos[1]+dy)
+            dwg.add(dxf.line(pos, pos3))
+            draw_node(node.right, pos3, dx*fact)
+    dy = 1
+    fact = 0.45
+    dxf = dxfwrite.DXFEngine
+    dwg = dxf.drawing(fname)
+    if key != -1:
+        dwg.add(dxf.text('before remove key: ' + str(key), insert=(100, 95)))
+    draw_node(tree.root, (100, 100), 40)
+    return dwg
 
 class TestRBTree(unittest.TestCase):
     default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
@@ -30,37 +52,57 @@ class TestRBTree(unittest.TestCase):
         self.assertEqual(tree.get(34), 34)
         self.assertEqual(tree.get(12), 12)
 
-    def test_remove_node(self):
-        tree = RBTree(self.default_values1)
-        tree.remove(34)
-        self.assertFalse(34 in tree)
+    def test_remove(self):
+        keys = [50, 25, 20, 35, 22, 23, 27, 75, 65, 90, 60, 70, 85, 57, 83, 58]
+        data = dict.fromkeys(keys)
+        for remove_key in keys:
+            tree = RBTree.fromkeys(keys)
+            tree.remove(remove_key)
+            for search_key in keys:
+                if search_key == remove_key:
+                    self.assertFalse(search_key in tree)
+                else:
+                    self.assertTrue(search_key in tree)
 
-    def test_remove_root(self):
-        tree = RBTree(self.default_values1)
-        tree.remove(12)
-        self.assertFalse(12 in tree)
-        self.assertTrue(16 in tree)
-        self.assertTrue(34 in tree)
-        self.assertTrue(35 in tree)
-        self.assertTrue(45 in tree)
-        self.assertTrue(57 in tree)
-        self.assertEqual(len(tree), 5)
+    def test_remove_shuffeld(self):
+        keys = [50, 25, 20, 35, 22, 23, 27, 75, 65, 90, 60, 70, 85, 57, 83, 58]
+        data = dict.fromkeys(keys)
+        remove_keys = keys[:]
+        for _ in range(10):
+            shuffle(remove_keys)
+            for remove_key in remove_keys:
+                tree = RBTree.fromkeys(keys)
+                tree.remove(remove_key)
+                for search_key in keys:
+                    if search_key == remove_key:
+                        self.assertFalse(search_key in tree)
+                    else:
+                        self.assertTrue(search_key in tree)
 
     def test_delete_node(self):
         tree = RBTree(self.default_values1)
         del tree[57]
         self.assertFalse(57 in tree)
 
-    def test_random_numbers(self):
-        tree = RBTree()
-        for x in xrange(100):
-            val = randint(0, 10000)
-            tree[val] = val
-        self.assertGreater(len(tree), 0)
+    def test_remove_random_numbers(self):
+        #keys = list(set([randint(0, 10000) for _ in xrange(1000)]))
+        with open('testkey.txt') as fp:
+            keys = eval(fp.read())
+        tree = RBTree.fromkeys(keys)
+        draw_tree(tree, 'rbtree.dxf').save()
+        self.assertEqual(len(tree), len(keys))
+        for key in keys:
+            del tree[key]
+        self.assertEqual(len(tree), 0)
+
+    def test_order(self):
+        keys = set([randint(0, 10000) for _ in xrange(1000)])
+        tree = RBTree.fromkeys(keys)
         generator = iter(tree)
         a = generator.next()
         for b in generator:
             self.assertGreaterEqual(b, a)
+            a = b
 
     def test_index_operator(self):
         tree = RBTree(self.default_values1)

@@ -194,11 +194,13 @@ class RBTree(BaseTree):
         else:
             if node.left is None:
                 child = node.right
+                self._replace1(node, child)
             elif node.right is None:
                 child = node.left
-            else: #left and right not nil
+                self._replace1(node, child)
+            else: #left and right != None
                 child = self._smallest_node(node.right)
-            self._replace(node, child)
+                self._replace2(node, child)
             if (node.color == _BLACK) and (child is not None):
                 if child.color == _RED:
                     child.color == _BLACK
