@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: test binary trees
+# Purpose: test JSWRBTrees
 # Created: 28.04.2010
 
 import unittest
 
 from tree_test import TestAbstTree
-from bintrees.rbtree import RBTree
+from bintrees.jsw_rbtree import JSWRBTree
 
-class TestRBTree(TestAbstTree):
+class TestJSWRBTree(TestAbstTree):
     def setUp(self):
-        self.TREE = RBTree
+        self.TREE = JSWRBTree
 
 if __name__=='__main__':
     unittest.main()
