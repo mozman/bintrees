@@ -1,9 +1,34 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman
-# Purpose: red-black tree module (Julienne Walker Top-down Algorithm)
+# Author:  mozman (python version)
+# Purpose: red-black tree module (Julienne Walker Top-Down Algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 # Created: 01.05.2010
+
+# Conclusion of Julian Walker
+
+# Red black trees are interesting beasts. They're believed to be simpler than
+# AVL trees (their direct competitor), and at first glance this seems to be the
+# case because insertion is a breeze. However, when one begins to play with the
+# deletion algorithm, red black trees become very tricky. However, the
+# counterweight to this added complexity is that both insertion and deletion
+# can be implemented using a single pass, top-down algorithm. Such is not the
+# case with AVL trees, where only the insertion algorithm can be written top-down.
+# Deletion from an AVL tree requires a bottom-up algorithm.
+
+# So when do you use a red black tree? That's really your decision, but I've
+# found that red black trees are best suited to largely random data that has
+# occasional degenerate runs, and searches have no locality of reference. This
+# takes full advantage of the minimal work that red black trees perform to
+# maintain balance compared to AVL trees and still allows for speedy searches.
+
+# Red black trees are popular, as most data structures with a whimsical name.
+# For example, in Java and C++, the library map structures are typically
+# implemented with a red black tree. Red black trees are also comparable in
+# speed to AVL trees. While the balance is not quite as good, the work it takes
+# to maintain balance is usually better in a red black tree. There are a few
+# misconceptions floating around, but for the most part the hype about red black
+# trees is accurate.
 
 from basetree import BaseTree
 
@@ -25,22 +50,15 @@ class Node(object):
         self.value = None
 
     def __getitem__(self, key):
-        """Get left or right node by index"""
-        if key == 0:
-            return self.left
-        elif key == 1:
-            return self.right
-        else:
-            raise KeyError(str(key))
+        """Get left (==0) or right (==1) node by index"""
+        return self.left if key == 0 else self.right
 
     def __setitem__(self, key, value):
-        """Set left or right node by index"""
+        """Set left (==0) or right (==1) node by index"""
         if key == 0:
             self.left = value
-        elif key == 1:
-            self.right = value
         else:
-            raise KeyError(str(key))
+            self.right = value
 
 def is_red(node):
     if (node is not None) and node.red:
@@ -72,7 +90,6 @@ class RBTree(BaseTree):
         return Node(key, value)
 
     def insert(self, key, value):
-        # does not work !?
         compare = self.compare
         if self.root is None: # Empty tree case
             self.root = self.new_node(key, value)
