@@ -64,7 +64,7 @@ def jsw_double (root, direction):
 
 class RBTree(BaseTree):
     def copy(self):
-        return JSWRBTree(self) # has no problem with sorted keys
+        return RBTree(self) # has no problem with sorted keys
     __copy__ = copy
 
     def new_node(self, key, value):
