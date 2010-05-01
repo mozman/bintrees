@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: cython abstract tree module
+# Purpose: cython avltree module
 # Created: 28.04.2010
 
 from itertools import izip
@@ -17,7 +17,7 @@ cdef class Node:
     cdef object value
     cdef int balance
 
-    def __init__(self, object key=None, object value=None):
+    def __init__(self, key=None, value=None):
         self.left = None
         self.right = None
         self.key = key
@@ -68,9 +68,10 @@ cdef Node jsw_single(Node root, int direction):
     save.balance = imax(slh, root.balance) + 1
     return save
 
-def jsw_double(root, direction):
+cdef Node jsw_double(Node root, int direction):
+    cdef int other_side
     other_side = 1 - direction
-    root[other_side] = jsw_single(root[other_side], other_side)
+    root[other_side] = jsw_single(root.link(other_side), other_side)
     return jsw_single(root, direction)
 
 cdef void tree_to_str(Node node, result):
@@ -238,7 +239,8 @@ cdef class cAVLTree:
 
     @classmethod
     def fromkeys(cls, iterable, value=None):
-        tree = cls()
+        cdef cAVLTree tree
+        tree = cAVLTree()
         for key in iterable:
             tree.insert(key, value)
         return tree
@@ -269,7 +271,7 @@ cdef class cAVLTree:
 
     def popitem(self):
         cdef Node node
-        if self.is_empty():
+        if self.root is None:
             raise KeyError("popitem(): tree is empty")
         node = get_leaf(self.root)
         result = (node.key, node.value)
@@ -296,10 +298,10 @@ cdef class cAVLTree:
         self._count += 1
         return Node(key, value)
 
-    def insert(self, key, value):
+    cdef void insert(self, key, value):
         cdef int dir_stack[MAXSTACK]
-        cdef Node node
-        cdef int top, direction
+        cdef Node node, a, b
+        cdef int top, direction, other_side
         cdef int left_height, right_height
         cdef bint done
 
@@ -361,10 +363,10 @@ cdef class cAVLTree:
                 node.balance = imax(left_height, right_height) + 1
                 top -= 1
 
-    def remove(self, key):
+    cdef void remove(self, key) except *:
         cdef int dir_stack[MAXSTACK]
-        cdef Node node, tmp, heir
-        cdef int top, direction, xdir, b_max
+        cdef Node node, tmp, heir, a, b
+        cdef int top, direction, xdir, b_max, other_side
         cdef int left_height, right_height
         cdef bint done
 

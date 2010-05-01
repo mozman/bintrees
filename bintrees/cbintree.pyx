@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: cython abstract tree module
+# Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
 from itertools import izip
@@ -15,7 +15,7 @@ cdef class Node:
     cdef object key
     cdef object value
 
-    def __init__(self, object key, object value):
+    def __init__(self, key, value):
         self.left = None
         self.right = None
         self.key = key
@@ -106,11 +106,14 @@ cdef class cBinaryTree:
         self.update(items)
 
     def copy(self):
+        cdef cBinaryTree newtree
+        cdef Node node
         treekeys = self.keys()
         shuffle(treekeys)  # sorted keys generates a linked list!
         newtree = cBinaryTree()
         for key in treekeys:
-            newtree[key] = self[key]
+            node = self.find_node(key)
+            newtree.insert(key, node.value)
         return newtree
 
     def __copy__(self):
@@ -213,7 +216,8 @@ cdef class cBinaryTree:
 
     @classmethod
     def fromkeys(cls, iterable, value=None):
-        tree = cls()
+        cdef cBinaryTree tree
+        tree = cBinaryTree()
         for key in iterable:
             tree.insert(key, value)
         return tree
@@ -244,7 +248,7 @@ cdef class cBinaryTree:
 
     def popitem(self):
         cdef Node node
-        if self.is_empty():
+        if self.root is None:
             raise KeyError("popitem(): tree is empty")
         node = get_leaf(self.root)
         result = (node.key, node.value)
@@ -272,7 +276,7 @@ cdef class cBinaryTree:
         self._count += 1
         return Node(key, value)
 
-    def insert(self, key, value):
+    cdef void insert(self, key, value):
         cdef Node parent, node
         cdef int direction, cval
 
@@ -296,7 +300,7 @@ cdef class cBinaryTree:
                     direction = 0 if cval < 0 else 1
                     node = node.link(direction)
 
-    def remove(self, key):
+    cdef void remove(self, key) except *:
         cdef Node node, parent, child
         cdef int direction, cmp_res, down_dir
         cdef object tmp

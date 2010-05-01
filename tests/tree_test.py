@@ -57,7 +57,7 @@ class TestAbstTree(unittest.TestCase):
     def test_remove_root_1(self):
         keys = [50,]
         tree = self.TREE.fromkeys(keys)
-        tree.remove(50)
+        del tree[50]
         self.assertTrue(tree.is_empty)
 
     def check_integrity(self, keys, remove_key, tree):
@@ -79,70 +79,70 @@ class TestAbstTree(unittest.TestCase):
         keys = [50, 25]
         tree = self.TREE.fromkeys(keys)
         remove_key = 25
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_child_2(self):
         keys = [50, 25, 12]
         tree = self.TREE.fromkeys(keys)
         remove_key = 25
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_child_3(self):
         keys = [50, 25, 12, 33]
         tree = self.TREE.fromkeys(keys)
         remove_key = 25
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_child_4(self):
         keys = [50, 25, 12, 33, 40]
         tree = self.TREE.fromkeys(keys)
         remove_key = 25
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_child_5(self):
         keys = [50, 25, 12, 33, 40, 37, 43]
         tree = self.TREE.fromkeys(keys)
         remove_key = 25
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_child_6(self):
         keys = [50, 75, 100, 150, 60, 65, 64, 80, 66]
         tree = self.TREE.fromkeys(keys)
         remove_key = 75
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_root_2(self):
         keys = [50, 25, 12, 33, 34]
         tree = self.TREE.fromkeys(keys)
         remove_key = 50
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_root_3(self):
         keys = [50, 25, 12, 33, 34, 75]
         tree = self.TREE.fromkeys(keys)
         remove_key = 50
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_root_4(self):
         keys = [50, 25, 12, 33, 34, 75, 60]
         tree = self.TREE.fromkeys(keys)
         remove_key = 50
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_root_5(self):
         keys = [50, 25, 12, 33, 34, 75, 60, 61]
         tree = self.TREE.fromkeys(keys)
         remove_key = 50
-        tree.remove(remove_key)
+        del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
 
     def test_remove_shuffeld(self):
@@ -152,7 +152,7 @@ class TestAbstTree(unittest.TestCase):
             shuffle(remove_keys)
             for remove_key in remove_keys:
                 tree = self.TREE.fromkeys(keys)
-                tree.remove(remove_key)
+                del tree[remove_key]
                 for search_key in keys:
                     if search_key == remove_key:
                         self.assertFalse(search_key in tree)

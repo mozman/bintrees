@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: cython abstract tree module
+# Purpose: cython red-black-tree module
 # Created: 28.04.2010
 
 from itertools import izip
