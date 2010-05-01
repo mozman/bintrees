@@ -11,7 +11,7 @@ if sys.platform.startswith('linux2'):
     pyximport.install()
 
 from tree_test import TestAbstTree
-from bintrees.ctrees import cRBTree
+from bintrees.crbtree import cRBTree
 
 class TestcRBTree(TestAbstTree):
     @property

@@ -11,7 +11,7 @@ if sys.platform.startswith('linux2'):
     pyximport.install()
 
 from tree_test import TestAbstTree
-from bintrees.ctrees import cAVLTree
+from bintrees.cavltree import cAVLTree
 
 class TestcAVLTree(TestAbstTree):
     @property
