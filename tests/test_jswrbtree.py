@@ -7,12 +7,12 @@
 import unittest
 
 from tree_test import TestAbstTree
-from bintrees.jsw_rbtree import JSWRBTree
+from bintrees.rbtree import RBTree
 
-class TestJSWRBTree(TestAbstTree):
+class TestRBTree(TestAbstTree):
     @property
     def TREE(self):
-        return JSWRBTree
+        return RBTree
 
 if __name__=='__main__':
     unittest.main()
