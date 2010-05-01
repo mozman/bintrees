@@ -26,6 +26,7 @@
 # because of its move-to-front design.
 
 from basetree import BaseTree
+from array import array
 
 __all__ = ['AVLTree']
 
@@ -67,11 +68,11 @@ def jsw_single(root, direction):
     save = root[other_side]
     root[other_side] = save[direction]
     save[direction] = root
-    rlh = height(root[0])
-    rrh = height(root[1])
+    rlh = height(root.left)
+    rrh = height(root.right)
     slh = height(save[other_side])
     root.balance = max(rlh, rrh) + 1
-    save.balance = max(slh, root.balance) +1
+    save.balance = max(slh, root.balance) + 1
     return save
 
 def jsw_double(root, direction):
@@ -107,7 +108,7 @@ class AVLTree(BaseTree):
             self.root = self.new_node(key, value)
         else:
             node_stack = [] # node stack
-            dir_stack = [] # direction stack
+            dir_stack = array('I') # direction stack
             done = False
             top = 0
             node = self.root
@@ -128,20 +129,21 @@ class AVLTree(BaseTree):
             while (top >= 0) and not done:
                 direction = dir_stack[top]
                 other_side = 1 - direction
-                left_height = height(node_stack[top][direction])
-                right_height = height(node_stack[top][other_side])
+                topnode = node_stack[top]
+                left_height = height(topnode[direction])
+                right_height = height(topnode[other_side])
 
                 # Terminate or rebalance as necessary */
                 if (left_height-right_height == 0):
                     done = True
                 if (left_height-right_height >= 2):
-                    a = node_stack[top][direction][direction]
-                    b = node_stack[top][direction][other_side]
+                    a = topnode[direction][direction]
+                    b = topnode[direction][other_side]
 
                     if height(a) >= height(b):
-                        node_stack[top] = jsw_single(node_stack[top], other_side)
+                        node_stack[top] = jsw_single(topnode, other_side)
                     else:
-                        node_stack[top] = jsw_double(node_stack[top], other_side)
+                        node_stack[top] = jsw_double(topnode, other_side)
 
                     # Fix parent
                     if top != 0:
@@ -151,10 +153,11 @@ class AVLTree(BaseTree):
                     done = True
 
                 # Update balance factors
-                left_height = height(node_stack[top][direction])
-                right_height = height(node_stack[top][other_side])
+                topnode = node_stack[top]
+                left_height = height(topnode[direction])
+                right_height = height(topnode[other_side])
 
-                node_stack[top].balance = max(left_height, right_height) + 1
+                topnode.balance = max(left_height, right_height) + 1
                 top -= 1
 
     def remove(self, key):
@@ -163,7 +166,7 @@ class AVLTree(BaseTree):
         else:
             compare = self.compare
             node_stack = [None] * MAXSTACK # node stack
-            dir_stack = [0] * MAXSTACK # direction stack
+            dir_stack = array('I', [0] * MAXSTACK) # direction stack
             top = 0
             node = self.root
 
@@ -196,7 +199,7 @@ class AVLTree(BaseTree):
                 self._count -= 1
             else:
                 # Find the inorder successor
-                heir = node[1]
+                heir = node.right
 
                 # Save the path
                 dir_stack[top] = 1
@@ -224,23 +227,24 @@ class AVLTree(BaseTree):
             while top >= 0:
                 direction = dir_stack[top]
                 other_side = 1 - direction
-                left_height = height(node_stack[top][direction])
-                right_height = height(node_stack[top][other_side])
+                topnode = node_stack[top]
+                left_height = height(topnode[direction])
+                right_height = height(topnode[other_side])
                 b_max = max(left_height, right_height)
 
                 # Update balance factors
-                node_stack[top].balance = b_max + 1
+                topnode.balance = b_max + 1
 
                 # Terminate or rebalance as necessary
                 if (left_height - right_height) == -1:
                     break
                 if (left_height - right_height) <= -2:
-                    a = node_stack[top][other_side][direction]
-                    b = node_stack[top][other_side][other_side]
+                    a = topnode[other_side][direction]
+                    b = topnode[other_side][other_side]
                     if height(a) <= height(b):
-                        node_stack[top] = jsw_single(node_stack[top], direction)
+                        node_stack[top] = jsw_single(topnode, direction)
                     else:
-                        node_stack[top] = jsw_double(node_stack[top], direction)
+                        node_stack[top] = jsw_double(topnode, direction)
                     # Fix parent
                     if top != 0:
                         node_stack[top-1][dir_stack[top-1]] = node_stack[top]
