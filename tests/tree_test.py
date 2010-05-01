@@ -161,7 +161,7 @@ class TestAbstTree(unittest.TestCase):
 
     def test_remove_random_numbers(self):
         try:
-            with open('xtestkey.txt') as fp:
+            with open('xtestkey.txt') as fp: # if you need known keys
                 keys = eval(fp.read())
         except IOError:
             keys = list(set([randint(0, 10000) for _ in xrange(1000)]))

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: test JSWRBTrees
+# Purpose: test RBTrees
 # Created: 28.04.2010
 
 import unittest

@@ -11,7 +11,7 @@ __all__ = ['RBTree']
 
 class Node(object):
     __slots__ = ['key', 'value', 'red', 'left', 'right']
-    def __init__(self, key, value):
+    def __init__(self, key=None, value=None):
         self.key = key
         self.value = value
         self.red = True
@@ -79,7 +79,7 @@ class RBTree(BaseTree):
             self.root.red = False # make root black
             return
 
-        head = Node(0, 0) # False tree root
+        head = Node() # False tree root
         grandparent = None # Grandparent
         t = head # parent
         p = None # Iterator
@@ -133,7 +133,7 @@ class RBTree(BaseTree):
         compare = self.compare
         if self.root is None:
             return
-        head = Node(0, 0) # False tree root
+        head = Node() # False tree root
         node = head
         node.right = self.root
         parent = None
@@ -191,31 +191,3 @@ class RBTree(BaseTree):
         self.root = head.right
         if self.root is not None:
             self.root.red = False
-
-def jsw_rb_assert(root):
-    if root is None:
-        return 1
-    else:
-        left_node = root.left
-        right_node = root.right
-        # Consecutive red links
-        if is_red(root):
-            if is_red(left_node) or is_red(right_node):
-                print("Red violation")
-                return 0
-    lh = jsw_rb_assert(left_node)
-    rh = jsw_rb_assert(right_node)
-    # Invalid binary search tree
-    if ((left_node is not None) and (left_node.key >= root.key)) or \
-         ((right_node is not None) and (right_node.key <= root.key)):
-        print("Binary tree violation")
-        return 0
-    # Black height mismatch
-    if (lh != 0) and (rh != 0) and (lh != rh ):
-        print("Black violation")
-        return 0
-    # Only count black links
-    if (lh != 0) and (rh != 0):
-        return lh if is_red(root) else lh + 1
-    else:
-        return 0
