@@ -10,8 +10,9 @@ from tree_test import TestAbstTree
 from bintrees.jsw_rbtree import JSWRBTree
 
 class TestJSWRBTree(TestAbstTree):
-    def setUp(self):
-        self.TREE = JSWRBTree
+    @property
+    def TREE(self):
+        return JSWRBTree
 
 if __name__=='__main__':
     unittest.main()

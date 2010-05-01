@@ -10,8 +10,9 @@ from tree_test import TestAbstTree
 from bintrees.avltree import AVLTree
 
 class TestAVLTree(TestAbstTree):
-    def setUp(self):
-        self.TREE = AVLTree
+    @property
+    def TREE(self):
+        return AVLTree
 
 if __name__=='__main__':
     unittest.main()

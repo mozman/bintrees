@@ -33,9 +33,9 @@ def draw_tree(tree, fname, key=-1):
 class TestAbstTree(unittest.TestCase):
     default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
     default_values2 = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
-
-    def setUp(self):
-        self.TREE = dict
+    @property
+    def TREE(self):
+        return dict
 
     def test_create_tree(self):
         tree = self.TREE()
@@ -44,6 +44,7 @@ class TestAbstTree(unittest.TestCase):
         self.assertEqual(len(tree), 6)
 
     def test_iter_tree(self):
+
         tree = self.TREE(self.default_values1)
         result = list(iter(tree))
         self.assertEqual(result, [12, 16, 34, 35, 45, 57])
@@ -159,7 +160,11 @@ class TestAbstTree(unittest.TestCase):
                         self.assertTrue(search_key in tree)
 
     def test_remove_random_numbers(self):
-        keys = list(set([randint(0, 10000) for _ in xrange(1000)]))
+        try:
+            with open('xtestkey.txt') as fp:
+                keys = eval(fp.read())
+        except IOError:
+            keys = list(set([randint(0, 10000) for _ in xrange(1000)]))
         shuffle(keys)
         tree = self.TREE.fromkeys(keys)
         self.assertEqual(len(tree), len(keys))

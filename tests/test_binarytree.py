@@ -10,8 +10,9 @@ from tree_test import TestAbstTree
 from bintrees.bintree import BinaryTree
 
 class TestBinaryTree(TestAbstTree):
-    def setUp(self):
-        self.TREE = BinaryTree
+    @property
+    def TREE(self):
+        return BinaryTree
 
 if __name__=='__main__':
     unittest.main()
