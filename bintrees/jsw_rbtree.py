@@ -51,7 +51,7 @@ def is_red(node):
 def jsw_single (root, direction):
     other_side = 1 - direction
     save = root[other_side]
-    root[other_side] = save[direction];
+    root[other_side] = save[direction]
     save[direction] = root
     root.red = True
     save.red = False
@@ -72,16 +72,17 @@ class JSWRBTree(BaseTree):
         return Node(key, value)
 
     def insert(self, key, value):
+        # does not work !?
         compare = self.compare
         if self.root is None: # Empty tree case
             self.root = self.new_node(key, value)
+            self.root.red = False # make root black
             return
 
         head = Node(0, 0) # False tree root
         grandparent = None # Grandparent
         t = head # parent
         p = None # Iterator
-        q = None # parent
         direction = 0
         last = 0
 
@@ -107,13 +108,13 @@ class JSWRBTree(BaseTree):
                     t[direction2] = jsw_double(grandparent, 1-last)
 
             # Stop if found
-            cmp_res = compare(q.key, key)
+            cmp_res = compare(key, q.key)
             if cmp_res == 0:
-                q.value = value
+                q.value = value #set new value for key
                 break
-            last = direction
 
-            if cmp_res > 0:
+            last = direction
+            if cmp_res < 0:
                 direction = 0 # key < q.key
             else:
                 direction = 1 # key > q.key
@@ -123,11 +124,10 @@ class JSWRBTree(BaseTree):
                 t = grandparent
             grandparent = p
             p = q
-            q = q[direction];
+            q = q[direction]
 
         self.root = head[1] # Update root
         self.root.red = False # make root black
-
 
     def remove(self, key):
         compare = self.compare
@@ -156,7 +156,7 @@ class JSWRBTree(BaseTree):
                 found = node
 
             # Push the red node down
-            if (not isred(node)) and (not is_red(node[direction])):
+            if (not is_red(node)) and (not is_red(node[direction])):
                 if is_red(node[1-direction]):
                     parent[last] = jsw_single(node, direction)
                     parent = parent[last]
@@ -185,6 +185,7 @@ class JSWRBTree(BaseTree):
             found.value = node.value
             parent[int(parent.right == node)] = node[int(node.left == None)]
             node.free()
+            self._count -= 1
 
         # Update root and make it black
         self.root = head.right

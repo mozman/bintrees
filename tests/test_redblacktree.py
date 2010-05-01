@@ -10,8 +10,9 @@ from tree_test import TestAbstTree
 from bintrees.rbtree import RBTree
 
 class TestRBTree(TestAbstTree):
-    def setUp(self):
-        self.TREE = RBTree
+    @property
+    def TREE(self):
+        return RBTree
 
 if __name__=='__main__':
     unittest.main()
