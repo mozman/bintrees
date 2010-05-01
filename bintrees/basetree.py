@@ -42,6 +42,7 @@ class BaseTree(object):
                 _clear(node.right)
                 node.free()
         _clear(self.root)
+        self._count = 0
         self.root = None
 
     def __len__(self):

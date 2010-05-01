@@ -19,11 +19,11 @@ class Node(object):
         self.right = None
 
     def __getitem__(self, key):
-        """Get left (==0) or right (==1) node by index"""
+        """Get left (key==0) or right (key==1) node by index"""
         return self.left if key == 0 else self.right
 
     def __setitem__(self, key, value):
-        """Set left (==0) or right (==1) node by index"""
+        """Set left (key==0) or right (key==1) node by index"""
         if key == 0:
             self.left = value
         else:
@@ -34,11 +34,6 @@ class Node(object):
         self.right = None
         self.value = None
         self.key = None
-
-def _smallest_node(node):
-    while node.left is not None:
-        node = node.left
-    return node
 
 class BinaryTree(BaseTree):
     def copy(self):
@@ -82,7 +77,7 @@ class BinaryTree(BaseTree):
     def remove(self, key):
         node = self.root
         if node is None:
-            return
+            raise KeyError(str(key))
         else:
             compare = self.compare
             parent = None
@@ -90,8 +85,13 @@ class BinaryTree(BaseTree):
             while True:
                 cmp_res = compare(key, node.key)
                 if cmp_res == 0:
+                    # remove node
                     if (node.left is not None) and (node.right is not None):
-                        child = _smallest_node(node.right)
+                        # find replacment node: smallest key in right-subtree
+                        child = node.right
+                        while child.left is not None:
+                            child = child.left
+
                         #swap places
                         child.key, node.key = node.key, child.key
                         child.value, node.value = node.value, child.value

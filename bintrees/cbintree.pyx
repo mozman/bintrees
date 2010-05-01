@@ -7,7 +7,7 @@
 from itertools import izip
 from random import shuffle
 
-__all__ = ['cBinaryTree', 'cRBTree', 'cAVLTree']
+__all__ = ['cBinaryTree']
 
 cdef class Node:
     cdef Node left
@@ -94,7 +94,7 @@ cdef Node get_leaf(Node node):
         else:
             return node
 
-cdef class cBaseTree:
+cdef class cBinaryTree:
     cdef object root
     cdef object compare
     cdef int _count
@@ -278,7 +278,6 @@ cdef class cBaseTree:
             else:
                 node = node.right
 
-cdef class cBinaryTree(cBaseTree):
     def copy(self):
         treekeys = self.keys()
         shuffle(treekeys)  # sorted keys generates a linked list!
@@ -290,7 +289,7 @@ cdef class cBinaryTree(cBaseTree):
     def __len__(self):
         return self._count
 
-    def new_node(self, key, value):
+    cdef Node new_node(self, key, value):
         """Create a new tree node."""
         self._count += 1
         return Node(key, value)
@@ -369,223 +368,3 @@ cdef class cBinaryTree(cBaseTree):
                     node = node.link(direction)
                     if node is None:
                         raise KeyError(str(key))
-
-cdef class xRBNode(Node):
-    cdef bint red
-
-    def __init__(self, object key=None, object value=None):
-        Node.__init__(self, key, value)
-        self.red = True
-
-cdef class RBNode:
-    cdef RBNode left
-    cdef RBNode right
-    cdef object key
-    cdef object value
-    cdef bint red
-
-    def __init__(self, object key=None, object value=None):
-        self.left = None
-        self.right = None
-        self.key = key
-        self.value = value
-        self.red = True
-
-    cdef RBNode link(self, int key):
-        """Get left (key==0) or right (key==1) node by index"""
-        # this is a little bit faster as __getitem__
-        return self.left if key == 0 else self.right
-
-    def __getitem__(self, int key):
-        """Get left (key==0) or right (key==1) node by index"""
-        return self.left if key == 0 else self.right
-
-    def __setitem__(self, int key, value):
-        """Set left (key==0) or right (key==1) node by index"""
-        if key == 0:
-            self.left = value
-        else:
-            self.right = value
-
-    cdef void free(self):
-        self.left = None
-        self.right = None
-        self.key = None
-        self.value = None
-
-cdef bint is_red(RBNode node):
-    if (node is not None) and node.red:
-        return True
-    else:
-        return False
-
-cdef RBNode rb_single(RBNode root, int direction):
-    cdef int other_side
-    cdef RBNode save
-
-    other_side = 1 - direction
-    save = root.link(other_side)
-    root[other_side] = save.link(direction)
-    save[direction] = root
-    root.red = True
-    save.red = False
-    return save
-
-cdef RBNode rb_double(RBNode root, int direction):
-    cdef int otherside
-    other_side = 1 - direction
-    root[other_side] = rb_single(root.link(other_side), other_side)
-    return rb_single(root, direction)
-
-cdef class cRBTree(cBaseTree):
-    def copy(self):
-        return cRBTree(self) # has no problem with sorted keys
-
-    def new_node(self, key, value):
-        self._count += 1
-        return RBNode(key, value)
-
-    def insert(self, key, value):
-        cdef RBNode head, t, grandparent, node, q
-        cdef int direction, direction2, last, cmp_res
-
-        compare = self.compare
-        if self.root is None: # Empty tree case
-            head = self.new_node(key, value)
-            head.red = False # make root black
-            self.root = head
-            return
-
-        head = RBNode() # False tree root
-        grandparent = None # Grandparent
-        t = head # parent
-        node = None # Iterator
-        direction = 0
-        last = 0
-
-        # Set up helpers
-        t.right = self.root
-        q = t.right
-        # Search down the tree
-        while True:
-            if (q is None):# Insert new node at the bottom
-                q = self.new_node(key, value)
-                node[direction] = q
-            elif is_red(q.left) and is_red(q.right):# Color flip
-                q.red = True
-                q.left.red = False
-                q.right.red = False
-
-            # Fix red violation
-            if is_red(q) and is_red(node):
-                direction2 = 1 if t.right is grandparent else 0
-                if q is node.link(last):
-                    t[direction2] = rb_single(grandparent, 1-last)
-                else:
-                    t[direction2] = rb_double(grandparent, 1-last)
-
-            # Stop if found
-            cmp_res = compare(key, q.key)
-            if cmp_res == 0:
-                q.value = value #set new value for key
-                break
-
-            last = direction
-            if cmp_res < 0:
-                direction = 0 # key < q.key
-            else:
-                direction = 1 # key > q.key
-
-            # Update helpers
-            if grandparent is not None:
-                t = grandparent
-            grandparent = node
-            node = q
-            q = q.link(direction)
-
-        head.red = False # make root black
-        self.root = head.right # Update root
-
-    def remove(self, key):
-        cdef RBNode head, node, parent, grandparent, found
-        cdef int direction, last, direction2
-
-        if self.root is None:
-            raise KeyError(str(key))
-        compare = self.compare
-        head = RBNode() # False tree root
-        node = head
-        node.right = self.root
-        parent = None
-        grandparent = None
-        found = None # Found item
-        direction = 1
-
-        # Search and push a red down
-        while (node.link(direction) is not None):
-            last = direction
-
-            # Update helpers
-            grandparent = parent
-            parent = node
-            node = node.link(direction)
-            direction = int(compare(node.key, key) < 0)
-
-            # Save found node
-            if compare(node.key, key) == 0:
-                found = node
-
-            # Push the red node down
-            if (not is_red(node)) and (not is_red(node.link(direction))):
-                if is_red(node.link(1-direction)):
-                    parent[last] = rb_single(node, direction)
-                    parent = parent.link(last)
-                elif not is_red(node.link(1-direction)):
-                    s = parent.link(1-last)
-                    if s is not None:
-                        if (not is_red(s.link(1-last))) and \
-                           (not is_red(s.link(last))):
-                            # Color flip
-                            parent.red = False
-                            s.red = True
-                            node.red = True
-                        else:
-                            direction2 = int(grandparent.right == parent)
-                            if is_red(s.link(last)):
-                                grandparent[direction2] = rb_double(parent, last)
-                            elif is_red(s.link(1-last)):
-                                grandparent[direction2] = rb_single(parent, last)
-                            # Ensure correct coloring
-                            grandparent.link(direction2).red = True
-                            node.red = True
-                            grandparent[direction2].left.red = False
-                            grandparent[direction2].right.red = False
-
-        # Replace and remove if found
-        if found is not None:
-            found.key = node.key
-            found.value = node.value
-            parent[int(parent.right == node)] = node[int(node.left == None)]
-            node.free()
-            self._count -= 1
-
-        # Update root and make it black
-        self.root = head.right
-        if self.root is not None:
-            self.root.red = False
-
-cdef class AVLNode(Node):
-    cdef int height
-
-    def __init__(self, key=None, value=None):
-        Node.__init__(self, key, value)
-        self.balance = 0
-
-cdef class cAVLTree(cBaseTree):
-    def copy(self):
-        return cAVLTree(self)
-    __copy__ = copy
-
-    def new_node(self, key, value):
-        self._count += 1
-        return AVLNode(key, value)
