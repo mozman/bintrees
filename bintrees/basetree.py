@@ -189,18 +189,6 @@ class BaseTree(object):
         for key, value in generator:
             self.insert(key, value)
 
-    @staticmethod
-    def _smallest_node(node):
-        while node.left is not None:
-            node = node.left
-        return node
-
-    @staticmethod
-    def _biggest_node(node):
-        while node.right is not None:
-            node = node.right
-        return node
-
     @classmethod
     def fromkeys(cls, iterable, value=None):
         tree = cls()
@@ -266,52 +254,6 @@ class BaseTree(object):
                 node = node.right
             else:
                 return node
-
-    @staticmethod
-    def _link_nodes(parent, child, left=True):
-        if parent is not None:
-            if left:
-                parent.left=child
-            else:
-                parent.right=child
-        if child is not None:
-            child.parent = parent
-
-    def _set_parent(self, oldnode, newnode):
-        parent = oldnode.parent
-        if parent is None: #root
-            self.root = newnode
-        else:
-            if parent.left is oldnode: # is left node
-                parent.left = newnode
-            else: # is right node
-                parent.right = newnode
-
-    def _replace1(self, oldnode, newnode):
-        """Replace node with one child."""
-        self._count -= 1
-        self._set_parent(oldnode, newnode)
-        if newnode is not None:
-            newnode.parent = oldnode.parent # link to newnode to new parent
-
-    def _replace2(self, oldnode, newnode):
-        """Replace node with two childs."""
-        # works only with newnode = smallest_node!
-
-        self._count -= 1
-        self._set_parent(oldnode, newnode)
-        if newnode is not None:
-            # remove newnode from tree
-            if newnode.parent.left is newnode: # is left node
-                left = True
-            else: # is right node
-                left = False
-            self._link_nodes(newnode.parent, newnode.right, left)
-
-            # replace oldnode with newnode
-            newnode.parent = oldnode.parent # link to newnode to new parent
-            self._link_nodes(newnode, oldnode.left, left=True)
-            self._link_nodes(newnode, oldnode.right, left=False)
 
     def insert(self, data, key):
         raise NotImplementedError
