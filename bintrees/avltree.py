@@ -95,12 +95,17 @@ class AVLTree(BaseTree):
     (searching for a value based on its key), or as a set of keys which is always
     ordered.
     """
+    def __init__(self, items=[], compare=None):
+        BaseTree.__init__(self, items, compare)
+        self._done = True
+
     def copy(self):
         """Returns a shallow copy of this tree"""
         return AVLTree(self) # has no problem with sorted keys
     __copy__ = copy
 
     def new_node(self, key, value):
+        self._count += 1
         return Node(key, value)
 
     def _insert_r(self, root, key, value):
