@@ -246,7 +246,11 @@ class TestAbstTree(unittest.TestCase):
     def test_clear(self):
         tree = self.TREE(self.default_values2)
         tree.clear()
-        self.assertEqual(tree.root, None)
+        self.assertEqual(len(tree), 0)
+        try:
+            self.assertEqual(tree.root, None)
+        except AttributeError:
+            pass # no access to root for cython trees
 
     def test_setdefault(self):
         tree = self.TREE(self.default_values2)

@@ -3,7 +3,7 @@
 # Author:  mozman
 # Purpose: test cAVLTree
 # Created: 28.04.2010
-
+import sys
 import unittest
 
 if sys.platform.startswith('linux2'):
@@ -14,8 +14,9 @@ from tree_test import TestAbstTree
 from bintrees.ctrees import cAVLTree
 
 class TestcAVLTree(TestAbstTree):
-    def setUp(self):
-        self.TREE = cAVLTree
+    @property
+    def TREE(self):
+        return cAVLTree
 
 if __name__=='__main__':
     unittest.main()

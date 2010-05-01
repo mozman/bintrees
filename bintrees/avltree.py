@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman (python version)
-# Purpose: avl tree module (Julienne Walker Recursive Algorithm)
+# Purpose: avl tree module (Julienne Walker's unbounded none recursive  algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_avl.aspx
-# unbounded top-down algorithm
 # Created: 01.05.2010
 
-# Conclusion of Julian Walker
+# Conclusion of Julienne Walker
 
 # AVL trees are about as close to optimal as balanced binary search trees can
 # get without eating up resources. You can rest assured that the O(log N)
@@ -85,7 +84,7 @@ class AVLTree(BaseTree):
     """AVL Tree (balanced binary search tree)
 
     The AVL tree structure is a balanced binary tree which stores a collection of
-    nodes.  Each node has a key and a value associated with it.  The nodes are
+    nodes.  Each node has a key and a value associated with node_stack.  The nodes are
     sorted within the tree based on the order of their keys. Modifications to the
     tree are constructed such that the tree remains balanced at all times (there are
     always roughly equal numbers of nodes on either side of the tree).
@@ -94,10 +93,6 @@ class AVLTree(BaseTree):
     (searching for a value based on its key), or as a set of keys which is always
     ordered.
     """
-    def __init__(self, items=[], compare=None):
-        BaseTree.__init__(self, items, compare)
-        self._done = True
-
     def copy(self):
         """Returns a shallow copy of this tree"""
         return AVLTree(self) # has no problem with sorted keys
@@ -111,16 +106,16 @@ class AVLTree(BaseTree):
         if self.root is None:
             self.root = self.new_node(key, value)
         else:
-            up = []
-            upd = []
+            node_stack = [] # node stack
+            dir_stack = [] # direction stack
             done = False
             top = 0
             node = self.root
             # search for an empty link, save path
             while True:
                 direction = 1 if self.compare(key, node.key) > 0 else 0
-                upd.append(direction)
-                up.append(node)
+                dir_stack.append(direction)
+                node_stack.append(node)
                 if node[direction] is None:
                     break
                 node = node[direction]
@@ -129,121 +124,126 @@ class AVLTree(BaseTree):
             node[direction] = self.new_node(key, value)
 
             # Walk back up the search path
-            top = len(up) - 1
+            top = len(node_stack) - 1
             while (top >= 0) and not done:
-                direction = upd[top]
-                lh = height(up[top][direction])
-                rh = height(up[top][1-direction])
+                direction = dir_stack[top]
+                other_side = 1 - direction
+                left_height = height(node_stack[top][direction])
+                right_height = height(node_stack[top][other_side])
 
                 # Terminate or rebalance as necessary */
-                if (lh-rh == 0):
+                if (left_height-right_height == 0):
                     done = True
-                if (lh-rh >= 2):
-                    a = up[top][direction][direction]
-                    b = up[top][direction][1-direction]
+                if (left_height-right_height >= 2):
+                    a = node_stack[top][direction][direction]
+                    b = node_stack[top][direction][other_side]
 
                     if height(a) >= height(b):
-                        up[top] = jsw_single(up[top], 1-direction)
+                        node_stack[top] = jsw_single(node_stack[top], other_side)
                     else:
-                        up[top] = jsw_double(up[top], 1-direction)
+                        node_stack[top] = jsw_double(node_stack[top], other_side)
 
                     # Fix parent
                     if top != 0:
-                        up[top-1][upd[top-1]] = up[top]
+                        node_stack[top-1][dir_stack[top-1]] = node_stack[top]
                     else:
-                        self.root = up[0]
+                        self.root = node_stack[0]
                     done = True
 
                 # Update balance factors
-                lh = height(up[top][direction])
-                rh = height(up[top][1-direction])
+                left_height = height(node_stack[top][direction])
+                right_height = height(node_stack[top][other_side])
 
-                up[top].balance = max(lh, rh) + 1
+                node_stack[top].balance = max(left_height, right_height) + 1
                 top -= 1
 
     def remove(self, key):
-        if self.root is not None:
+        if self.root is None:
+            raise KeyError(str(key))
+        else:
             compare = self.compare
-            up = [None] * MAXSTACK
-            upd = [0] * MAXSTACK
+            node_stack = [None] * MAXSTACK # node stack
+            dir_stack = [0] * MAXSTACK # direction stack
             top = 0
-            it = self.root
+            node = self.root
 
             while True:
                 # Terminate if not found
-                if it is None:
+                if node is None:
                     raise KeyError(str(key))
-                elif compare(it.key, key)==0:
+                elif compare(node.key, key)==0:
                     break
 
                 # Push direction and node onto stack
-                direction = 1 if compare(key, it.key) > 0 else 0
-                upd[top] = direction
+                direction = 1 if compare(key, node.key) > 0 else 0
+                dir_stack[top] = direction
 
-                up[top] = it
-                it = it[direction]
+                node_stack[top] = node
+                node = node[direction]
                 top += 1
 
             # Remove the node
-            if (it.left is None) or (it.right is None):
+            if (node.left is None) or (node.right is None):
                 # Which child is not null?
-                direction = 1 if it.left is None else 0
+                direction = 1 if node.left is None else 0
 
                 # Fix parent
                 if top != 0:
-                    up[top-1][upd[top-1]] = it[direction]
+                    node_stack[top-1][dir_stack[top-1]] = node[direction]
                 else:
-                    self.root = it[direction]
-                it.free()
+                    self.root = node[direction]
+                node.free()
                 self._count -= 1
             else:
                 # Find the inorder successor
-                heir = it[1]
+                heir = node[1]
 
                 # Save the path
-                upd[top] = 1
-                up[top] = it
+                dir_stack[top] = 1
+                node_stack[top] = node
                 top += 1
 
-                while (heir[0] is not None):
-                    upd[top] = 0
-                    up[top] = heir
+                while (heir.left is not None):
+                    dir_stack[top] = 0
+                    node_stack[top] = heir
                     top += 1
-                    heir = heir[0]
+                    heir = heir.left
 
                 # Swap data
-                it.key = heir.key
-                it.value = heir.value
+                node.key = heir.key
+                node.value = heir.value
 
                 # Unlink successor and fix parent
-                xdir = 1 if compare(up[top-1], it) == 0 else 0
-                up[top-1][xdir] = heir[1]
+                xdir = 1 if compare(node_stack[top-1], node) == 0 else 0
+                node_stack[top-1][xdir] = heir.right
                 heir.free()
                 self._count -= 1
 
             # Walk back up the search path
             top -= 1
             while top >= 0:
-                lh = height(up[top][upd[top]])
-                rh = height(up[top][1-upd[top]])
-                b_max = max(lh, rh)
+                direction = dir_stack[top]
+                other_side = 1 - direction
+                left_height = height(node_stack[top][direction])
+                right_height = height(node_stack[top][other_side])
+                b_max = max(left_height, right_height)
 
                 # Update balance factors
-                up[top].balance = b_max + 1
+                node_stack[top].balance = b_max + 1
 
                 # Terminate or rebalance as necessary
-                if (lh - rh) == -1:
+                if (left_height - right_height) == -1:
                     break
-                if (lh - rh) <= -2:
-                    a = up[top][1-upd[top]][upd[top]]
-                    b = up[top][1-upd[top]][1-upd[top]]
+                if (left_height - right_height) <= -2:
+                    a = node_stack[top][other_side][direction]
+                    b = node_stack[top][other_side][other_side]
                     if height(a) <= height(b):
-                        up[top] = jsw_single(up[top], upd[top])
+                        node_stack[top] = jsw_single(node_stack[top], direction)
                     else:
-                        up[top] = jsw_double(up[top], upd[top])
+                        node_stack[top] = jsw_double(node_stack[top], direction)
                     # Fix parent
                     if top != 0:
-                        up[top-1][upd[top-1]] = up[top]
+                        node_stack[top-1][dir_stack[top-1]] = node_stack[top]
                     else:
-                        self.root = up[0]
+                        self.root = node_stack[0]
                 top -= 1

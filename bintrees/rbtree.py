@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman (python version)
-# Purpose: red-black tree module (Julienne Walker Top-Down Algorithm)
+# Purpose: red-black tree module (Julienne Walker's none recursive algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 # Created: 01.05.2010
 
@@ -50,11 +50,11 @@ class Node(object):
         self.value = None
 
     def __getitem__(self, key):
-        """Get left (==0) or right (==1) node by index"""
+        """Get left (key==0) or right (key==1) node by index"""
         return self.left if key == 0 else self.right
 
     def __setitem__(self, key, value):
-        """Set left (==0) or right (==1) node by index"""
+        """Set left (key==0) or right (key==1) node by index"""
         if key == 0:
             self.left = value
         else:
@@ -99,27 +99,27 @@ class RBTree(BaseTree):
         head = Node() # False tree root
         grandparent = None # Grandparent
         t = head # parent
-        p = None # Iterator
+        node = None # Iterator
         direction = 0
         last = 0
 
         # Set up helpers
-        t[1] = self.root
-        q = t[1]
+        t.right = self.root
+        q = t.right
         # Search down the tree
         while True:
             if (q is None):# Insert new node at the bottom
                 q = self.new_node(key, value)
-                p[direction] = q
-            elif is_red(q[0]) and is_red(q[1]):# Color flip
+                node[direction] = q
+            elif is_red(q.left) and is_red(q.right):# Color flip
                 q.red = True
-                q[0].red = False
-                q[1].red = False
+                q.left.red = False
+                q.right.red = False
 
             # Fix red violation
-            if is_red(q) and is_red(p):
-                direction2 = int(t[1] is grandparent)
-                if q is p[last]:
+            if is_red(q) and is_red(node):
+                direction2 = int(t.right is grandparent)
+                if q is node[last]:
                     t[direction2] = jsw_single(grandparent, 1-last)
                 else:
                     t[direction2] = jsw_double(grandparent, 1-last)
@@ -139,17 +139,17 @@ class RBTree(BaseTree):
             # Update helpers
             if grandparent is not None:
                 t = grandparent
-            grandparent = p
-            p = q
+            grandparent = node
+            node = q
             q = q[direction]
 
-        self.root = head[1] # Update root
+        self.root = head.right # Update root
         self.root.red = False # make root black
 
     def remove(self, key):
-        compare = self.compare
         if self.root is None:
-            return
+            raise KeyError(str(key))
+        compare = self.compare
         head = Node() # False tree root
         node = head
         node.right = self.root
@@ -192,7 +192,8 @@ class RBTree(BaseTree):
                             elif is_red(s[1-last]):
                                 grandparent[direction2] = jsw_single(parent, last)
                             # Ensure correct coloring
-                            node.red = grandparent[direction2].red = True
+                            grandparent[direction2].red = True
+                            node.red = True
                             grandparent[direction2].left.red = False
                             grandparent[direction2].right.red = False
 
