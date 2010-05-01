@@ -3,7 +3,7 @@
 # Author:  mozman (python version)
 # Purpose: avl tree module (Julienne Walker Recursive Algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_avl.aspx
-# unbounded recursive algorithm
+# unbounded top-down algorithm
 # Created: 01.05.2010
 
 # Conclusion of Julian Walker
@@ -30,8 +30,7 @@ from basetree import BaseTree
 
 __all__ = ['AVLTree']
 
-AVL_LEFT = 0
-AVL_RIGHT = 1
+MAXSTACK = 32
 
 class Node(object):
     __slots__ = ['left', 'right', 'balance', 'key', 'value']
@@ -108,91 +107,143 @@ class AVLTree(BaseTree):
         self._count += 1
         return Node(key, value)
 
-    def _insert_r(self, root, key, value):
-        if root is None:
-            root = self.new_node(key, value)
-        else:
-            cmp_res = self.compare(key, root.key)
-            direction = 0 if cmp_res < 0 else 1
-            if cmp_res == 0:
-                root.value = value # replace existing values
-                self._done = True
-            else:
-                root[direction] = self._insert_r(root[direction], key, value)
-
-            if not self._done:
-                # Rebalance if necessary
-                lh = height(root[direction])
-                rh = height(root[1-direction])
-
-                if (lh - rh >= 2):
-                    a = root[direction][direction]
-                    b = root[direction][1-direction]
-
-                    if (height(a) >= height(b)):
-                        root = jsw_single(root, 1-direction)
-                    else:
-                        root = jsw_double(root, 1-direction)
-                    self._done = True
-
-                # Update balance factors
-                lh = height(root[direction])
-                rh = height(root[1-direction])
-                h_max = max(lh, rh)
-                root.balance = h_max + 1
-        return root
-
     def insert(self, key, value):
-        self._done = False
-        self.root = self._insert_r(self.root, key, value)
+        if self.root is None:
+            self.root = self.new_node(key, value)
+        else:
+            up = []
+            upd = []
+            done = False
+            top = 0
+            node = self.root
+            # search for an empty link, save path
+            while True:
+                direction = 1 if self.compare(key, node.key) > 0 else 0
+                upd.append(direction)
+                up.append(node)
+                if node[direction] is None:
+                    break
+                node = node[direction]
 
-    def _remove_r (self, root, key):
-        if root is not None:
-            # Remove node
-            cmp_res = self.compare(root.key, key)
-            if cmp_res == 0:
-                #  Unlink and fix parent
-                if (root[0] is None) or  (root[1] is None):
-                    direction = 1 if root[0] is None else 0
-                    save = root[direction]
-                    root.free()
-                    self._count -= 1
-                    return save
-                else:
-                    # Find inorder predecessor
-                    heir = root[0]
-                    while(heir[1] is not None):
-                        heir = heir[1]
+            # Insert a new node at the bottom of the tree
+            node[direction] = self.new_node(key, value)
 
-                    # Copy and set new search data
-                    root.key = heir.key
-                    root.value = heir.value
-                    key = heir.key
-            cmp_res = self.compare(root.key, key)
-            direction = 1 if cmp_res < 0 else 0
-            root[direction] = self._remove_r(root[direction], key)
+            # Walk back up the search path
+            top = len(up) - 1
+            while (top >= 0) and not done:
+                direction = upd[top]
+                lh = height(up[top][direction])
+                rh = height(up[top][1-direction])
 
-            if not self._done:
-                # Update balance factors
-                lh = height(root[direction])
-                rh = height(root[1-direction])
-                h_max = max(lh, rh)
+                # Terminate or rebalance as necessary */
+                if (lh-rh == 0):
+                    done = True
+                if (lh-rh >= 2):
+                    a = up[top][direction][direction]
+                    b = up[top][direction][1-direction]
 
-                root.balance = h_max + 1
-
-                # Terminate or rebalance as necessary
-                if (lh-rh == -1):
-                    self._done = True
-                if (lh-rh <= -2):
-                    a = root[1-direction][direction]
-                    b = root[1-direction][1-direction]
-
-                    if height(a) <= height(b):
-                        root = jsw_single(root, direction)
+                    if height(a) >= height(b):
+                        up[top] = jsw_single(up[top], 1-direction)
                     else:
-                        root = jsw_double(root, direction)
-        return root
+                        up[top] = jsw_double(up[top], 1-direction)
+
+                    # Fix parent
+                    if top != 0:
+                        up[top-1][upd[top-1]] = up[top]
+                    else:
+                        self.root = up[0]
+                    done = True
+
+                # Update balance factors
+                lh = height(up[top][direction])
+                rh = height(up[top][1-direction])
+
+                up[top].balance = max(lh, rh) + 1
+                top -= 1
 
     def remove(self, key):
-        self._done = False
-        self.root = self._remove_r( self.root, key)
+        if self.root is not None:
+            compare = self.compare
+            up = [None] * MAXSTACK
+            upd = [0] * MAXSTACK
+            top = 0
+            it = self.root
+
+            while True:
+                # Terminate if not found
+                if it is None:
+                    raise KeyError(str(key))
+                elif compare(it.key, key)==0:
+                    break
+
+                # Push direction and node onto stack
+                direction = 1 if compare(key, it.key) > 0 else 0
+                upd[top] = direction
+
+                up[top] = it
+                it = it[direction]
+                top += 1
+
+            # Remove the node
+            if (it.left is None) or (it.right is None):
+                # Which child is not null?
+                direction = 1 if it.left is None else 0
+
+                # Fix parent
+                if top != 0:
+                    up[top-1][upd[top-1]] = it[direction]
+                else:
+                    self.root = it[direction]
+                it.free()
+                self._count -= 1
+            else:
+                # Find the inorder successor
+                heir = it[1]
+
+                # Save the path
+                upd[top] = 1
+                up[top] = it
+                top += 1
+
+                while (heir[0] is not None):
+                    upd[top] = 0
+                    up[top] = heir
+                    top += 1
+                    heir = heir[0]
+
+                # Swap data
+                it.key = heir.key
+                it.value = heir.value
+
+                # Unlink successor and fix parent
+                xdir = 1 if compare(up[top-1], it) == 0 else 0
+                up[top-1][xdir] = heir[1]
+                heir.free()
+                self._count -= 1
+
+            # Walk back up the search path
+            top -= 1
+            while top >= 0:
+                lh = height(up[top][upd[top]])
+                rh = height(up[top][1-upd[top]])
+                b_max = max(lh, rh)
+
+                # Update balance factors
+                up[top].balance = b_max + 1
+
+                # Terminate or rebalance as necessary
+                if (lh - rh) == -1:
+                    break
+                if (lh - rh) <= -2:
+                    a = up[top][1-upd[top]][upd[top]]
+                    b = up[top][1-upd[top]][1-upd[top]]
+                    if height(a) <= height(b):
+                        up[top] = jsw_single(up[top], upd[top])
+                    else:
+                        up[top] = jsw_double(up[top], upd[top])
+                    # Fix parent
+                    if top != 0:
+                        up[top-1][upd[top-1]] = up[top]
+                    else:
+                        self.root = up[0]
+                top -= 1
