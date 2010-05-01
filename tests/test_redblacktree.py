@@ -64,7 +64,7 @@ class TestRBTree(unittest.TestCase):
                 else:
                     self.assertTrue(search_key in tree)
 
-    def test_remove_shuffeld(self):
+    def test_remove_shuffled(self):
         keys = [50, 25, 20, 35, 22, 23, 27, 75, 65, 90, 60, 70, 85, 57, 83, 58]
         data = dict.fromkeys(keys)
         remove_keys = keys[:]
