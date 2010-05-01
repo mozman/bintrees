@@ -54,11 +54,21 @@ class TreeNode(object):
         return self is self.parent.right
 
     @property
+    def has_sibling_2childs(self):
+        sibling = self.sibling
+        if sibling is None or \
+           sibling.left is None or\
+           sibling.right is None: \
+            return False
+        else:
+            return True
+
+    @property
     def sibling(self):
-        _sibiling = self.parent.left
-        if self is _sibiling:
-            _sibiling = self.parent.right
-        return _sibiling
+        _sibling = self.parent.left
+        if self is _sibling:
+            _sibling = self.parent.right
+        return _sibling
 
 class RBTree(BaseTree):
     def copy(self):
@@ -210,7 +220,7 @@ class RBTree(BaseTree):
 
     def _balance_after_delete(self, startnode):
         def case1(node):
-            if (node.parent is not None):
+            if node.parent is not None and node.has_sibling_2childs:
                 case2(node)
 
         def case2(node):
@@ -221,7 +231,8 @@ class RBTree(BaseTree):
                     self._rotate_left(node.parent)
                 else:
                     self._rotate_right(node.parent)
-            case3(node)
+            if node.has_sibling_2childs:
+                case3(node)
 
         def case3(node):
             if (node.parent.color == _BLACK) and \
@@ -230,7 +241,7 @@ class RBTree(BaseTree):
                (node.sibling.right.color == _BLACK):
                 node.sibling.color = _RED
                 case1(node.parent)
-            else:
+            elif node.has_sibling_2childs:
                 case4(node)
 
         def case4(node):

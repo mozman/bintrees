@@ -69,11 +69,11 @@ class TestAVLTree(unittest.TestCase):
         self.assertFalse(57 in tree)
 
     def test_random_numbers(self):
-        # keys = set([randint(0, 10000) for _ in xrange(1000)])
-        with open('testkey.txt') as fp:
-            keys = eval(fp.read())
+        keys = set([randint(0, 10000) for _ in xrange(1000)])
+        #with open('testkey.txt') as fp:
+        #    keys = eval(fp.read())
         tree = AVLTree.fromkeys(keys)
-        draw_tree(tree, 'avltree.dxf').save()
+        #draw_tree(tree, 'avltree.dxf').save()
         self.assertEqual(len(tree), len(keys))
         keystack = []
         for key in keys:
