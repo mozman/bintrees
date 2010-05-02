@@ -187,6 +187,14 @@ class AVLTree(BaseTree):
     min_key(...)
         T.min_key() -> get smallest key of T
 
+    nlargest(...)
+        T.nlargest(n[,pop]) -> get list of n largest items (k, v)
+        If pop is True remove items from T, pop defaults to False
+
+    nsmallest(...)
+        T.nlargest(n[,pop]) -> get list of n smallest items (k, v)
+        If pop is True remove items from T, pop defaults to False
+
     pop(...)
         T.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised

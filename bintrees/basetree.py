@@ -93,6 +93,14 @@ class BaseTree(object):
     min_key(...)
         T.min_key() -> get smallest key of T
 
+    nlargest(...)
+        T.nlargest(n[,pop]) -> get list of n largest items (k, v)
+        If pop is True remove items from T, pop defaults to False
+
+    nsmallest(...)
+        T.nlargest(n[,pop]) -> get list of n smallest items (k, v)
+        If pop is True remove items from T, pop defaults to False
+
     pop(...)
         T.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
@@ -191,19 +199,40 @@ class BaseTree(object):
 
     def keys(self):
         """ T.keys() -> list of T's keys """
-        return list(self.iterkeys())
+        return list(self._iterkeys(0))
+
+    def _iterkeys(self, direction):
+        """ T.iterkeys() -> an iterator over the keys of T
+        direction -- 0 = ascendering; 1 = descendering
+        """
+        node = self.root
+        other = 1 - direction
+        go_down = True
+        stack = list()
+        while True:
+            if node[direction] is not None and go_down:
+                stack.append(node)
+                node = node[direction]
+            else:
+                yield node.key
+                if node[other] is not None:
+                    node = node[other]
+                    go_down = True
+                else:
+                    if not len(stack):
+                        return # all done
+                    node = stack.pop()
+                    go_down = False
 
     def iterkeys(self):
-        """ T.iterkeys() -> an iterator over the keys of T """
-        def _iterkeys(node):
-            if node is not None:
-                for key in _iterkeys(node.left):
-                    yield key
-                yield node.key
-                for key in _iterkeys(node.right):
-                    yield key
-        return _iterkeys(self.root)
+        """ T.iterkeys() -> an iterator over the keys of T
+        """
+        return self._iterkeys(0)
     __iter__ = iterkeys
+
+    def riterkeys(self):
+        """ T.iterkeys() -> reverse iterator over the keys of T """
+        return self._iterkeys(1)
 
     def values(self):
         """ T.values() -> list of T's values """
@@ -387,7 +416,7 @@ class BaseTree(object):
             raise KeyError("tree is empty")
         path = []
         compare = self.compare
-        while True:
+        while node is not None:
             cval = compare(key, node.key)
             if cval == 0:
                 break
@@ -396,8 +425,9 @@ class BaseTree(object):
             else:
                 path.append(node) # predecessor on path to root?
                 node = node.right
-            if node is None:
-                raise KeyError(unicode(key))
+
+        if node is None:
+            raise KeyError(unicode(key))
         # found node of key
         if node.left is not None:
             # find biggest node of left subtree
@@ -406,7 +436,7 @@ class BaseTree(object):
                 node = node.right
             path.append(node)
         else: # left subtree is None
-            if len(path) == 0: # key is smallest in tree
+            if len(path) == 0: # given key is smallest in tree
                 raise KeyError(unicode(key))
 
         # find max key on stack
@@ -426,7 +456,7 @@ class BaseTree(object):
             raise KeyError("tree is empty")
         path = []
         compare = self.compare
-        while True:
+        while node is not None:
             cval = compare(key, node.key)
             if cval == 0:
                 break
@@ -435,8 +465,9 @@ class BaseTree(object):
                 node = node.left
             else:
                 node = node.right
-            if node is None:
-                raise KeyError(unicode(key))
+
+        if node is None:
+            raise KeyError(unicode(key))
         # found node of key
         if node.right is not None:
             # find smallest node of right subtree
@@ -445,7 +476,7 @@ class BaseTree(object):
                 node = node.left
             path.append(node)
         else: # right subtree is None
-            if len(path) == 0: # key is biggest in tree
+            if len(path) == 0: # given key is biggest in tree
                 raise KeyError(unicode(key))
 
         # find min key on stack
@@ -491,6 +522,28 @@ class BaseTree(object):
         """ Get max key of tree, raises KeyError if tree is empty. """
         key, value = self.max_item()
         return key
+
+    def nsmallest(self, n, pop=False):
+        """ T.nsmallest(n) -> get list of n smallest items (k, v).
+        If pop is True, remove items from T.
+        """
+        if pop:
+            return [self.pop_min() for _ in xrange(min(len(self), n))]
+        else:
+            gen = self._iterkeys(0)
+            keys = (next(gen) for _ in xrange(min(len(self), n)))
+            return [(key, self.get(key)) for key in keys]
+
+    def nlargest(self, n, pop=False):
+        """ T.nlargest(n) -> get list of n largest items (k, v).
+        If pop is True remove items from T.
+        """
+        if pop:
+            return [self.pop_max() for _ in xrange(min(len(self), n))]
+        else:
+            gen = self._iterkeys(1)
+            keys = (next(gen) for _ in xrange(min(len(self), n)))
+            return [(key, self.get(key)) for key in keys]
 
     def _check_parent_links(self):
         # used in tests to check the tree integrity

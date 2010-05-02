@@ -344,5 +344,21 @@ class TestAbstTree(unittest.TestCase):
             k, v = tree.pop_max()
             self.assertEqual(key, v)
 
+    def test_nlargest(self):
+        l = range(30)
+        shuffle(l)
+        tree = self.TREE(zip(l, l))
+        result = tree.nlargest(10)
+        chk = [(x,x) for x in range(29, 19, -1)]
+        self.assertEqual(chk, result)
+
+    def test_riterkeys(self):
+        tree = self.TREE(zip(set3, set3))
+        result = reversed(sorted(set3))
+        for key in tree.riterkeys():
+            chk = next(result)
+            self.assertEqual(chk, key)
+
+
 if __name__=='__main__':
     unittest.main()
