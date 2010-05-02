@@ -97,51 +97,47 @@ class RBTree(BaseTree):
             return
 
         head = Node() # False tree root
-        grandparent = None # Grandparent
-        t = head # parent
-        node = None # Iterator
+        grand_parent = None
+        grand_grand_parent = head
+        parent = None # parent
         direction = 0
         last = 0
 
         # Set up helpers
-        t.right = self.root
-        q = t.right
+        grand_grand_parent.right = self.root
+        node = grand_grand_parent.right
         # Search down the tree
         while True:
-            if (q is None):# Insert new node at the bottom
-                q = self.new_node(key, value)
-                node[direction] = q
-            elif is_red(q.left) and is_red(q.right):# Color flip
-                q.red = True
-                q.left.red = False
-                q.right.red = False
+            if node is None: # Insert new node at the bottom
+                node = self.new_node(key, value)
+                parent[direction] = node
+            elif is_red(node.left) and is_red(node.right):# Color flip
+                node.red = True
+                node.left.red = False
+                node.right.red = False
 
             # Fix red violation
-            if is_red(q) and is_red(node):
-                direction2 = int(t.right is grandparent)
-                if q is node[last]:
-                    t[direction2] = jsw_single(grandparent, 1-last)
+            if is_red(node) and is_red(parent):
+                direction2 = 1 if grand_grand_parent.right is grand_parent else 0
+                if node is parent[last]:
+                    grand_grand_parent[direction2] = jsw_single(grand_parent, 1-last)
                 else:
-                    t[direction2] = jsw_double(grandparent, 1-last)
+                    grand_grand_parent[direction2] = jsw_double(grand_parent, 1-last)
 
             # Stop if found
-            cmp_res = compare(key, q.key)
+            cmp_res = compare(key, node.key)
             if cmp_res == 0:
-                q.value = value #set new value for key
+                node.value = value #set new value for key
                 break
 
             last = direction
-            if cmp_res < 0:
-                direction = 0 # key < q.key
-            else:
-                direction = 1 # key > q.key
-
+            direction = 0 if cmp_res < 0 else 1
             # Update helpers
-            if grandparent is not None:
-                t = grandparent
-            grandparent = node
-            node = q
-            q = q[direction]
+            if grand_parent is not None:
+                grand_grand_parent = grand_parent
+            grand_parent = parent
+            parent = node
+            node = node[direction]
 
         self.root = head.right # Update root
         self.root.red = False # make root black
@@ -154,7 +150,7 @@ class RBTree(BaseTree):
         node = head
         node.right = self.root
         parent = None
-        grandparent = None
+        grand_parent = None
         found = None # Found item
         direction = 1
 
@@ -163,13 +159,14 @@ class RBTree(BaseTree):
             last = direction
 
             # Update helpers
-            grandparent = parent
+            grand_parent = parent
             parent = node
             node = node[direction]
-            direction = int(compare(node.key, key) < 0)
+            cmp_res = compare(key, node.key)
+            direction = 1 if cmp_res > 0 else 0
 
             # Save found node
-            if compare(node.key, key) == 0:
+            if cmp_res == 0:
                 found = node
 
             # Push the red node down
@@ -178,30 +175,30 @@ class RBTree(BaseTree):
                     parent[last] = jsw_single(node, direction)
                     parent = parent[last]
                 elif not is_red(node[1-direction]):
-                    s = parent[1-last]
-                    if s is not None:
-                        if (not is_red(s[1-last])) and (not is_red(s[last])):
+                    sibling = parent[1-last]
+                    if sibling is not None:
+                        if (not is_red(sibling[1-last])) and (not is_red(sibling[last])):
                             # Color flip
                             parent.red = False
-                            s.red = True
+                            sibling.red = True
                             node.red = True
                         else:
-                            direction2 = int(grandparent.right == parent)
-                            if is_red(s[last]):
-                                grandparent[direction2] = jsw_double(parent, last)
-                            elif is_red(s[1-last]):
-                                grandparent[direction2] = jsw_single(parent, last)
+                            direction2 = 1 if grand_parent.right is parent else 0
+                            if is_red(sibling[last]):
+                                grand_parent[direction2] = jsw_double(parent, last)
+                            elif is_red(sibling[1-last]):
+                                grand_parent[direction2] = jsw_single(parent, last)
                             # Ensure correct coloring
-                            grandparent[direction2].red = True
+                            grand_parent[direction2].red = True
                             node.red = True
-                            grandparent[direction2].left.red = False
-                            grandparent[direction2].right.red = False
+                            grand_parent[direction2].left.red = False
+                            grand_parent[direction2].right.red = False
 
         # Replace and remove if found
         if found is not None:
             found.key = node.key
             found.value = node.value
-            parent[int(parent.right == node)] = node[int(node.left == None)]
+            parent[int(parent.right is node)] = node[int(node.left is None)]
             node.free()
             self._count -= 1
 

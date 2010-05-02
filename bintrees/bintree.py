@@ -88,17 +88,18 @@ class BinaryTree(BaseTree):
                     # remove node
                     if (node.left is not None) and (node.right is not None):
                         # find replacment node: smallest key in right-subtree
-                        child = node.right
-                        while child.left is not None:
-                            child = child.left
-
-                        #swap places
-                        child.key, node.key = node.key, child.key
-                        child.value, node.value = node.value, child.value
                         parent = node
                         direction = 1
-                        node = node.right
-                        continue
+                        replacement = node.right
+                        while replacement.left is not None:
+                            parent = replacement
+                            direction = 0
+                            replacement = replacement.left
+                        parent[direction] = replacement.right
+                        #swap places
+                        node.key = replacement.key
+                        node.value = replacement.value
+                        node = replacement # delete replacement!
                     else:
                         down_dir = 1 if node.left is None else 0
                         if parent is None: # root
