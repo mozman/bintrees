@@ -1,6 +1,8 @@
 syntax: glob
 build/*.*
 dist/*.*
+*.so
+*.pyd
 *.err
 *.orig
 *.bak
