@@ -8,27 +8,7 @@ import sys
 import unittest2 as unittest
 from random import randint, shuffle
 
-import dxfwrite
-
-def draw_tree(tree, fname, key=-1):
-    def draw_node(node, pos, dx):
-        dwg.add(dxf.text(str(node.key), halign=dxfwrite.CENTER, insert=pos, alignpoint=pos, height=0.1))
-        if node.left is not None:
-            pos2 = (pos[0]-dx, pos[1]+dy)
-            dwg.add(dxf.line(pos, pos2))
-            draw_node(node.left, pos2, dx*fact)
-        if node.right is not None:
-            pos3 = (pos[0]+dx, pos[1]+dy)
-            dwg.add(dxf.line(pos, pos3))
-            draw_node(node.right, pos3, dx*fact)
-    dy = 1
-    fact = 0.45
-    dxf = dxfwrite.DXFEngine
-    dwg = dxf.drawing(fname)
-    if key != -1:
-        dwg.add(dxf.text('before remove key: ' + str(key), insert=(100, 95)))
-    draw_node(tree.root, (100, 100), 60)
-    return dwg
+set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
 
 class TestAbstTree(unittest.TestCase):
     default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
@@ -258,6 +238,111 @@ class TestAbstTree(unittest.TestCase):
         self.assertEqual(value, 12)
         value = tree.setdefault(99, 77)
         self.assertEqual(value, 77)
+
+    def test_min_item(self):
+        tree = self.TREE(zip(set3, set3))
+        min_item = tree.min_item()
+        self.assertEqual(min_item[1], 0)
+
+    def test_max_item(self):
+        tree = self.TREE(zip(set3, set3))
+        max_item = tree.max_item()
+        self.assertEqual(max_item[1], 999)
+
+    def test_min_key(self):
+        tree = self.TREE(zip(set3, set3))
+        self.assertEqual(tree.min_key(), 0)
+
+    def test_max_key(self):
+        tree = self.TREE(zip(set3, set3))
+        self.assertEqual(tree.max_key(), 999)
+
+    def test_prev_item(self):
+        tree = self.TREE(zip(set3, set3))
+        prev_value = None
+        for key in tree.iterkeys():
+            try:
+                prev_item = tree.prev_item(key)
+            except KeyError: # only on first key
+                self.assertEqual(prev_value, None)
+            if prev_value is not None:
+                self.assertEqual(prev_value, prev_item[1])
+            prev_value = key
+
+    def test_succ_item(self):
+        tree = self.TREE(zip(set3, set3))
+        succ_value = None
+        for key in reversed(tree.keys()):
+            try:
+                succ_item = tree.succ_item(key)
+            except KeyError: # only on last key
+                self.assertEqual(succ_value, None)
+            if succ_value is not None:
+                self.assertEqual(succ_value, succ_item[1])
+            succ_value = key
+
+    def test_prev_key(self):
+        tree = self.TREE(zip(set3, set3))
+        pkey = None
+        for key in tree.iterkeys():
+            try:
+                prev_key = tree.prev_key(key)
+            except KeyError: # only on first key
+                self.assertEqual(pkey, None)
+            if pkey is not None:
+                self.assertEqual(pkey, prev_key)
+            pkey = key
+
+    def test_succ_key(self):
+        tree = self.TREE(zip(set3, set3))
+        skey = None
+        for key in reversed(tree.keys()):
+            try:
+                succ_key = tree.succ_key(key)
+            except KeyError: # only on last key
+                self.assertEqual(skey, None)
+            if skey is not None:
+                self.assertEqual(skey, succ_key)
+            skey = key
+
+    def test_succ_prev_key_random_1000(self):
+        keys = list(set([randint(0, 10000) for _ in xrange(1000)]))
+        shuffle(keys)
+        tree = self.TREE.fromkeys(keys)
+
+        skey = None
+        for key in reversed(tree.keys()):
+            try:
+                succ_key = tree.succ_key(key)
+            except KeyError: # only on last key
+                self.assertEqual(skey, None)
+            if skey is not None:
+                self.assertEqual(skey, succ_key)
+            skey = key
+
+        pkey = None
+        for key in tree.iterkeys():
+            try:
+                prev_key = tree.prev_key(key)
+            except KeyError: # only on first key
+                self.assertEqual(pkey, None)
+            if pkey is not None:
+                self.assertEqual(pkey, prev_key)
+            pkey = key
+
+    def test_pop_min(self):
+        tree = self.TREE(zip(set3, set3))
+        keys = sorted(set3[:])
+        for key in keys:
+            k, v = tree.pop_min()
+            self.assertEqual(key, v)
+
+    def test_pop_max(self):
+        tree = self.TREE(zip(set3, set3))
+        keys = sorted(set3[:], reverse=True)
+        for key in keys:
+            k, v = tree.pop_max()
+            self.assertEqual(key, v)
 
 if __name__=='__main__':
     unittest.main()

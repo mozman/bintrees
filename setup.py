@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+#coding:utf-8
+# Author:  mozman
 # to build c-extension:
 # setup.py build_ext --inplace
 

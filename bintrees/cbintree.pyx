@@ -58,12 +58,12 @@ cdef void clear_tree(Node node):
 cdef void traverse_inorder(Node node, object func):
     if node is not None:
         traverse_inorder(node.left, func)
-        func(node.value)
+        func(node.key, node.value)
         traverse_inorder(node.right, func)
 
 cdef void traverse_preorder(Node node, object func):
     if node is not None:
-        func(node.value)
+        func(node.key, node.value)
         traverse_preorder(node.left, func)
         traverse_preorder(node.right, func)
 
@@ -71,7 +71,7 @@ cdef void traverse_postorder(Node node, object func):
     if node is not None:
         traverse_postorder(node.left, func)
         traverse_postorder(node.right, func)
-        func(node.value)
+        func(node.key, node.value)
 
 cdef void add_values(Node node, result):
     if node is not None:
