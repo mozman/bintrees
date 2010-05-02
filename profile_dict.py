@@ -4,89 +4,61 @@
 # Purpose: profile BinaryTree, cBinaryTree
 # Created: 01.05.2010
 
+import sys
 from timeit import Timer
-from bintrees.cbintree import cBinaryTree
-from bintrees.cavltree import cAVLTree
+from random import shuffle
 
 COUNT = 100
-KEYS = 5000
 
 setup_Dict_bd = """
-from __main__ import keys, profile_dict_bd
+from __main__ import keys, dict_build_delete
 """
-setup_cBinaryTree_bd = """
-from __main__ import keys, profile_cbintree_bd
-"""
+
 setup_Dict_b = """
-from __main__ import keys, profile_dict_b
-"""
-setup_cBinaryTree_b = """
-from __main__ import keys, profile_cbintree_b
-"""
-setup_cAVLTree_bd = """
-from __main__ import keys, profile_cavltree_bd
-"""
-setup_cAVLTree_b = """
-from __main__ import keys, profile_cavltree_b
+from __main__ import keys, dict_build
 """
 
-def random_keys():
-    from random import shuffle, randint
-    keys = list(set([randint(0, 1000000) for _ in xrange(KEYS)]))
-    shuffle(keys)
-    return keys
+setup_Dict_s = """
+from __main__ import keys, dict_search, searchdict
+"""
 
-keys = random_keys()
+try:
+    with open('testkeys.txt') as fp:
+        keys = eval(fp.read())
+except IOError:
+    print("create 'testkeys.txt' with profile_bintree.py\n")
+    sys.exit()
 
-def profile_dict_bd():
+searchdict = dict.fromkeys(keys)
+
+def dict_build_delete():
     tree = dict.fromkeys(keys)
     for key in keys:
         del tree[key]
 
-def profile_cbintree_bd():
-    from bintrees.cbintree import cBinaryTree
-    tree = cBinaryTree.fromkeys(keys)
-    for key in keys:
-        del tree[key]
-
-def profile_dict_b():
+def dict_build():
     tree = dict.fromkeys(keys)
 
-def profile_cbintree_b():
-    from bintrees.cbintree import cBinaryTree
-    tree = cBinaryTree.fromkeys(keys)
-
-def profile_cavltree_bd():
-    from bintrees.cavltree import cAVLTree
-    tree = cAVLTree.fromkeys(keys)
+def dict_search():
     for key in keys:
-        del tree[key]
-
-def profile_cavltree_b():
-    from bintrees.cavltree import cAVLTree
-    tree = cAVLTree.fromkeys(keys)
+        obj = searchdict[key]
 
 def print_result(time, text):
     print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
 
 def main():
-    t = Timer("profile_dict_b()", setup_Dict_b)
+    print ("Nodes: {0}".format(len(keys)))
+
+    t = Timer("dict_build()", setup_Dict_b)
     print_result(t.timeit(COUNT), 'dict() build only')
 
-    t = Timer("profile_cbintree_b()", setup_cBinaryTree_b)
-    print_result(t.timeit(COUNT), 'cBinaryTree build only')
-
-    t = Timer("profile_cavltree_b()", setup_cAVLTree_b)
-    print_result(t.timeit(COUNT), 'cAVLTree build only')
-
-    t = Timer("profile_dict_bd()", setup_Dict_bd)
+    t = Timer("dict_build_delete()", setup_Dict_bd)
     print_result(t.timeit(COUNT), 'dict() build & delete')
 
-    t = Timer("profile_cbintree_bd()", setup_cBinaryTree_bd)
-    print_result(t.timeit(COUNT), 'cBinaryTree build & delete')
-
-    t = Timer("profile_cavltree_bd()", setup_cAVLTree_bd)
-    print_result(t.timeit(COUNT), 'cAVLTree build & delete')
+    # shuffle search keys
+    shuffle(keys)
+    t = Timer("dict_search()", setup_Dict_s)
+    print_result(t.timeit(COUNT), 'Dict search')
 
 if __name__=='__main__':
     main()

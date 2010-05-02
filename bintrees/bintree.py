@@ -11,7 +11,7 @@ from basetree import BaseTree
 __all__ = ['BinaryTree']
 
 class Node(object):
-    __slots__ = ['key', 'value', 'left', 'right']
+    #__slots__ = ['key', 'value', 'left', 'right']
     def __init__(self, key, value, parent=None):
         self.key = key
         self.value = value
