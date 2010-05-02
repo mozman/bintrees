@@ -11,32 +11,181 @@ from basetree import BaseTree
 __all__ = ['BinaryTree']
 
 class Node(object):
-    #__slots__ = ['key', 'value', 'left', 'right']
-    def __init__(self, key, value, parent=None):
+    """ Internal object, represents a treenode """
+    __slots__ = ['key', 'value', 'left', 'right']
+    def __init__(self, key, value):
         self.key = key
         self.value = value
         self.left = None
         self.right = None
 
     def __getitem__(self, key):
-        """Get left (key==0) or right (key==1) node by index"""
+        """ x.__getitem__(key) <==> x[key], where key is 0 (left) or 1 (right) """
         return self.left if key == 0 else self.right
 
     def __setitem__(self, key, value):
-        """Set left (key==0) or right (key==1) node by index"""
+        """ x.__setitem__(key, value) <==> x[key]=value, where key is 0 (left) or 1 (right) """
         if key == 0:
             self.left = value
         else:
             self.right = value
 
     def free(self):
+        """ Set references to None """
         self.left = None
         self.right = None
         self.value = None
         self.key = None
 
 class BinaryTree(BaseTree):
+    """
+    BinaryTree implements an unbalanced binary tree with a dict-like interface.
+
+    see: http://en.wikipedia.org/wiki/Binary_tree
+
+    A binary tree is a tree data structure in which each node has at most two
+    children.
+
+    BinaryTree([compare=None]) -> new empty tree.
+        if compare is None, cmp() is used
+        compare(key1, key2) -> -1 if key1 < key2, 0 for key1 == key2 else +1
+    BinaryTree(mapping, [compare=cmpfunc]) -> new tree initialized from a mapping
+        object's (key, value) pairs.
+    BinaryTree(seq) -> new tree initialized as if via:
+        for k, v in seq:
+            T[k] = v
+
+    Methods defined here:
+    __contains__(...)
+        T.__contains__(k) -> True if T has a key k, else False
+
+    __delitem__(...)
+        x.__delitem__(y) <==> del x[y]
+
+    __getitem__(...)
+        x.__getitem__(y) <==> x[y]
+
+    __init__(...)
+        x.__init__(...) initializes x; see x.__class__.__doc__ for signature
+
+    __iter__(...)
+        x.__iter__() <==> iter(x)
+
+    __len__(...)
+        x.__len__() <==> len(x)
+
+    __repr__(...)
+        x.__repr__() <==> repr(x)
+
+    __setitem__(...)
+        x.__setitem__(i, y) <==> x[i]=y
+
+    clear(...)
+        T.clear() -> None.  Remove all items from T.
+
+    copy(...)
+        T.copy() -> a shallow copy of T
+
+    foreach(...)
+        T.foreach(self, func, order) -> visit all nodes of tree and call
+        func(key, value) at each node.
+
+        order -- 'preorder', 'inorder', 'postorder'
+            'preorder' -- func(), traverse left-subtree, traverse right-subtree
+            'inorder' -- traverse left-subtree, func(), traverse right-subtree
+            'postorder' -- traverse left-subtree, traverse right-subtree, func()
+
+    get(...)
+        T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None.
+
+    has_key(...)
+        T.has_key(k) -> True if T has a key k, else False
+
+    insert(key, value)
+        T.insert(key, value) <==> T[key] = value, insert key, value into Tree
+
+    is_empty(...)
+        T.is_empty() -> True if len(T) == 0
+
+    items(...)
+        T.items() -> list of D's (key, value) pairs, as 2-tuples
+
+    iteritems(...)
+        T.iteritems() -> an iterator over the (key, value) items of D
+
+    iterkeys(...)
+        T.iterkeys() -> an iterator over the keys of T
+
+    itervalues(...)
+        T.itervalues() -> an iterator over the values of T
+
+    keys(...)
+        T.keys() -> list of T's keys
+
+    max_item(...)
+        T.max_item() -> get biggest (key, value) pair of T
+
+    max_key(...)
+        T.max_key() -> get biggest key of T
+
+    min_item(...)
+        T.min_item() -> get smallest (key, value) pair of T
+
+    min_key(...)
+        T.min_key() -> get smallest key of T
+
+    pop(...)
+        T.pop(k[,d]) -> v, remove specified key and return the corresponding value.
+        If key is not found, d is returned if given, otherwise KeyError is raised
+
+    popitem(...)
+        T.popitem() -> (k, v), remove and return some (key, value) pair as a
+        2-tuple; but raise KeyError if T is empty.
+
+    pop_min(...)
+        T.pop_min() -> (k, v), remove item with minimum key, raise KeyError if T
+        is empty.
+
+    pop_max(...)
+        T.pop_max() -> (k, v), remove item with maximum key, raise KeyError if T
+        is empty.
+
+    prev_item(...)
+        T.prev_item(key) -> get (k, v) pair, where k is predecessor to key
+
+    prev_key(...)
+        T.prev_key(key) -> k, get the predecessor of key
+
+    remove(...)
+        T.remove(key) <==> del T[key], remove item <key> from tree
+
+    setdefault(...)
+        T.setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
+
+    succ_item(...)
+        T.succ_item(key) -> get (k, v) pair, where k is successor to key
+
+    succ_key(...)
+        T.succ_key(key) -> k, get the successor of key
+
+    update(...)
+        T.update(E) -> None.  Update T from dict/iterable E.
+        If E has a .iteritems() method, does: for (k, v) in E: T[k] = v
+        If E lacks .iteritems() method, does: for (k, v) in iter(E): T[k] = v
+
+    values(...)
+        T.values() -> list of T's values
+
+    ----------------------------------------------------------------------
+    classmethods:
+
+    fromkeys(S[,v])
+        BinaryTree.fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
+        v defaults to None.
+    """
+
     def copy(self):
+        """ T.copy() -> a shallow copy of T """
         treekeys = self.keys()
         shuffle(treekeys)  # sorted keys generates a linked list!
         newtree = BinaryTree()
@@ -45,17 +194,15 @@ class BinaryTree(BaseTree):
         return newtree
     __copy__ = copy
 
-    def __len__(self):
-        return self._count
-
-    def new_node(self, key, value):
-        """Create a new tree node."""
+    def _new_node(self, key, value):
+        """ Create a new tree node. """
         self._count += 1
         return Node(key, value)
 
     def insert(self, key, value):
+        """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
         if self.root is None:
-            self.root = self.new_node(key, value)
+            self.root = self._new_node(key, value)
         else:
             compare = self.compare
             parent = None
@@ -63,7 +210,7 @@ class BinaryTree(BaseTree):
             node = self.root
             while True:
                 if node is None:
-                    parent[direction] = self.new_node(key, value)
+                    parent[direction] = self._new_node(key, value)
                     break
                 cval = compare(key, node.key)
                 if cval == 0: # key exists
@@ -75,6 +222,7 @@ class BinaryTree(BaseTree):
                     node = node[direction]
 
     def remove(self, key):
+        """ T.remove(key) <==> del T[key], remove item <key> from tree """
         node = self.root
         if node is None:
             raise KeyError(str(key))
