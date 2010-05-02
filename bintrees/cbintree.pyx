@@ -301,9 +301,8 @@ cdef class cBinaryTree:
                     node = node.link(direction)
 
     cdef void remove(self, key) except *:
-        cdef Node node, parent, child
+        cdef Node node, parent, replacement
         cdef int direction, cmp_res, down_dir
-        cdef object tmp
 
         node = self.root
         if node is None:
@@ -318,23 +317,18 @@ cdef class cBinaryTree:
                     # remove node
                     if (node.left is not None) and (node.right is not None):
                         # find replacment node: smallest key in right-subtree
-                        child = node.right
-                        while child.left is not None:
-                            child = child.left
-
-                        #swap places
-                        tmp = child.key
-                        child.key = node.key
-                        node.key = tmp
-
-                        tmp = child.value
-                        child.value = node.value
-                        node.value = tmp
-
                         parent = node
                         direction = 1
-                        node = node.right
-                        continue
+                        replacement = node.right
+                        while replacement.left is not None:
+                            parent = replacement
+                            direction = 0
+                            replacement = replacement.left
+                        parent[direction] = replacement.right
+                        #swap places
+                        node.key = replacement.key
+                        node.value = replacement.value
+                        node = replacement # delete replacement node
                     else:
                         down_dir = 1 if node.left is None else 0
                         if parent is None: # root
