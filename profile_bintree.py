@@ -7,65 +7,96 @@
 from timeit import Timer
 from bintrees.bintree import BinaryTree
 from bintrees.cbintree import cBinaryTree
+from random import shuffle
 
 COUNT = 100
 
 setup_BinaryTree_bd = """
-from __main__ import keys, profile_bintree_bd
+from __main__ import keys, bintree_build_delete, BinaryTree
 """
 setup_cBinaryTree_bd = """
-from __main__ import keys, profile_cbintree_bd
+from __main__ import keys, cbintree_build_delete, cBinaryTree
 """
 setup_BinaryTree_b = """
-from __main__ import keys, profile_bintree_b
+from __main__ import keys, bintree_build, BinaryTree
 """
 setup_cBinaryTree_b = """
-from __main__ import keys, profile_cbintree_b
+from __main__ import keys, cbintree_build, cBinaryTree
+"""
+setup_BinaryTree_s = """
+from __main__ import keys, bintree_search, py_searchtree
+"""
+setup_cBinaryTree_s = """
+from __main__ import keys, cbintree_search, cy_searchtree
 """
 
 def random_keys():
     from random import shuffle, randint
-    keys = list(set([randint(0, 10000) for _ in xrange(1000)]))
+    keys = set()
+    while len(keys) < KEYS:
+        keys.add(randint(0, KEYRANGE))
+    keys = list(keys)
     shuffle(keys)
     return keys
+try:
+    with open('testkeys.txt') as fp:
+        keys = eval(fp.read())
+except IOError:
+    keys = random_keys()
 
-keys = random_keys()
+py_searchtree = BinaryTree.fromkeys(keys)
+cy_searchtree = cBinaryTree.fromkeys(keys)
 
-def profile_bintree_bd():
-    from bintrees.bintree import BinaryTree
+def bintree_build_delete():
     tree = BinaryTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
-def profile_cbintree_bd():
-    from bintrees.cbintree import cBinaryTree
+def cbintree_build_delete():
     tree = cBinaryTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
-def profile_bintree_b():
-    from bintrees.bintree import BinaryTree
+def bintree_build():
     tree = BinaryTree.fromkeys(keys)
 
-def profile_cbintree_b():
-    from bintrees.cbintree import cBinaryTree
+def cbintree_build():
     tree = cBinaryTree.fromkeys(keys)
+
+def bintree_search():
+    for key in keys:
+        obj = py_searchtree[key]
+
+def cbintree_search():
+    for key in keys:
+        obj = cy_searchtree[key]
 
 def print_result(time, text):
     print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
 
 def main():
-    t = Timer("profile_bintree_b()", setup_BinaryTree_b)
+    with open('testkeys.txt', 'w') as fp:
+        fp.write(repr(keys))
+    print ("Nodes: {0}".format(len(keys)))
+
+    t = Timer("bintree_build()", setup_BinaryTree_b)
     print_result(t.timeit(COUNT), 'BinaryTree build only')
 
-    t = Timer("profile_cbintree_b()", setup_cBinaryTree_b)
+    t = Timer("cbintree_build()", setup_cBinaryTree_b)
     print_result(t.timeit(COUNT), 'cBinaryTree build only')
 
-    t = Timer("profile_bintree_bd()", setup_BinaryTree_bd)
+    t = Timer("bintree_build_delete()", setup_BinaryTree_bd)
     print_result(t.timeit(COUNT), 'BinaryTree build & delete')
 
-    t = Timer("profile_cbintree_bd()", setup_cBinaryTree_bd)
+    t = Timer("cbintree_build_delete()", setup_cBinaryTree_bd)
     print_result(t.timeit(COUNT), 'cBinaryTree build & delete')
+    # shuffle search keys
+    shuffle(keys)
+    t = Timer("bintree_search()", setup_BinaryTree_s)
+    print_result(t.timeit(COUNT), 'BinaryTree search')
+
+    t = Timer("cbintree_search()", setup_cBinaryTree_s)
+    print_result(t.timeit(COUNT), 'cBinaryTree search')
 
 if __name__=='__main__':
     main()

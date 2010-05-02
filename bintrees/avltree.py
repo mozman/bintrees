@@ -33,8 +33,7 @@ __all__ = ['AVLTree']
 MAXSTACK = 32
 
 class Node(object):
-    __slots__ = ['left', 'right', 'balance', 'key', 'value']
-
+    #__slots__ = ['left', 'right', 'balance', 'key', 'value']
     def __init__(self, key=None, value=None):
         self.left = None
         self.right = None

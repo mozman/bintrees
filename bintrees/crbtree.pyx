@@ -408,7 +408,9 @@ cdef class cRBTree:
         if found is not None:
             found.key = node.key
             found.value = node.value
-            parent[int(parent.right is node)] = node[int(node.left is None)]
+            direction = 1 if parent.right is node else 0
+            direction2 = 1 if node.left is None else 0
+            parent[direction] = node.link(direction2)
             node.free()
             self._count -= 1
 

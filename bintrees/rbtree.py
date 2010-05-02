@@ -35,7 +35,7 @@ from basetree import BaseTree
 __all__ = ['RBTree']
 
 class Node(object):
-    __slots__ = ['key', 'value', 'red', 'left', 'right']
+    #__slots__ = ['key', 'value', 'red', 'left', 'right']
     def __init__(self, key=None, value=None):
         self.key = key
         self.value = value
@@ -155,7 +155,7 @@ class RBTree(BaseTree):
         direction = 1
 
         # Search and push a red down
-        while (node[direction] is not None):
+        while node[direction] is not None:
             last = direction
 
             # Update helpers
@@ -170,7 +170,7 @@ class RBTree(BaseTree):
                 found = node
 
             # Push the red node down
-            if (not is_red(node)) and (not is_red(node[direction])):
+            if not is_red(node) and not is_red(node[direction]):
                 if is_red(node[1-direction]):
                     parent[last] = jsw_single(node, direction)
                     parent = parent[last]
