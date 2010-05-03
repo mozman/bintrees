@@ -4,6 +4,8 @@
 # Purpose: cython avltree module
 # Created: 28.04.2010
 
+from itertools import izip
+
 __all__ = ['cAVLTree']
 
 DEF MAXSTACK = 32
@@ -57,6 +59,12 @@ cdef class Node:
         self._key = None
         self._value = None
 
+cdef void clear_tree(Node node):
+    if node is not None:
+        clear_tree(node.left)
+        clear_tree(node.right)
+        node.free()
+
 cdef inline int imax(int a, int b):
     return a if a > b else b
 
@@ -85,19 +93,13 @@ cdef Node jsw_double(Node root, int direction):
     root[other_side] = jsw_single(root.link(other_side), other_side)
     return jsw_single(root, direction)
 
-cdef void clear_tree(Node node):
-    if node is not None:
-        clear_tree(node._left)
-        clear_tree(node._right)
-        node.free()
-
 cdef class cAVLTree:
     cdef Node _root
     cdef object _compare
     cdef int _count
 
     def __init__(self, items=[], compare=None):
-        self._value = None
+        self._root = None
         self._compare = compare if compare is not None else cmp
         self._count = 0
         self.update(items)
@@ -115,9 +117,9 @@ cdef class cAVLTree:
         return self._count
 
     def clear(self):
-        clear_tree(self._value)
+        clear_tree(self._root)
         self._count = 0
-        self._value = None
+        self._root = None
 
     cdef Node new_node(self, key, value):
         self._count += 1
@@ -127,7 +129,7 @@ cdef class cAVLTree:
         cdef int cval
         cdef Node node
         compare = self._compare
-        node = self._value
+        node = self._root
         while True:
             if node is None:
                 return None
@@ -146,13 +148,13 @@ cdef class cAVLTree:
         cdef int left_height, right_height
         cdef bint done
 
-        if self._value is None:
-            self._value = self.new_node(key, value)
+        if self._root is None:
+            self._root = self.new_node(key, value)
         else:
             node_stack = [] # node stack
             done = False
             top = 0
-            node = self._value
+            node = self._root
             # search for an empty link, save path
             while True:
                 direction = 1 if self._compare(key, node._key) > 0 else 0
@@ -193,7 +195,7 @@ cdef class cAVLTree:
                         node = <Node> node_stack[top-1]
                         node[dir_stack[top-1]] = node_stack[top]
                     else:
-                        self._value = node_stack[0]
+                        self._root = node_stack[0]
                     done = True
 
                 # Update balance factors
@@ -211,13 +213,13 @@ cdef class cAVLTree:
         cdef int left_height, right_height
         cdef bint done
 
-        if self._value is None:
+        if self._root is None:
             raise KeyError(str(key))
         else:
             compare = self._compare
             node_stack = [None] * MAXSTACK # node stack
             top = 0
-            node = self._value
+            node = self._root
 
             while True:
                 # Terminate if not found
@@ -244,7 +246,7 @@ cdef class cAVLTree:
                     tmp = <Node> node_stack[top-1]
                     tmp[dir_stack[top-1]] = node.link(direction)
                 else:
-                    self._value = node.link(direction)
+                    self._root = node.link(direction)
                 node.free()
                 self._count -= 1
             else:
@@ -299,5 +301,5 @@ cdef class cAVLTree:
                     if top != 0:
                         node_stack[top-1][dir_stack[top-1]] = node_stack[top]
                     else:
-                        self._value = node_stack[0]
+                        self._root = node_stack[0]
                 top -= 1
