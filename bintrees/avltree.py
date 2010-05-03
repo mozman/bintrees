@@ -25,7 +25,7 @@
 # items, a splay tree is theoretically better than all of the balanced trees
 # because of its move-to-front design.
 
-from basetree import BaseTree
+from treemixin import TreeMixin
 from array import array
 
 __all__ = ['AVLTree']
@@ -81,7 +81,7 @@ def jsw_double(root, direction):
     return jsw_single(root, direction)
 
 
-class AVLTree(BaseTree):
+class AVLTree(TreeMixin):
     """
     AVLTree implements a balanced binary tree with a dict-like interface.
 
@@ -252,6 +252,35 @@ class AVLTree(BaseTree):
         AVLTree.fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
         v defaults to None.
     """
+    def __init__(self, items=[], compare=None):
+        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
+        self._root = None
+        self._compare = compare if compare is not None else cmp
+        self._count = 0
+        self.update(items)
+
+    def clear(self):
+        """ T.clear() -> None.  Remove all items from T. """
+        def _clear(node):
+            if node is not None:
+                _clear(node.left)
+                _clear(node.right)
+                node.free()
+        _clear(self._root)
+        self._count = 0
+        self._root = None
+
+    @property
+    def count(self):
+        return self._count
+
+    @property
+    def root(self):
+        return self._root
+
+    @property
+    def compare(self):
+        return self._compare
 
     def copy(self):
         """ T.copy() -> a shallow copy of T """
@@ -265,17 +294,17 @@ class AVLTree(BaseTree):
 
     def insert(self, key, value):
         """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
-        if self.root is None:
-            self.root = self._new_node(key, value)
+        if self._root is None:
+            self._root = self._new_node(key, value)
         else:
             node_stack = [] # node stack
             dir_stack = array('I') # direction stack
             done = False
             top = 0
-            node = self.root
+            node = self._root
             # search for an empty link, save path
             while True:
-                direction = 1 if self.compare(key, node.key) > 0 else 0
+                direction = 1 if self._compare(key, node.key) > 0 else 0
                 dir_stack.append(direction)
                 node_stack.append(node)
                 if node[direction] is None:
@@ -310,7 +339,7 @@ class AVLTree(BaseTree):
                     if top != 0:
                         node_stack[top-1][dir_stack[top-1]] = node_stack[top]
                     else:
-                        self.root = node_stack[0]
+                        self._root = node_stack[0]
                     done = True
 
                 # Update balance factors
@@ -323,14 +352,14 @@ class AVLTree(BaseTree):
 
     def remove(self, key):
         """ T.remove(key) <==> del T[key], remove item <key> from tree """
-        if self.root is None:
+        if self._root is None:
             raise KeyError(str(key))
         else:
-            compare = self.compare
+            compare = self._compare
             node_stack = [None] * MAXSTACK # node stack
             dir_stack = array('I', [0] * MAXSTACK) # direction stack
             top = 0
-            node = self.root
+            node = self._root
 
             while True:
                 # Terminate if not found
@@ -356,7 +385,7 @@ class AVLTree(BaseTree):
                 if top != 0:
                     node_stack[top-1][dir_stack[top-1]] = node[direction]
                 else:
-                    self.root = node[direction]
+                    self._root = node[direction]
                 node.free()
                 self._count -= 1
             else:
@@ -411,5 +440,5 @@ class AVLTree(BaseTree):
                     if top != 0:
                         node_stack[top-1][dir_stack[top-1]] = node_stack[top]
                     else:
-                        self.root = node_stack[0]
+                        self._root = node_stack[0]
                 top -= 1
