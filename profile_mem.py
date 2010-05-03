@@ -24,7 +24,6 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-
 def main():
     with open("memory_usage.txt", 'w') as log:
         log.write("Initial memory usage:\n\n")
