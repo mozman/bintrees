@@ -6,7 +6,7 @@
 
 from random import shuffle
 
-from basetree import BaseTree
+from treemixin import TreeMixin
 
 __all__ = ['BinaryTree']
 
@@ -37,7 +37,7 @@ class Node(object):
         self.value = None
         self.key = None
 
-class BinaryTree(BaseTree):
+class BinaryTree(TreeMixin):
     """
     BinaryTree implements an unbalanced binary tree with a dict-like interface.
 
@@ -199,6 +199,35 @@ class BinaryTree(BaseTree):
         BinaryTree.fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
         v defaults to None.
     """
+    def __init__(self, items=[], compare=None):
+        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
+        self._root = None
+        self._compare = compare if compare is not None else cmp
+        self._count = 0
+        self.update(items)
+
+    def clear(self):
+        """ T.clear() -> None.  Remove all items from T. """
+        def _clear(node):
+            if node is not None:
+                _clear(node.left)
+                _clear(node.right)
+                node.free()
+        _clear(self._root)
+        self._count = 0
+        self._root = None
+
+    @property
+    def count(self):
+        return self._count
+
+    @property
+    def root(self):
+        return self._root
+
+    @property
+    def compare(self):
+        return self._compare
 
     def copy(self):
         """ T.copy() -> a shallow copy of T """
@@ -217,13 +246,13 @@ class BinaryTree(BaseTree):
 
     def insert(self, key, value):
         """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
-        if self.root is None:
-            self.root = self._new_node(key, value)
+        if self._root is None:
+            self._root = self._new_node(key, value)
         else:
-            compare = self.compare
+            compare = self._compare
             parent = None
             direction = 0
-            node = self.root
+            node = self._root
             while True:
                 if node is None:
                     parent[direction] = self._new_node(key, value)
@@ -239,11 +268,11 @@ class BinaryTree(BaseTree):
 
     def remove(self, key):
         """ T.remove(key) <==> del T[key], remove item <key> from tree """
-        node = self.root
+        node = self._root
         if node is None:
             raise KeyError(str(key))
         else:
-            compare = self.compare
+            compare = self._compare
             parent = None
             direction = 0
             while True:
@@ -267,7 +296,7 @@ class BinaryTree(BaseTree):
                     else:
                         down_dir = 1 if node.left is None else 0
                         if parent is None: # root
-                            self.root = node[down_dir]
+                            self._root = node[down_dir]
                         else:
                             parent[direction] = node[down_dir]
                     node.free()

@@ -30,7 +30,7 @@
 # misconceptions floating around, but for the most part the hype about red black
 # trees is accurate.
 
-from basetree import BaseTree
+from treemixin import TreeMixin
 
 __all__ = ['RBTree']
 
@@ -81,7 +81,7 @@ def jsw_double (root, direction):
     root[other_side] = jsw_single(root[other_side], other_side)
     return jsw_single(root, direction)
 
-class RBTree(BaseTree):
+class RBTree(TreeMixin):
     """
     RBTree implements a balanced binary tree with a dict-like interface.
 
@@ -251,6 +251,35 @@ class RBTree(BaseTree):
         RBTree.fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
         v defaults to None.
     """
+    def __init__(self, items=[], compare=None):
+        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
+        self._root = None
+        self._compare = compare if compare is not None else cmp
+        self._count = 0
+        self.update(items)
+
+    def clear(self):
+        """ T.clear() -> None.  Remove all items from T. """
+        def _clear(node):
+            if node is not None:
+                _clear(node.left)
+                _clear(node.right)
+                node.free()
+        _clear(self._root)
+        self._count = 0
+        self._root = None
+
+    @property
+    def count(self):
+        return self._count
+
+    @property
+    def root(self):
+        return self._root
+
+    @property
+    def compare(self):
+        return self._compare
 
     def copy(self):
         """ T.copy() -> a shallow copy of T """
@@ -264,10 +293,10 @@ class RBTree(BaseTree):
 
     def insert(self, key, value):
         """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
-        compare = self.compare
-        if self.root is None: # Empty tree case
-            self.root = self._new_node(key, value)
-            self.root.red = False # make root black
+        compare = self._compare
+        if self._root is None: # Empty tree case
+            self._root = self._new_node(key, value)
+            self._root.red = False # make root black
             return
 
         head = Node() # False tree root
@@ -278,7 +307,7 @@ class RBTree(BaseTree):
         last = 0
 
         # Set up helpers
-        grand_grand_parent.right = self.root
+        grand_grand_parent.right = self._root
         node = grand_grand_parent.right
         # Search down the tree
         while True:
@@ -313,17 +342,17 @@ class RBTree(BaseTree):
             parent = node
             node = node[direction]
 
-        self.root = head.right # Update root
-        self.root.red = False # make root black
+        self._root = head.right # Update root
+        self._root.red = False # make root black
 
     def remove(self, key):
         """ T.remove(key) <==> del T[key], remove item <key> from tree """
-        if self.root is None:
+        if self._root is None:
             raise KeyError(str(key))
-        compare = self.compare
+        compare = self._compare
         head = Node() # False tree root
         node = head
-        node.right = self.root
+        node.right = self._root
         parent = None
         grand_parent = None
         found = None # Found item
@@ -378,6 +407,6 @@ class RBTree(BaseTree):
             self._count -= 1
 
         # Update root and make it black
-        self.root = head.right
-        if self.root is not None:
-            self.root.red = False
+        self._root = head.right
+        if self._root is not None:
+            self._root.red = False

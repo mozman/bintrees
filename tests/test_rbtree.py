@@ -7,7 +7,7 @@
 import unittest
 
 from tree_test import TestAbstTree
-from bintrees.rbtree import RBTree
+from bintrees import RBTree
 
 class TestRBTree(TestAbstTree):
     @property

@@ -7,7 +7,7 @@
 import unittest
 
 from tree_test import TestAbstTree
-from bintrees.avltree import AVLTree
+from bintrees import AVLTree
 
 class TestAVLTree(TestAbstTree):
     @property
