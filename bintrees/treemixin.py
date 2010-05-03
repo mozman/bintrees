@@ -11,8 +11,10 @@ class TreeMixin(object):
 
     The Node Class
     ==============
+
     N has to implement following properties
     ---------------------------------------
+
         key -- get key object of node
         value -- get value object of node
         left -- get left node
@@ -20,6 +22,7 @@ class TreeMixin(object):
 
     N has to implement following methods
     ------------------------------------
+
     free(...)
         N.free() set all object references to None
 
@@ -29,8 +32,10 @@ class TreeMixin(object):
 
     The TreeMixin Class
     ===================
+
     T has to implement following properties
     ---------------------------------------
+
     root -- get root node
     count -- get node count
     compare -- get compare function, behave like builtin cmp()
@@ -46,140 +51,50 @@ class TreeMixin(object):
     clear(...)
         T.clear() -> None.  Remove all items from T.
 
-    Methods defined here:
-    __contains__(...)
-        T.__contains__(k) -> True if T has a key k, else False
+    Methods
+    -------
 
-    __delitem__(...)
-        x.__delitem__(y) <==> del x[y]
+    * __contains__(k) -> True if T has a key k, else False
+    * __delitem__(y) <==> del T[y]
+    * __getitem__(y) <==> T[y]
+    * __iter__() <==> iter(T)
+    * __len__() <==> len(T)
+    * __repr__() <==> repr(T)
+    * __setitem__(k, v) <==> T[k] = v
+    * clear() -> None, Remove all items from T.
+    * copy() -> a shallow copy of T
+    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node.
+    * get(k[,d]) -> T[k] if k in T, else d
+    * has_key(k) -> True if T has a key k, else False
+    * insert(k, v) <==> T[k] = v, insert k, v into T
+    * is_empty() -> True if len(T) == 0
+    * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples
+    * iteritems([reverse]) -> an iterator over the (k, v) items of T.
+    * iterkeys([reverse]) -> an iterator over the keys of T
+    * itervalues([reverse]) -> an iterator over the values of T
+    * keys([reverse]) -> list of T's keys
+    * max_item() -> get biggest (key, value) pair of T
+    * max_key() -> get biggest key of T
+    * min_item() -> get smallest (key, value) pair of T
+    * min_key() -> get smallest key of T
+    * nlargest(n[,pop]) -> get list of n largest items (k, v)
+    * nsmallest(n[,pop]) -> get list of n smallest items (k, v)
+    * pop(k[,d]) -> v, remove specified key and return the corresponding value.
+    * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple
+    * pop_min() -> (k, v), remove item with minimum key
+    * pop_max() -> (k, v), remove item with maximum key
+    * prev_item(key) -> get (k, v) pair, where k is predecessor to key
+    * prev_key(key) -> k, get the predecessor of key
+    * remove(k) <==> del T[k], remove item k from T
+    * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
+    * succ_item(key) -> get (k, v) pair, where k is successor to key
+    * succ_key(key) -> k, get the successor of key
+    * update(E) -> None.  Update T from dict/iterable E.
+    * values([reverse]) -> list of T's values
 
-    __getitem__(...)
-        x.__getitem__(y) <==> x[y]
+    Classmethods
 
-    __init__(...)
-        x.__init__(...) initializes x; see x.__class__.__doc__ for signature
-
-    __iter__(...)
-        x.__iter__() <==> iter(x)
-
-    __len__(...)
-        x.__len__() <==> len(x)
-
-    __repr__(...)
-        x.__repr__() <==> repr(x)
-
-    __setitem__(...)
-        x.__setitem__(i, y) <==> x[i]=y
-
-    find_node(...)
-        T.find_node(key) -> Node, find node for key in T, returns None if not found
-
-    foreach(...)
-        T.foreach(self, func, order) -> visit all nodes of tree and call
-        func(key, value) at each node.
-
-        order -- 'preorder', 'inorder', 'postorder'
-            'preorder' -- func(), traverse left-subtree, traverse right-subtree
-            'inorder' -- traverse left-subtree, func(), traverse right-subtree
-            'postorder' -- traverse left-subtree, traverse right-subtree, func()
-
-    get(...)
-        T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None.
-
-    has_key(...)
-        T.has_key(k) -> True if T has a key k, else False
-
-    is_empty(...)
-        T.is_empty() -> True if len(T) == 0
-
-    items(...)
-        T.items([reverse]) -> list of T's (key, value) pairs, as 2-tuples in
-        ascending order, if reverse is True, in descending order, reverse
-        defaults to False
-
-    iteritems(...)
-        T.iteritems([reverse]) -> an iterator over the (key, value) items of T,
-        in ascending order if reverse is True, iterate in descending order,
-        reverse defaults to False
-
-    iterkeys(...)
-        T.iterkeys([reverse]) -> an iterator over the keys of T, in ascending order
-        if reverse is True, iterate in descending order, reverse defaults to False
-
-    itervalues(...)
-        T.itervalues([reverse]) -> an iterator over the values of T, in ascending order
-        if reverse is True, iterate in descending order, reverse defaults to False
-
-    keys(...)
-        T.keys([reverse]) -> list of T's keys in ascending order, if reverse is
-        True, in descending order, reverse defaults to False
-
-    max_item(...)
-        T.max_item() -> get biggest (key, value) pair of T
-
-    max_key(...)
-        T.max_key() -> get biggest key of T
-
-    min_item(...)
-        T.min_item() -> get smallest (key, value) pair of T
-
-    min_key(...)
-        T.min_key() -> get smallest key of T
-
-    nlargest(...)
-        T.nlargest(n[,pop]) -> get list of n largest items (k, v)
-        If pop is True remove items from T, pop defaults to False
-
-    nsmallest(...)
-        T.nlargest(n[,pop]) -> get list of n smallest items (k, v)
-        If pop is True remove items from T, pop defaults to False
-
-    pop(...)
-        T.pop(k[,d]) -> v, remove specified key and return the corresponding value.
-        If key is not found, d is returned if given, otherwise KeyError is raised
-
-    popitem(...)
-        T.popitem() -> (k, v), remove and return some (key, value) pair as a
-        2-tuple; but raise KeyError if T is empty.
-
-    pop_min(...)
-        T.pop_min() -> (k, v), remove item with minimum key, raise KeyError if T
-        is empty.
-
-    pop_max(...)
-        T.pop_max() -> (k, v), remove item with maximum key, raise KeyError if T
-        is empty.
-
-    prev_item(...)
-        T.prev_item(key) -> get (k, v) pair, where k is predecessor to key
-
-    prev_key(...)
-        T.prev_key(key) -> k, get the predecessor of key
-
-    setdefault(...)
-        T.setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
-
-    succ_item(...)
-        T.succ_item(key) -> get (k, v) pair, where k is successor to key
-
-    succ_key(...)
-        T.succ_key(key) -> k, get the successor of key
-
-    update(...)
-        T.update(E) -> None.  Update T from dict/iterable E.
-        If E has a .iteritems() method, does: for (k, v) in E: T[k] = v
-        If E lacks .iteritems() method, does: for (k, v) in iter(E): T[k] = v
-
-    values(...)
-        T.values([reverse]) -> list of T's values in ascending order, if reverse
-        is True, in descending order, reverse defaults to False
-
-    ----------------------------------------------------------------------
-    classmethods:
-
-    fromkeys(S[,v])
-        BaseTree.fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
-        v defaults to None.
+    * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
     def _get_leaf(self):
         """ get a leaf node """
@@ -227,6 +142,7 @@ class TreeMixin(object):
         return "{{{0}}}".format(", ".join(_tostr(self.root)))
 
     def __copy__(self):
+        """ T.__copy__() -> get a shallow copy of T. """
         return self.copy()
 
     def has_key(self, key):

@@ -4,8 +4,6 @@
 # Purpose: cython avltree module
 # Created: 28.04.2010
 
-from itertools import izip
-
 __all__ = ['cAVLTree']
 
 DEF MAXSTACK = 32

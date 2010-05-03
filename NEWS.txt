@@ -1,3 +1,5 @@
-Version 0.1.0 - ?? Mai 2010
+Version 0.2.0 - 03 Mai 2010
+  * TreeMixin Class as base for Python-Trees and as Mixin for Cython-Trees
+Version 0.1.0 - 27 April 2010
   * Alpha status
   * Initial release
