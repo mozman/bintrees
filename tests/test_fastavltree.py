@@ -4,12 +4,12 @@
 # Purpose: test AVLTrees
 # Created: 28.04.2010
 
-import unittest
+import unittest2 as unittest
+from tree_test import TestTreeMixin
 
-from tree_test import TestAbstTree
 from bintrees import FastAVLTree
 
-class TestAVLTree(TestAbstTree):
+class TestFastAVLTree(TestTreeMixin, unittest.TestCase):
     @property
     def TREE(self):
         return FastAVLTree

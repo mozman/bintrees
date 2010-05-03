@@ -8,11 +8,9 @@ import unittest
 
 from bintrees.cavltree import cAVLTree
 
-if sys.platform.startswith('linux2'):
-    import pyximport
-    pyximport.install()
+from random import randint, shuffle
 
-class HelperTree(cAVLTree):
+class Tree(cAVLTree):
     def update(self, items):
         """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
         try:
@@ -22,15 +20,63 @@ class HelperTree(cAVLTree):
         for key, value in generator:
             self.insert(key, value)
 
-class TestHelperTree(unittest.TestCase):
-    default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
-    default_values2 = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
-
+class TestTree(unittest.TestCase):
+    values = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
+    keys = [2, 4, 8, 1, 9, 3]
     def test_create_tree(self):
-        tree = HelperTree()
+        tree = Tree()
         self.assertEqual(tree.count, 0)
-        tree.update(self.default_values1)
+        tree.update(self.values)
         self.assertEqual(tree.count, 6)
+
+    def test_find_key(self):
+        tree = Tree(self.values)
+        for key in self.keys:
+            node = tree.find_node(key)
+            self.assertTrue(node is not None)
+
+    def test_find_key_not(self):
+        tree = Tree()
+        node = tree.find_node(17)
+        self.assertTrue(node is None)
+
+    def test_properties(self):
+        tree = Tree(self.values)
+        self.assertTrue(tree.root is not None)
+        self.assertEqual(tree.count, 6)
+        self.assertEqual(tree.compare, cmp)
+
+    def test_clear_tree(self):
+        tree = Tree(self.values)
+        tree.clear()
+        self.assertTrue(tree.root is None)
+        self.assertEqual(tree.count, 0)
+
+    def test_insert(self):
+        tree = Tree()
+        for key in self.keys:
+            tree.insert(key, key)
+            node = tree.find_node(key)
+            self.assertTrue(node is not None)
+            self.assertEqual(node.key, key)
+        self.assertEqual(tree.count, 6)
+
+    def test_remove(self):
+        tree = Tree(self.values)
+        for key in self.keys:
+            tree.remove(key)
+            node = tree.find_node(key)
+            self.assertTrue(node is None)
+        self.assertEqual(tree.count, 0)
+
+    def test_remove_random_numbers(self):
+        keys = list(set([randint(0, 10000) for _ in xrange(500)]))
+        shuffle(keys)
+        tree = Tree(zip(keys, keys))
+        self.assertEqual(tree.count, len(keys))
+        for key in keys:
+            tree.remove(key)
+        self.assertEqual(tree.count, 0)
 
 if __name__=='__main__':
     unittest.main()

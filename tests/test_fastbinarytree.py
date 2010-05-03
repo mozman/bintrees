@@ -4,12 +4,12 @@
 # Purpose: test fast binary trees
 # Created:03.05.2010
 
-import unittest
+import unittest2 as unittest
+from tree_test import TestTreeMixin
 
-from tree_test import TestAbstTree
 from bintrees import FastBinaryTree
 
-class TestBinaryTree(TestAbstTree):
+class TestFastBinaryTree(TestTreeMixin, unittest.TestCase):
     @property
     def TREE(self):
         return FastBinaryTree

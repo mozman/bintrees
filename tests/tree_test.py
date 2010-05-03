@@ -5,17 +5,14 @@
 # Created: 28.04.2010
 
 import sys
-import unittest2 as unittest
+
 from random import randint, shuffle
 
 set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
 
-class TestAbstTree(unittest.TestCase):
+class TestTreeMixin(object):
     default_values1 = zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57])
     default_values2 = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
-    @property
-    def TREE(self):
-        return dict
 
     def test_create_tree(self):
         tree = self.TREE()
