@@ -4,8 +4,6 @@
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
-from random import shuffle
-
 __all__ = ['cBinaryTree']
 
 cdef class Node:
@@ -89,20 +87,6 @@ cdef class cBinaryTree:
         """Create a new tree node."""
         self._count += 1
         return Node(key, value)
-
-    def copy(self):
-        cdef cBinaryTree newtree
-        cdef Node node
-        treekeys = self.keys()
-        shuffle(treekeys)  # sorted keys generates a linked list!
-        newtree = cBinaryTree()
-        for key in treekeys:
-            node = self.find_node(key)
-            newtree.insert(key, node._value)
-        return newtree
-
-    def __copy__(self):
-        return self.copy()
 
     def clear(self):
         clear_tree(self._root)

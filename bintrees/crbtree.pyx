@@ -113,12 +113,6 @@ cdef class cRBTree:
         self._count += 1
         return Node(key, value)
 
-    def copy(self):
-        return cRBTree(self)
-
-    def __copy__(self):
-        return self.copy()
-
     def clear(self):
         clear_tree(self._root)
         self._count = 0

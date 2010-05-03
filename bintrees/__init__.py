@@ -4,6 +4,8 @@
 # Purpose: binary trees package
 # Created: 03.05.2010
 
+from random import shuffle
+
 from treemixin import TreeMixin
 from bintree import BinaryTree
 from avltree import AVLTree
@@ -16,10 +18,21 @@ __all__ = ['FastBinaryTree', 'FastAVLTree', 'FastRBTree',
            'BinaryTree', 'AVLTree', 'RBTree']
 
 class FastBinaryTree(cBinaryTree, TreeMixin):
-    pass
+    def copy(self):
+        """ T.copy() -> a shallow copy of T """
+        treekeys = self.keys()
+        shuffle(treekeys)  # sorted keys generates a linked list!
+        newtree = FastBinaryTree()
+        for key in treekeys:
+            newtree[key] = self[key]
+        return newtree
 
 class FastAVLTree(cAVLTree, TreeMixin):
-    pass
+    def copy(self):
+        """ T.copy() -> a shallow copy of T """
+        return FastAVLTree(self) # has no problem with sorted keys
 
 class FastRBTree(cRBTree, TreeMixin):
-    pass
+    def copy(self):
+        """ T.copy() -> a shallow copy of T """
+        return FastRBTree(self) # has no problem with sorted keys

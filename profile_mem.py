@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: profile memory usage of cBinaryTree, cRBTree and cAVLTree compared with dict
+# Purpose: profile memory usage of FastBinaryTree, FastRBTree and FastAVLTree compared with dict
 # Created: 02.05.2010
 
 from guppy import hpy
 hp=hpy()
 
-from bintrees.cbintree import cBinaryTree
-from bintrees.cavltree import cAVLTree
-from bintrees.crbtree import cRBTree
+from bintrees import FastBinaryTree
+from bintrees import FastAVLTree
+from bintrees import FastRBTree
 
-from bintrees.bintree import BinaryTree
-from bintrees.avltree import AVLTree
-from bintrees.rbtree import RBTree
+from bintrees import BinaryTree
+from bintrees import AVLTree
+from bintrees import RBTree
 
 COUNT = 100
 
@@ -32,14 +32,14 @@ def main():
         log.write("\n\nCreating {0} dicts with {1} objects:\n".format(COUNT, len(keys)))
         dicts = [dict.fromkeys(keys) for _ in xrange(COUNT)]
 
-        log.write("Creating {0} Cython cBinaryTrees with {1} objects:\n".format(COUNT, len(keys)))
-        bintrees = [cBinaryTree.fromkeys(keys) for _ in xrange(COUNT)]
+        log.write("Creating {0} Cython FastBinaryTrees with {1} objects:\n".format(COUNT, len(keys)))
+        bintrees = [FastBinaryTree.fromkeys(keys) for _ in xrange(COUNT)]
 
-        log.write("Creating {0} Cython cAVLTrees with {1} objects:\n".format(COUNT, len(keys)))
-        avltrees = [cAVLTree.fromkeys(keys) for _ in xrange(COUNT)]
+        log.write("Creating {0} Cython FastAVLTrees with {1} objects:\n".format(COUNT, len(keys)))
+        avltrees = [FastAVLTree.fromkeys(keys) for _ in xrange(COUNT)]
 
-        log.write("Creating {0} Cython cRBTrees with {1} objects:\n\n".format(COUNT, len(keys)))
-        rbtrees = [cRBTree.fromkeys(keys) for _ in xrange(COUNT)]
+        log.write("Creating {0} Cython FastRBTrees with {1} objects:\n\n".format(COUNT, len(keys)))
+        rbtrees = [FastRBTree.fromkeys(keys) for _ in xrange(COUNT)]
 
         log.write("Creating {0} Python BinaryTrees with {1} objects:\n".format(COUNT, len(keys)))
         pbintrees = [BinaryTree.fromkeys(keys) for _ in xrange(COUNT)]

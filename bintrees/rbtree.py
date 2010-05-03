@@ -284,7 +284,6 @@ class RBTree(TreeMixin):
     def copy(self):
         """ T.copy() -> a shallow copy of T """
         return RBTree(self) # has no problem with sorted keys
-    __copy__ = copy
 
     def _new_node(self, key, value):
         """ Create a new treenode """

@@ -196,8 +196,8 @@ class TreeMixin(object):
     def find_node(self, key):
         """ T.find_node(key) -> get treenode of key, returns None if not found.
         """
-        node = self._root
-        compare = self._compare
+        node = self.root
+        compare = self.compare
         while node is not None:
             cval = compare(key, node.key)
             if cval == 0:
@@ -225,6 +225,9 @@ class TreeMixin(object):
             else:
                 return None
         return "{{{0}}}".format(", ".join(_tostr(self.root)))
+
+    def __copy__(self):
+        return self.copy()
 
     def has_key(self, key):
         """ T.has_key(k) -> True if T has a key k, else False """
