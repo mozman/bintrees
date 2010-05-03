@@ -6,10 +6,6 @@
 import sys
 import unittest
 
-if sys.platform.startswith('linux2'):
-    import pyximport
-    pyximport.install()
-
 from bintrees.crbtree import cRBTree
 
 class HelperTree(cRBTree):

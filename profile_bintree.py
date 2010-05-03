@@ -10,6 +10,8 @@ from bintrees import FastBinaryTree
 from random import shuffle
 
 COUNT = 100
+KEYS = 5000
+KEYRANGE = 1000000
 
 setup_BinaryTree_bd = """
 from __main__ import keys, bintree_build_delete, BinaryTree

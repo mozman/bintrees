@@ -6,10 +6,6 @@
 import sys
 import unittest
 
-if sys.platform.startswith('linux2'):
-    import pyximport
-    pyximport.install()
-
 from bintrees.cavltree import cAVLTree
 
 if sys.platform.startswith('linux2'):
