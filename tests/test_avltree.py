@@ -5,11 +5,11 @@
 # Created: 28.04.2010
 
 import unittest2 as unittest
-from tree_test import TestTreeMixin
+from tree_test import CheckTree
 
 from bintrees import AVLTree
 
-class TestAVLTree(TestTreeMixin, unittest.TestCase):
+class TestAVLTree(CheckTree, unittest.TestCase):
     @property
     def TREE(self):
         return AVLTree

@@ -5,11 +5,11 @@
 # Created: 28.04.2010
 
 import unittest2 as unittest
-from tree_test import TestTreeMixin
+from tree_test import CheckTree
 
 from bintrees import FastAVLTree
 
-class TestFastAVLTree(TestTreeMixin, unittest.TestCase):
+class TestFastAVLTree(CheckTree, unittest.TestCase):
     @property
     def TREE(self):
         return FastAVLTree

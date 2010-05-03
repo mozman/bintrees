@@ -5,11 +5,11 @@
 # Created: 28.04.2010
 
 import unittest2 as unittest
-from tree_test import TestTreeMixin
+from tree_test import CheckTree
 
 from bintrees import BinaryTree
 
-class TestBinaryTree(TestTreeMixin, unittest.TestCase):
+class TestBinaryTree(CheckTree, unittest.TestCase):
     @property
     def TREE(self):
         return BinaryTree
