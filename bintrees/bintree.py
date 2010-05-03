@@ -237,7 +237,6 @@ class BinaryTree(TreeMixin):
         for key in treekeys:
             newtree[key] = self[key]
         return newtree
-    __copy__ = copy
 
     def _new_node(self, key, value):
         """ Create a new tree node. """

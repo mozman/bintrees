@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: profile BinaryTree, cBinaryTree
+# Purpose: profile BinaryTree, FastBinaryTree
 # Created: 01.05.2010
 
 from timeit import Timer
-from bintrees.bintree import BinaryTree
-from bintrees.cbintree import cBinaryTree
+from bintrees import BinaryTree
+from bintrees import FastBinaryTree
 from random import shuffle
 
 COUNT = 100
@@ -14,19 +14,19 @@ COUNT = 100
 setup_BinaryTree_bd = """
 from __main__ import keys, bintree_build_delete, BinaryTree
 """
-setup_cBinaryTree_bd = """
-from __main__ import keys, cbintree_build_delete, cBinaryTree
+setup_FastBinaryTree_bd = """
+from __main__ import keys, cbintree_build_delete, FastBinaryTree
 """
 setup_BinaryTree_b = """
 from __main__ import keys, bintree_build, BinaryTree
 """
-setup_cBinaryTree_b = """
-from __main__ import keys, cbintree_build, cBinaryTree
+setup_FastBinaryTree_b = """
+from __main__ import keys, cbintree_build, FastBinaryTree
 """
 setup_BinaryTree_s = """
 from __main__ import keys, bintree_search, py_searchtree
 """
-setup_cBinaryTree_s = """
+setup_FastBinaryTree_s = """
 from __main__ import keys, cbintree_search, cy_searchtree
 """
 
@@ -45,7 +45,7 @@ except IOError:
     keys = random_keys()
 
 py_searchtree = BinaryTree.fromkeys(keys)
-cy_searchtree = cBinaryTree.fromkeys(keys)
+cy_searchtree = FastBinaryTree.fromkeys(keys)
 
 def bintree_build_delete():
     tree = BinaryTree.fromkeys(keys)
@@ -53,7 +53,7 @@ def bintree_build_delete():
         del tree[key]
 
 def cbintree_build_delete():
-    tree = cBinaryTree.fromkeys(keys)
+    tree = FastBinaryTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
@@ -61,7 +61,7 @@ def bintree_build():
     tree = BinaryTree.fromkeys(keys)
 
 def cbintree_build():
-    tree = cBinaryTree.fromkeys(keys)
+    tree = FastBinaryTree.fromkeys(keys)
 
 def bintree_search():
     for key in keys:
@@ -82,21 +82,21 @@ def main():
     t = Timer("bintree_build()", setup_BinaryTree_b)
     print_result(t.timeit(COUNT), 'BinaryTree build only')
 
-    t = Timer("cbintree_build()", setup_cBinaryTree_b)
-    print_result(t.timeit(COUNT), 'cBinaryTree build only')
+    t = Timer("cbintree_build()", setup_FastBinaryTree_b)
+    print_result(t.timeit(COUNT), 'FastBinaryTree build only')
 
     t = Timer("bintree_build_delete()", setup_BinaryTree_bd)
     print_result(t.timeit(COUNT), 'BinaryTree build & delete')
 
-    t = Timer("cbintree_build_delete()", setup_cBinaryTree_bd)
-    print_result(t.timeit(COUNT), 'cBinaryTree build & delete')
+    t = Timer("cbintree_build_delete()", setup_FastBinaryTree_bd)
+    print_result(t.timeit(COUNT), 'FastBinaryTree build & delete')
     # shuffle search keys
     shuffle(keys)
     t = Timer("bintree_search()", setup_BinaryTree_s)
     print_result(t.timeit(COUNT), 'BinaryTree search')
 
-    t = Timer("cbintree_search()", setup_cBinaryTree_s)
-    print_result(t.timeit(COUNT), 'cBinaryTree search')
+    t = Timer("cbintree_search()", setup_FastBinaryTree_s)
+    print_result(t.timeit(COUNT), 'FastBinaryTree search')
 
 if __name__=='__main__':
     main()

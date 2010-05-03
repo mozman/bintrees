@@ -285,7 +285,6 @@ class AVLTree(TreeMixin):
     def copy(self):
         """ T.copy() -> a shallow copy of T """
         return AVLTree(self) # has no problem with sorted keys
-    __copy__ = copy
 
     def _new_node(self, key, value):
         """ Create a new treenode """

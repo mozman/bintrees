@@ -114,12 +114,6 @@ cdef class cAVLTree:
     def count(self):
         return self._count
 
-    def copy(self):
-        return cAVLTree(self)
-
-    def __copy__(self):
-        return self.copy()
-
     def clear(self):
         clear_tree(self._value)
         self._count = 0
