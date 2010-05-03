@@ -352,10 +352,10 @@ class TestAbstTree(unittest.TestCase):
         chk = [(x,x) for x in range(29, 19, -1)]
         self.assertEqual(chk, result)
 
-    def test_riterkeys(self):
+    def test_reverse_iterkeys(self):
         tree = self.TREE(zip(set3, set3))
         result = reversed(sorted(set3))
-        for key in tree.riterkeys():
+        for key in tree.iterkeys(reverse=True):
             chk = next(result)
             self.assertEqual(chk, key)
 

@@ -4,8 +4,6 @@
 # Purpose: abstract tree module
 # Created: 28.04.2010
 
-from itertools import izip
-
 class BaseTree(object):
     """
     BaseTree is an abstract base class for BinaryTree, AVLTree and RBTree
@@ -67,19 +65,26 @@ class BaseTree(object):
         T.is_empty() -> True if len(T) == 0
 
     items(...)
-        T.items() -> list of D's (key, value) pairs, as 2-tuples
+        T.items([reverse]) -> list of T's (key, value) pairs, as 2-tuples in
+        ascending order, if reverse is True, in descending order, reverse
+        defaults to False
 
     iteritems(...)
-        T.iteritems() -> an iterator over the (key, value) items of D
+        T.iteritems([reverse]) -> an iterator over the (key, value) items of T,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
 
     iterkeys(...)
-        T.iterkeys() -> an iterator over the keys of T
+        T.iterkeys([reverse]) -> an iterator over the keys of T, in ascending order
+        if reverse is True, iterate in descending order, reverse defaults to False
 
     itervalues(...)
-        T.itervalues() -> an iterator over the values of T
+        T.itervalues([reverse]) -> an iterator over the values of T, in ascending order
+        if reverse is True, iterate in descending order, reverse defaults to False
 
     keys(...)
-        T.keys() -> list of T's keys
+        T.keys([reverse]) -> list of T's keys in ascending order, if reverse is
+        True, in descending order, reverse defaults to False
 
     max_item(...)
         T.max_item() -> get biggest (key, value) pair of T
@@ -138,7 +143,8 @@ class BaseTree(object):
         If E lacks .iteritems() method, does: for (k, v) in iter(E): T[k] = v
 
     values(...)
-        T.values() -> list of T's values
+        T.values([reverse]) -> list of T's values in ascending order, if reverse
+        is True, in descending order, reverse defaults to False
 
     ----------------------------------------------------------------------
     classmethods:
@@ -197,15 +203,37 @@ class BaseTree(object):
         """ x.is_empty() -> False if T contains any items else True"""
         return self.root is None
 
-    def keys(self):
+    def keys(self, reverse=False):
         """ T.keys() -> list of T's keys """
-        return list(self._iterkeys(0))
+        return list(self.iterkeys(reverse))
 
-    def _iterkeys(self, direction):
-        """ T.iterkeys() -> an iterator over the keys of T
-        direction -- 0 = ascendering; 1 = descendering
+    def iterkeys(self, reverse=False):
+        """ T.iterkeys([reverse]) -> an iterator over the keys of T, in ascending
+        order if reverse is True, iterate in descending order, reverse defaults
+        to False
+        """
+        for item in self.iteritems(reverse):
+            yield item[0]
+    __iter__ = iterkeys
+
+    def values(self, reverse=False):
+        """ T.values() -> list of T's values """
+        return list(self.itervalues(reverse))
+
+    def itervalues(self, reverse=False):
+        """ T.itervalues([reverse]) -> an iterator over the values of T, in ascending order
+        if reverse is True, iterate in descending order, reverse defaults to False
+        """
+        for item in self.iteritems(reverse):
+            yield item[1]
+
+    def iteritems(self, reverse=False):
+        """ T.iteritems([reverse]) -> an iterator over the (key, value) items of T,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
         """
         node = self.root
+        direction = 1 if reverse else 0
         other = 1 - direction
         go_down = True
         stack = list()
@@ -214,7 +242,7 @@ class BaseTree(object):
                 stack.append(node)
                 node = node[direction]
             else:
-                yield node.key
+                yield (node.key, node.value)
                 if node[other] is not None:
                     node = node[other]
                     go_down = True
@@ -224,38 +252,9 @@ class BaseTree(object):
                     node = stack.pop()
                     go_down = False
 
-    def iterkeys(self):
-        """ T.iterkeys() -> an iterator over the keys of T
-        """
-        return self._iterkeys(0)
-    __iter__ = iterkeys
-
-    def riterkeys(self):
-        """ T.iterkeys() -> reverse iterator over the keys of T """
-        return self._iterkeys(1)
-
-    def values(self):
-        """ T.values() -> list of T's values """
-        return list(self.itervalues())
-
-    def itervalues(self):
-        """ T.itervalues() -> an iterator over the values of T """
-        def _itervalues(node):
-            if node is not None:
-                for value in _itervalues(node.left):
-                    yield value
-                yield node.value
-                for value in _itervalues(node.right):
-                    yield value
-        return _itervalues(self.root)
-
-    def iteritems(self):
-        """ T.iteritems() -> an iterator over the (key, value) items of T """
-        return izip(self.iterkeys(), self.itervalues())
-
-    def items(self):
+    def items(self, reverse=False):
         """ T.items() -> list of T's (key, value) pairs, as 2-tuples """
-        return list(self.iteritems())
+        return list(self.iteritems(reverse))
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
@@ -530,7 +529,7 @@ class BaseTree(object):
         if pop:
             return [self.pop_min() for _ in xrange(min(len(self), n))]
         else:
-            gen = self._iterkeys(0)
+            gen = self.iterkeys()
             keys = (next(gen) for _ in xrange(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
 
@@ -541,7 +540,7 @@ class BaseTree(object):
         if pop:
             return [self.pop_max() for _ in xrange(min(len(self), n))]
         else:
-            gen = self._iterkeys(1)
+            gen = self.iterkeys(reverse=True)
             keys = (next(gen) for _ in xrange(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
 
@@ -576,9 +575,3 @@ class BaseTree(object):
             else:
                 return node
         return None
-
-    def insert(self, data, key):
-        raise NotImplementedError
-
-    def remove(self, key):
-        raise NotImplementedError

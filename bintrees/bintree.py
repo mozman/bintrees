@@ -108,19 +108,26 @@ class BinaryTree(BaseTree):
         T.is_empty() -> True if len(T) == 0
 
     items(...)
-        T.items() -> list of D's (key, value) pairs, as 2-tuples
+        T.items([reverse]) -> list of T's (key, value) pairs, as 2-tuples in
+        ascending order, if reverse is True, in descending order, reverse
+        defaults to False
 
     iteritems(...)
-        T.iteritems() -> an iterator over the (key, value) items of D
+        T.iteritems([reverse]) -> an iterator over the (key, value) items of T,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
 
     iterkeys(...)
-        T.iterkeys() -> an iterator over the keys of T
+        T.iterkeys([reverse]) -> an iterator over the keys of T, in ascending order
+        if reverse is True, iterate in descending order, reverse defaults to False
 
     itervalues(...)
-        T.itervalues() -> an iterator over the values of T
+        T.itervalues([reverse]) -> an iterator over the values of T, in ascending order
+        if reverse is True, iterate in descending order, reverse defaults to False
 
     keys(...)
-        T.keys() -> list of T's keys
+        T.keys([reverse]) -> list of T's keys in ascending order, if reverse is
+        True, in descending order, reverse defaults to False
 
     max_item(...)
         T.max_item() -> get biggest (key, value) pair of T
@@ -182,7 +189,8 @@ class BinaryTree(BaseTree):
         If E lacks .iteritems() method, does: for (k, v) in iter(E): T[k] = v
 
     values(...)
-        T.values() -> list of T's values
+        T.values([reverse]) -> list of T's values in ascending order, if reverse
+        is True, in descending order, reverse defaults to False
 
     ----------------------------------------------------------------------
     classmethods:
