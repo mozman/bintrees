@@ -6,6 +6,7 @@
 
 import sys
 import unittest2 as unittest
+from itertools import izip
 
 from random import randint, shuffle
 
@@ -22,7 +23,6 @@ class CheckTree(object):
         self.assertEqual(len(tree), 6)
 
     def test_iter_tree(self):
-
         tree = self.TREE(self.default_values1)
         result = list(iter(tree))
         self.assertEqual(result, [12, 16, 34, 35, 45, 57])
@@ -39,11 +39,6 @@ class CheckTree(object):
         self.assertTrue(tree.is_empty)
 
     def check_integrity(self, keys, remove_key, tree):
-        try:
-            if not tree._check_parent_links():
-                return False
-        except AttributeError:
-            pass
         for search_key in keys:
             if search_key == remove_key:
                 if search_key in tree:
@@ -122,6 +117,14 @@ class CheckTree(object):
         remove_key = 50
         del tree[remove_key]
         self.assertTrue(self.check_integrity(keys, remove_key, tree))
+
+    def test_discard(self):
+        keys = [50, 25, 12, 33, 34, 75, 60, 61]
+        tree = self.TREE.fromkeys(keys)
+        try:
+            tree.discard(17)
+        except KeyError:
+            self.assertTrue(False, "Discard raises KeyError")
 
     def test_remove_shuffeld(self):
         keys = [50, 25, 20, 35, 22, 23, 27, 75, 65, 90, 60, 70, 85, 57, 83, 58]
@@ -249,11 +252,15 @@ class CheckTree(object):
 
     def test_min_key(self):
         tree = self.TREE(zip(set3, set3))
-        self.assertEqual(tree.min_key(), 0)
+        minkey = tree.min_key()
+        self.assertEqual(minkey, 0)
+        self.assertEqual(minkey, min(tree))
 
     def test_max_key(self):
         tree = self.TREE(zip(set3, set3))
-        self.assertEqual(tree.max_key(), 999)
+        maxkey = tree.max_key()
+        self.assertEqual(maxkey, 999)
+        self.assertEqual(maxkey, max(tree))
 
     def test_prev_item(self):
         tree = self.TREE(zip(set3, set3))
@@ -357,6 +364,11 @@ class CheckTree(object):
             chk = next(result)
             self.assertEqual(chk, key)
 
+    def test_reversed(self):
+        tree = self.TREE(zip(set3, set3))
+        result = reversed(sorted(set3))
+        for key, chk in izip(reversed(tree), result):
+            self.assertEqual(chk, key)
 
 if __name__=='__main__':
     unittest.main()
