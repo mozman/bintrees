@@ -56,67 +56,74 @@ class TreeMixin(object):
     Methods
     -------
 
-    * __contains__(k) -> True if T has a key k, else False
-    * __delitem__(y) <==> del T[y]
-    * __getitem__(y) <==> T[y]
+    * __contains__(k) -> True if T has a key k, else False, O(log(n))
+    * __delitem__(y) <==> del T[y], O(log(n))
+    * __getitem__(y) <==> T[y], O(log(n))
     * __iter__() <==> iter(T)
-    * __len__() <==> len(T)
-    * __max__() <==> max(T), get max item (k,v) of T
-    * __min__() <==> min(T), get min item (k,v) of T
+    * __len__() <==> len(T), O(1)
+    * __max__() <==> max(T), get max item (k,v) of T, O(log(n))
+    * __min__() <==> min(T), get min item (k,v) of T, O(log(n))
+    * __and__(other) <==> T & other, intersection
+    * __or__(other) <==> T | other, union
+    * __sub__(other) <==> T - other, difference
+    * __xor__(other) <==> T ^ other, symmetric_difference
     * __repr__() <==> repr(T)
-    * __setitem__(k, v) <==> T[k] = v
-    * clear() -> None, Remove all items from T.
-    * copy() -> a shallow copy of T
-    * discard(k) -> None, remove k from T, if k is present
-    * get(k[,d]) -> T[k] if k in T, else d
-    * has_key(k) -> True if T has a key k, else False
-    * is_empty() -> True if len(T) == 0
-    * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples
-    * keys([reverse]) -> list of T's keys
-    * pop(k[,d]) -> v, remove specified key and return the corresponding value.
-    * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple
-    * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
-    * update(E) -> None.  Update T from dict/iterable E.
-    * values([reverse]) -> list of T's values
+    * __setitem__(k, v) <==> T[k] = v, O(log(n))
+    * clear() -> None, Remove all items from T, , O(n)
+    * copy() -> a shallow copy of T, O(n*log(n))
+    * discard(k) -> None, remove k from T, if k is present, O(log(n))
+    * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
+    * has_key(k) -> True if T has a key k, else False, O(log(n))
+    * is_empty() -> True if len(T) == 0, O(1)
+    * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
+    * keys([reverse]) -> list of T's keys, O(n)
+    * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
+    * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
+    * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
+    * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
+    * values([reverse]) -> list of T's values, O(n)
 
-    walk forward/backward (not really fast!)
+    walk forward/backward, O(log(n))
 
-    * prev_item(key) -> get (k, v) pair, where k is predecessor to key
-    * prev_key(key) -> k, get the predecessor of key
-    * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key
-    * succ_key(key) -> k, get the successor of key
+    * prev_item(key) -> get (k, v) pair, where k is predecessor to key, O(log(n))
+    * prev_key(key) -> k, get the predecessor of key, O(log(n))
+    * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
+    * succ_key(key) -> k, get the successor of key, O(log(n))
 
     traverse tree
 
-    * iteritems([reverse]) -> an iterator over the (k, v) items of T.
-    * iterkeys([reverse]) -> an iterator over the keys of T
-    * itervalues([reverse]) -> an iterator over the values of T
+    * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
+    * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
+    * itervalues([reverse]) -> an iterator over the values of T, O(n)
     * treeiter([rtype, reverse]) -> TreeIterator
-    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node.
+    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
     Heap methods
 
-    * max_item() -> get biggest (key, value) pair of T
-    * max_key() -> get biggest key of T
-    * min_item() -> get smallest (key, value) pair of T
-    * min_key() -> get smallest key of T
-    * pop_min() -> (k, v), remove item with minimum key
-    * pop_max() -> (k, v), remove item with maximum key
-    * nlargest(n[,pop]) -> get list of n largest items (k, v)
-    * nsmallest(n[,pop]) -> get list of n smallest items (k, v)
+    * max_item() -> get biggest (key, value) pair of T, O(log(n))
+    * max_key() -> get biggest key of T, O(log(n))
+    * min_item() -> get smallest (key, value) pair of T, O(log(n))
+    * min_key() -> get smallest key of T, O(log(n))
+    * pop_min() -> (k, v), remove item with minimum key, O(log(n))
+    * pop_max() -> (k, v), remove item with maximum key, O(log(n))
+    * nlargest(i[,pop]) -> get list of i largest items (k, v), O(i*log(n))
+    * nsmallest(i[,pop]) -> get list of i smallest items (k, v), O(i*log(n))
 
-    Index methods (access by index is slow!)
+    Index methods (access by index slow)
 
-    * index_of(k) -> index of key k
-    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end
-    * T[s:e:i] -> slicing from start s to end e, step i
+    * index(k) -> index of key k, O(n)
+    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
+    * T[s:e:i] -> slicing from start s to end e, step i, O(n)
 
-    Set methods
+    Set methods (using frozenset)
 
     * intersection(t1, t2, ...) -> Tree with keys *common* to all trees
     * union(t1, t2, ...) -> Tree with keys from *either* trees
     * difference(t1, t2, ...) -> Tree with keys in T but not any of t1, t2, ...
-    * symetric_difference(t1) -> Tree with keys in either T and t1  but not both
+    * symmetric_difference(t1) -> Tree with keys in either T and t1  but not both
+    * issubset(S) -> True if every element in T is in S
+    * issuperset(S) -> True if every element in S is in T
+    * isdisjoint(S) ->  True if T has a null intersection with S
 
     Classmethods
 
@@ -189,6 +196,22 @@ class TreeMixin(object):
     def __max__(self):
         """ x.__max__() <==> max(x) """
         return self.max_item()
+
+    def __and__(self, other):
+        """ x.__and__(other) <==> self & other """
+        return self.intersection(other)
+
+    def __or__(self, other):
+        """ x.__or__(other) <==> self | other """
+        return self.union(other)
+
+    def __sub__(self, other):
+        """ x.__sub__(other) <==> self - other """
+        return self.difference(other)
+
+    def __xor__(self, other):
+        """ x.__xor__(other) <==> self ^ other """
+        return self.symmetric_difference(other)
 
     def discard(self, key):
         """ x.discard(k) -> None, remove k from T, if k is present """
@@ -558,8 +581,8 @@ class TreeMixin(object):
         else:
             return []
 
-    def index_of(self, key):
-        """ T.index_of(k) -> index, raises KeyError if k not in T
+    def index(self, key):
+        """ T.index(k) -> index, raises KeyError if k not in T
 
         O(n) ... foreach visit all nodes!
         """
@@ -594,7 +617,7 @@ class TreeMixin(object):
         """
         thiskeys = frozenset(self.iterkeys())
         sets = _make_sets(trees)
-        rkeys = thiskeys.intersection(*sets)
+        rkeys = thiskeys.union(*sets)
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
 
     def difference(self, *trees):
@@ -606,13 +629,28 @@ class TreeMixin(object):
         rkeys = thiskeys.difference(*sets)
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
 
-    def symetric_difference(self, tree):
-        """ x.symetric_difference(t1) -> Tree with keys in either T and t1  but
+    def symmetric_difference(self, tree):
+        """ x.symmetric_difference(t1) -> Tree with keys in either T and t1  but
         not both
         """
         thiskeys = frozenset(self.iterkeys())
-        rkeys = thiskeys.symmetric_difference(frozenset(tree))
+        rkeys = thiskeys.symmetric_difference(frozenset(tree.iterkeys()))
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
+
+    def issubset(self, tree):
+        """ x.issubset(tree) -> True if every element in x is in tree """
+        thiskeys = frozenset(self.iterkeys())
+        return thiskeys.issubset(frozenset(tree.iterkeys()))
+
+    def issuperset(self, tree):
+        """ x.issubset(tree) -> True if every element in tree is in x """
+        thiskeys = frozenset(self.iterkeys())
+        return thiskeys.issuperset(frozenset(tree.iterkeys()))
+
+    def isdisjoint(self, tree):
+        """ x.isdisjoint(S) ->  True if x has a null intersection with tree """
+        thiskeys = frozenset(self.iterkeys())
+        return thiskeys.isdisjoint(frozenset(tree.iterkeys()))
 
 def _make_sets(trees):
     sets = []

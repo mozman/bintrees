@@ -384,13 +384,13 @@ class CheckTree(object):
         for index in range(len(tree)):
             self.assertEqual(expected[index], tree.item_at(index)[0])
 
-    def test_index_of(self):
+    def test_index(self):
         tree = self.TREE(self.default_values2)
         expected = [1, 2, 3, 4, 8, 9]
-        self.assertEqual(tree.index_of(1), 0)
-        self.assertEqual(tree.index_of(2), 1)
-        self.assertEqual(tree.index_of(8), 4)
-        self.assertEqual(tree.index_of(9), 5)
+        self.assertEqual(tree.index(1), 0)
+        self.assertEqual(tree.index(2), 1)
+        self.assertEqual(tree.index(8), 4)
+        self.assertEqual(tree.index(9), 5)
 
     def test_slice(self):
         tree = self.TREE(self.default_values2)
@@ -415,6 +415,18 @@ class CheckTree(object):
         self.assertEqual(len(result), 3)
         self.assertEqual(result[0][0], 9)
 
+        result = tree[::2] # 1, 3, 8
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0][0], 1)
+        self.assertEqual(result[1][0], 3)
+        self.assertEqual(result[2][0], 8)
+
+        result = tree[6::-2] # 9, 4, 2
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0][0], 9)
+        self.assertEqual(result[1][0], 4)
+        self.assertEqual(result[2][0], 2)
+
     def test_nlargest_by_slicing(self):
         l = range(30)
         shuffle(l)
@@ -430,6 +442,60 @@ class CheckTree(object):
         result1 = tree.nsmallest(10)
         result2 = tree[0:10]
         self.assertEqual(result1, result2)
+
+    def test_intersection(self):
+        l1 = range(30)
+        shuffle(l1)
+        l2 = range(15, 45)
+        shuffle(l2)
+
+        tree1 = self.TREE(zip(l1, l1))
+        tree2 = self.TREE(zip(l2, l2))
+        i = tree1 & tree2
+        self.assertEqual(len(i), 15)
+        self.assertEqual(i.min_key(), 15)
+        self.assertEqual(i.max_key(), 29)
+
+    def test_union(self):
+        l1 = range(30)
+        shuffle(l1)
+        l2 = range(15, 45)
+        shuffle(l2)
+
+        tree1 = self.TREE(zip(l1, l1))
+        tree2 = self.TREE(zip(l2, l2))
+        i = tree1 | tree2
+        self.assertEqual(len(i), 45)
+        self.assertEqual(i.min_key(), 0)
+        self.assertEqual(i.max_key(), 44)
+
+    def test_difference(self):
+        l1 = range(30)
+        shuffle(l1)
+        l2 = range(15, 45)
+        shuffle(l2)
+
+        tree1 = self.TREE(zip(l1, l1))
+        tree2 = self.TREE(zip(l2, l2))
+        i = tree1 - tree2
+        self.assertEqual(len(i), 15)
+        self.assertEqual(i.min_key(), 0)
+        self.assertEqual(i.max_key(), 14)
+
+    def test_symmetric_difference(self):
+        l1 = range(30)
+        shuffle(l1)
+        l2 = range(15, 45)
+        shuffle(l2)
+
+        tree1 = self.TREE(zip(l1, l1))
+        tree2 = self.TREE(zip(l2, l2))
+        i = tree1 ^ tree2
+        self.assertEqual(len(i), 30)
+        self.assertEqual(i.min_key(), 0)
+        self.assertEqual(i.max_key(), 44)
+        self.assertTrue(15 not in i)
+        self.assertTrue(29 not in i)
 
 if __name__=='__main__':
     unittest.main()
