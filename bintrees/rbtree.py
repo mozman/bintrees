@@ -110,10 +110,13 @@ class RBTree(TreeMixin):
     * __getitem__(y) <==> T[y]
     * __iter__() <==> iter(T)
     * __len__() <==> len(T)
+    * __max__() <==> max(T), get max item (k,v) of T
+    * __min__() <==> min(T), get min item (k,v) of T
     * __repr__() <==> repr(T)
     * __setitem__(k, v) <==> T[k] = v
     * clear() -> None, Remove all items from T.
     * copy() -> a shallow copy of T
+    * discard(k) -> None, remove k from T, if k is present
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node.
     * get(k[,d]) -> T[k] if k in T, else d
     * has_key(k) -> True if T has a key k, else False

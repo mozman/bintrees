@@ -59,14 +59,16 @@ class TreeMixin(object):
     * __getitem__(y) <==> T[y]
     * __iter__() <==> iter(T)
     * __len__() <==> len(T)
+    * __max__() <==> max(T), get max item (k,v) of T
+    * __min__() <==> min(T), get min item (k,v) of T
     * __repr__() <==> repr(T)
     * __setitem__(k, v) <==> T[k] = v
     * clear() -> None, Remove all items from T.
     * copy() -> a shallow copy of T
+    * discard(k) -> None, remove k from T, if k is present
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node.
     * get(k[,d]) -> T[k] if k in T, else d
     * has_key(k) -> True if T has a key k, else False
-    * insert(k, v) <==> T[k] = v, insert k, v into T
     * is_empty() -> True if len(T) == 0
     * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples
     * iteritems([reverse]) -> an iterator over the (k, v) items of T.
@@ -85,9 +87,8 @@ class TreeMixin(object):
     * pop_max() -> (k, v), remove item with maximum key
     * prev_item(key) -> get (k, v) pair, where k is predecessor to key
     * prev_key(key) -> k, get the predecessor of key
-    * remove(k) <==> del T[k], remove item k from T
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
-    * succ_item(key) -> get (k, v) pair, where k is successor to key
+    * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key
     * succ_key(key) -> k, get the successor of key
     * update(E) -> None.  Update T from dict/iterable E.
     * values([reverse]) -> list of T's values
@@ -96,6 +97,24 @@ class TreeMixin(object):
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
+#    Future plans
+#    ------------
+#
+#    Indexing
+#    --------
+#
+#    * index(k) -> index of key k
+#    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end
+#    * slice(s, e[, i]) -> list of (k,v) pairs, from s to e [without e] step i
+#
+#    Set functions
+#    -------------
+#    * fromiter(i1, i2, ...) -> list of (k,v) pairs, with keys from i1, i2, ...
+#    * intersection(t1, t2, ...) -> list of (k,v) pairs, with keys *common* to all trees
+#    * union(t1, t2, ...) -> list of (k,v) pairs, with keys from *either* tree
+#    * difference(t1, t2, ...) -> list of (k,v) pairs, with keys in T but not any of t1, t2, ...
+#    * symetric_difference(t1) -> list of (k,v) pairs, with keys in either T and t1  but not both
+
     def _get_leaf(self):
         """ get a leaf node """
         node = self.root
@@ -154,6 +173,21 @@ class TreeMixin(object):
     def __len__(self):
         """ x.__len__() <==> len(x) """
         return self.count
+
+    def __min__(self):
+        """ x.__min__() <==> min(x) """
+        return self.min_item()
+
+    def __max__(self):
+        """ x.__max__() <==> max(x) """
+        return self.max_item()
+
+    def discard(self, key):
+        """ x.discard(k) -> None, remove k from T, if k is present """
+        try:
+            self.remove(key)
+        except KeyError:
+            pass
 
     def is_empty(self):
         """ x.is_empty() -> False if T contains any items else True"""
@@ -327,10 +361,10 @@ class TreeMixin(object):
             raise ValueError("foreach(): unknown order '{0}'.".format(order))
 
     def min_item(self):
-        """ Get item with min key of tree, raises KeyError if tree is empty. """
+        """ Get item with min key of tree, raises ValueError if tree is empty. """
         node = self.root
         if node is None: # root is None
-            raise KeyError("tree is empty")
+            raise ValueError("Tree is empty")
         while node.left is not None:
             node = node.left
         return (node.key, node.value)
@@ -344,7 +378,7 @@ class TreeMixin(object):
         return item
 
     def min_key(self):
-        """ Get min key of tree, raises KeyError if tree is empty. """
+        """ Get min key of tree, raises ValueError if tree is empty. """
         key, value = self.min_item()
         return key
 
@@ -394,7 +428,7 @@ class TreeMixin(object):
         """
         node = self.root
         if node is None:
-            raise KeyError("tree is empty")
+            raise KeyError("Tree is empty")
         path = []
         compare = self.compare
         while node is not None:
@@ -443,10 +477,10 @@ class TreeMixin(object):
         return key
 
     def max_item(self):
-        """ Get item with max key of tree, raises KeyError if tree is empty. """
+        """ Get item with max key of tree, raises ValueError if tree is empty. """
         node = self.root
         if node is None: # root is None
-            raise KeyError("tree is empty")
+            raise ValueError("Tree is empty")
         while node.right is not None:
             node = node.right
         return (node.key, node.value)
@@ -460,7 +494,7 @@ class TreeMixin(object):
         return item
 
     def max_key(self):
-        """ Get max key of tree, raises KeyError if tree is empty. """
+        """ Get max key of tree, raises ValueError if tree is empty. """
         key, value = self.max_item()
         return key
 
