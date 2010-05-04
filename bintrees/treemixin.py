@@ -68,55 +68,60 @@ class TreeMixin(object):
     * clear() -> None, Remove all items from T.
     * copy() -> a shallow copy of T
     * discard(k) -> None, remove k from T, if k is present
-    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node.
     * get(k[,d]) -> T[k] if k in T, else d
     * has_key(k) -> True if T has a key k, else False
     * is_empty() -> True if len(T) == 0
     * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples
+    * keys([reverse]) -> list of T's keys
+    * pop(k[,d]) -> v, remove specified key and return the corresponding value.
+    * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple
+    * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
+    * update(E) -> None.  Update T from dict/iterable E.
+    * values([reverse]) -> list of T's values
+
+    walk forward/backward (not really fast!)
+
+    * prev_item(key) -> get (k, v) pair, where k is predecessor to key
+    * prev_key(key) -> k, get the predecessor of key
+    * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key
+    * succ_key(key) -> k, get the successor of key
+
+    traverse tree
+
     * iteritems([reverse]) -> an iterator over the (k, v) items of T.
     * iterkeys([reverse]) -> an iterator over the keys of T
     * itervalues([reverse]) -> an iterator over the values of T
-    * keys([reverse]) -> list of T's keys
+    * treeiter([rtype, reverse]) -> TreeIterator
+    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node.
+
+    Heap methods
+
     * max_item() -> get biggest (key, value) pair of T
     * max_key() -> get biggest key of T
     * min_item() -> get smallest (key, value) pair of T
     * min_key() -> get smallest key of T
-    * nlargest(n[,pop]) -> get list of n largest items (k, v)
-    * nsmallest(n[,pop]) -> get list of n smallest items (k, v)
-    * pop(k[,d]) -> v, remove specified key and return the corresponding value.
-    * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple
     * pop_min() -> (k, v), remove item with minimum key
     * pop_max() -> (k, v), remove item with maximum key
-    * prev_item(key) -> get (k, v) pair, where k is predecessor to key
-    * prev_key(key) -> k, get the predecessor of key
-    * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
-    * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key
-    * succ_key(key) -> k, get the successor of key
-    * treeiter([rtype, reverse]) -> TreeIterator
-    * update(E) -> None.  Update T from dict/iterable E.
-    * values([reverse]) -> list of T's values
+    * nlargest(n[,pop]) -> get list of n largest items (k, v)
+    * nsmallest(n[,pop]) -> get list of n smallest items (k, v)
+
+    Index methods (access by index is slow!)
+
+    * index_of(k) -> index of key k
+    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end
+    * T[s:e:i] -> slicing from start s to end e, step i
+
+    Set methods
+
+    * intersection(t1, t2, ...) -> Tree with keys *common* to all trees
+    * union(t1, t2, ...) -> Tree with keys from *either* trees
+    * difference(t1, t2, ...) -> Tree with keys in T but not any of t1, t2, ...
+    * symetric_difference(t1) -> Tree with keys in either T and t1  but not both
 
     Classmethods
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
-#    Future plans
-#    ------------
-#
-#    Indexing
-#    --------
-#
-#    * index(k) -> index of key k
-#    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end
-#    * slice(s, e[, i]) -> list of (k,v) pairs, from s to e [without e] step i
-#
-#    Set functions
-#    -------------
-#    * fromiter(i1, i2, ...) -> list of (k,v) pairs, with keys from i1, i2, ...
-#    * intersection(t1, t2, ...) -> list of (k,v) pairs, with keys *common* to all trees
-#    * union(t1, t2, ...) -> list of (k,v) pairs, with keys from *either* tree
-#    * difference(t1, t2, ...) -> list of (k,v) pairs, with keys in T but not any of t1, t2, ...
-#    * symetric_difference(t1) -> list of (k,v) pairs, with keys in either T and t1  but not both
 
     def _get_leaf(self):
         """ get a leaf node """
@@ -259,10 +264,13 @@ class TreeMixin(object):
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
         # overwrite this in cython
-        node = self.find_node(key)
-        if node is None:
-            raise KeyError(unicode(key))
-        return node.value
+        if isinstance(key, slice):
+            return self._slice(key)
+        else:
+            node = self.find_node(key)
+            if node is None:
+                raise KeyError(unicode(key))
+            return node.value
 
     def __setitem__(self, key, value):
         """ x.__setitem__(i, y) <==> x[i]=y """
@@ -529,3 +537,121 @@ class TreeMixin(object):
             gen = self.iterkeys(reverse=True)
             keys = (next(gen) for _ in xrange(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
+
+    def _slice(self, s):
+        """ T.slice(s) -> list of (k,v) pairs, from slice s
+
+        O(n) ... foreach visit all nodes!
+        """
+        start, end, step = s.indices(self.count)
+        reverse = True if start > end else False
+        indices = range(start, end, step)
+        if len(indices) > 0 :
+            if reverse:
+                indices = reversed(indices) # indices have to be ascending !!!
+            collector = ItemCollector(indices)
+            self.foreach(collector.func())
+            if reverse:
+                return list(reversed(collector.result))
+            else:
+                return collector.result
+        else:
+            return []
+
+    def index_of(self, key):
+        """ T.index_of(k) -> index, raises KeyError if k not in T
+
+        O(n) ... foreach visit all nodes!
+        """
+        indexer = KeyIndexer( (key,) )
+        self.foreach(indexer.func())
+        return indexer.result[key]
+
+    def item_at(self, index):
+        """ T.item_at(index) -> item (k,v)
+
+        O(n) ... foreach visit all nodes!
+        """
+        if index < 0:
+            index = self.count + index
+        if 0 <= index < self.count:
+            collector = ItemCollector( (index,) )
+            self.foreach(collector.func())
+            return collector.result[0]
+        else:
+            return None
+
+    def intersection(self, *trees):
+        """ x.intersection(t1, t2, ...) -> Tree, with keys *common* to all trees
+        """
+        thiskeys = frozenset(self.iterkeys())
+        sets = _make_sets(trees)
+        rkeys = thiskeys.intersection(*sets)
+        return self.__class__( ((key, self.get(key)) for key in rkeys) )
+
+    def union(self, *trees):
+        """ x.union(t1, t2, ...) -> Tree with keys from *either* trees
+        """
+        thiskeys = frozenset(self.iterkeys())
+        sets = _make_sets(trees)
+        rkeys = thiskeys.intersection(*sets)
+        return self.__class__( ((key, self.get(key)) for key in rkeys) )
+
+    def difference(self, *trees):
+        """ x.difference(t1, t2, ...) -> Tree with keys in T but not any of t1,
+        t2, ...
+        """
+        thiskeys = frozenset(self.iterkeys())
+        sets = _make_sets(trees)
+        rkeys = thiskeys.difference(*sets)
+        return self.__class__( ((key, self.get(key)) for key in rkeys) )
+
+    def symetric_difference(self, tree):
+        """ x.symetric_difference(t1) -> Tree with keys in either T and t1  but
+        not both
+        """
+        thiskeys = frozenset(self.iterkeys())
+        rkeys = thiskeys.symmetric_difference(frozenset(tree))
+        return self.__class__( ((key, self.get(key)) for key in rkeys) )
+
+def _make_sets(trees):
+    sets = []
+    for tree in trees:
+        sets.append(frozenset(tree.iterkeys()))
+    return sets
+
+class KeyIndexer(object):
+    """ Get numeric index of keys.
+    """
+    def __init__(self, keys):
+        self.index = 0
+        self.keys = frozenset(keys)
+        self.result = {} # result[key] = index
+
+    def func(self):
+        def _indexer(key, value):
+            if key in self.keys:
+                self.result[key] = self.index
+            self.index += 1
+        return _indexer
+
+class ItemCollector(object):
+    """Collector object, collect all items defined by numeric indices.
+    """
+    def __init__(self, indices):
+        self.index = 0
+        self.wanted = iter(indices)
+        self.next_index = self.wanted.next()
+        self.result = [] # result list is sorted by key
+
+    def func(self):
+        def _collector(key, value):
+            if self.index == self.next_index:
+                self.result.append( (key, value) )
+                try:
+                    self.next_index = self.wanted.next()
+                except StopIteration:
+                    self.next_index = -1
+            self.index += 1
+        return _collector
+
