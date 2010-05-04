@@ -88,6 +88,7 @@ Classmethods
 from random import shuffle
 
 from treemixin import TreeMixin
+from iterator import TreeIterator
 from bintree import BinaryTree
 from avltree import AVLTree
 from rbtree import RBTree

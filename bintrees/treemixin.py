@@ -4,6 +4,8 @@
 # Purpose: treemixin provides top level functions for binary trees
 # Created: 03.05.2010
 
+from iterator import TreeIterator
+
 class TreeMixin(object):
     """
     Abstract-Base-Class for the pure Python Trees: BinaryTree, AVLTree and RBTree
@@ -90,6 +92,7 @@ class TreeMixin(object):
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key
     * succ_key(key) -> k, get the successor of key
+    * treeiter([rtype, reverse]) -> TreeIterator
     * update(E) -> None.  Update T from dict/iterable E.
     * values([reverse]) -> list of T's values
 
@@ -205,6 +208,13 @@ class TreeMixin(object):
         for item in self.iteritems(reverse):
             yield item[0]
     __iter__ = iterkeys
+
+    def treeiter(self, rtype='key', reverse=False):
+        """ T.treeiter([rtype, reverse]) -> TreeIterator """
+        return TreeIterator(self)
+
+    def __reversed__(self):
+        return self.iterkeys(reverse=True)
 
     def values(self, reverse=False):
         """ T.values() -> list of T's values """
@@ -519,23 +529,3 @@ class TreeMixin(object):
             gen = self.iterkeys(reverse=True)
             keys = (next(gen) for _ in xrange(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
-
-    def _check_parent_links(self):
-        # used in tests to check the tree integrity
-        def check(node):
-            if node.left is not None:
-                if node.left.parent is not node:
-                    valid = False
-            if node.right is not None:
-                if node.right.parent is not node:
-                    valid = False
-        def do_check(node):
-            if node is not None:
-                check(node)
-                do_check(node.left)
-                do_check(node.right)
-
-        valid = True
-        if self.root is not None:
-            do_check(self.root)
-        return valid

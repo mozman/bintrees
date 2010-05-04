@@ -144,6 +144,7 @@ class AVLTree(TreeMixin):
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T
     * succ_item(key) -> get (k, v) pair, where k is successor to key
     * succ_key(key) -> k, get the successor of key
+    * treeiter([rtype, reverse]) -> TreeIterator
     * update(E) -> None.  Update T from dict/iterable E.
     * values([reverse]) -> list of T's values
 
