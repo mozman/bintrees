@@ -357,6 +357,14 @@ class CheckTree(object):
         chk = [(x,x) for x in range(29, 19, -1)]
         self.assertEqual(chk, result)
 
+    def test_nsmallest(self):
+        l = range(30)
+        shuffle(l)
+        tree = self.TREE(zip(l, l))
+        result = tree.nsmallest(10)
+        chk = [(x,x) for x in range(0, 10)]
+        self.assertEqual(chk, result)
+
     def test_reverse_iterkeys(self):
         tree = self.TREE(zip(set3, set3))
         result = reversed(sorted(set3))
@@ -369,6 +377,59 @@ class CheckTree(object):
         result = reversed(sorted(set3))
         for key, chk in izip(reversed(tree), result):
             self.assertEqual(chk, key)
+
+    def test_item_at(self):
+        tree = self.TREE(self.default_values2)
+        expected = [1, 2, 3, 4, 8, 9]
+        for index in range(len(tree)):
+            self.assertEqual(expected[index], tree.item_at(index)[0])
+
+    def test_index_of(self):
+        tree = self.TREE(self.default_values2)
+        expected = [1, 2, 3, 4, 8, 9]
+        self.assertEqual(tree.index_of(1), 0)
+        self.assertEqual(tree.index_of(2), 1)
+        self.assertEqual(tree.index_of(8), 4)
+        self.assertEqual(tree.index_of(9), 5)
+
+    def test_slice(self):
+        tree = self.TREE(self.default_values2)
+        expected = [1, 2, 3, 4, 8, 9]
+        result = tree[0:1]
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0], 1)
+
+        result = tree[1: 3] # 2, 3
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[1][0], 3)
+
+        result = tree[3:]# 4, 8, 9
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[2][0], 9)
+
+        result = tree[:3] #  1, 2, 3
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0][0], 1)
+
+        result = tree[5:2:-1] # 9, 8, 4
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0][0], 9)
+
+    def test_nlargest_by_slicing(self):
+        l = range(30)
+        shuffle(l)
+        tree = self.TREE(zip(l, l))
+        result1 = tree.nlargest(10)
+        result2 = list(reversed(tree[-10:]))
+        self.assertEqual(result1, result2)
+
+    def test_nsmallest_by_slicing(self):
+        l = range(30)
+        shuffle(l)
+        tree = self.TREE(zip(l, l))
+        result1 = tree.nsmallest(10)
+        result2 = tree[0:10]
+        self.assertEqual(result1, result2)
 
 if __name__=='__main__':
     unittest.main()
