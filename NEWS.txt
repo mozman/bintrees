@@ -1,3 +1,12 @@
+Version 0.2.1 ...
+  * added discard: remove key without KeyError if not found
+  * added heap methods: min, max, nlarges, nsmallest ...
+  * added set methods: intersection, differnce, union, ...
+  * added slicing: T[5:10] get items with position (not key!)  5, 6, 7, 8, 9
+          T[5] get item with key! 5
+  * added index: T.index(key) -> get position of item <key>
+  * added item_at: T.item_at(0) -> get item at position (not key!) 0
+          T.item_at(0) O(n)! <==> T.min_item() O(log(n))
 Version 0.2.0 - 03 Mai 2010
   * TreeMixin Class as base for Python-Trees and as Mixin for Cython-Trees
 Version 0.1.0 - 27 April 2010
