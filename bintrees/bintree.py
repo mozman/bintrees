@@ -125,12 +125,13 @@ class BinaryTree(TreeMixin):
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
-    def __init__(self, items=[], compare=None):
+    def __init__(self, items=None, compare=None):
         """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
         self._root = None
         self._compare = compare if compare is not None else cmp
         self._count = 0
-        self.update(items)
+        if items is not None:
+            self.update(items)
 
     def clear(self):
         """ T.clear() -> None.  Remove all items from T. """
