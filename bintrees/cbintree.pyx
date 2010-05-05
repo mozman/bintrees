@@ -177,3 +177,11 @@ cdef class cBinaryTree:
                     node = node.link(direction)
                     if node is None:
                         raise KeyError(str(key))
+
+    def max_item(self):
+        cdef Node node
+        if self._root is None:
+            raise ValueError("Tree is empty")
+        else:
+            return cmax_item(self._root)
+

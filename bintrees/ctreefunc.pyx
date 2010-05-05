@@ -4,22 +4,16 @@
 # Purpose: cython tree function
 # Created: 05.05.2010
 
-cdef class Node:
-    cdef Node _left
-    cdef Node _right
-    cdef object _key
-    cdef object _value
+from ctreefunc cimport Node
 
-cdef Node cfind_node(Node node, object key, object compare):
-    """ T.find_node(key) -> get treenode of key, returns None if not found.
-    """
-    cdef int cval
-    while node is not None:
-        cval = <int>compare(key, node._key)
-        if cval == 0:
-            return node
-        elif cval < 0:
-            node = node._left
-        else:
-            node = node._right
-    return None
+cdef object cmax_item(Node node):
+    """ Get item with max key of tree """
+    while node._right is not None:
+        node = node._right
+    return (node._key, node._value)
+
+cdef object cmin_item(Node node):
+    """ Get node with min key of tree """
+    while node._right is not None:
+        node = node._right
+    return (node._key, node._value)

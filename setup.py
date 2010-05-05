@@ -11,8 +11,8 @@ from Cython.Distutils import build_ext
 
 ext_modules = [Extension("bintrees.cbintree", ["bintrees/cbintree.pyx"]),
                Extension("bintrees.crbtree", ["bintrees/crbtree.pyx"]),
-               Extension("bintrees.cavltree", ["bintrees/cavltree.pyx"],
-               Extension("bintrees.ctreefunc", ["bintrees/ctreefunc.pyx"],)]
+               Extension("bintrees.cavltree", ["bintrees/cavltree.pyx"]),
+               Extension("bintrees.ctreefunc", ["bintrees/ctreefunc.pyx"])]
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
