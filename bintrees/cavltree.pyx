@@ -141,7 +141,7 @@ cdef class cAVLTree:
         cdef int dir_stack[MAXSTACK]
         cdef Node node, a, b
         cdef int top, direction, other_side
-        cdef int left_height, right_height
+        cdef int left_height, right_height, cmp_res
         cdef bint done
 
         if self._root is None:
@@ -153,7 +153,11 @@ cdef class cAVLTree:
             node = self._root
             # search for an empty link, save path
             while True:
-                direction = 1 if self._compare(key, node._key) > 0 else 0
+                cmp_res = <int>self._compare(key, node._key)
+                if cmp_res == 0: # update existing item
+                    node._value = value
+                    return
+                direction = 1 if  cmp_res > 0 else 0
                 dir_stack[top] = direction
                 node_stack.append(node)
                 if node.link(direction) is None:

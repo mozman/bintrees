@@ -113,7 +113,7 @@ class TreeMixin(object):
 
     * index(k) -> index of key k, O(n)
     * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
-    * T[s:e:i] -> slicing from start s to end e, step i, O(n)
+    * T[s:e:i] -> list of (k,v) pairs, from start s to end e, step i, O(n)
     * del T[s:e:i] -> remove items by slicing, O(n)
 
     Set methods (using frozenset)
@@ -224,6 +224,9 @@ class TreeMixin(object):
         except KeyError:
             pass
 
+    def __del__(self):
+        self.clear()
+
     def is_empty(self):
         """ x.is_empty() -> False if T contains any items else True"""
         return self.root is None
@@ -319,15 +322,16 @@ class TreeMixin(object):
             return default
         return node.value
 
-    def update(self, items):
+    def update(self, *args):
         """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
-        try:
-            generator = items.iteritems()
-        except AttributeError:
-            generator = iter(items)
+        for items in args:
+            try:
+                generator = items.iteritems()
+            except AttributeError:
+                generator = iter(items)
 
-        for key, value in generator:
-            self.insert(key, value)
+            for key, value in generator:
+                self.insert(key, value)
 
     @classmethod
     def fromkeys(cls, iterable, value=None):
