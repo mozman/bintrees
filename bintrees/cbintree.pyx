@@ -96,18 +96,16 @@ cdef class cBinaryTree:
     def find_node(self, key):
         cdef int cval
         cdef Node node
-        compare = self._compare
         node = self._root
-        while True:
-            if node is None:
-                return None
-            cval = <int>compare(key, node._key)
+        while node is not None:
+            cval = <int>self._compare(key, node._key)
             if cval == 0:
                 return node
             elif cval < 0:
                 node = node._left
             else:
                 node = node._right
+        return None
 
     def insert(self, key, value):
         cdef Node parent, node
@@ -177,11 +175,4 @@ cdef class cBinaryTree:
                     node = node.link(direction)
                     if node is None:
                         raise KeyError(str(key))
-
-    def max_item(self):
-        cdef Node node
-        if self._root is None:
-            raise ValueError("Tree is empty")
-        else:
-            return cmax_item(self._root)
 

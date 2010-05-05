@@ -32,6 +32,10 @@ setup_FastBinaryTree_s = """
 from __main__ import keys, cbintree_search, cy_searchtree
 """
 
+setup_FastBinaryTree_swc = """
+from __main__ import keys, cbintree_wc_search, cy_wc_searchtree
+"""
+
 def random_keys():
     from random import shuffle, randint
     keys = set()
@@ -48,6 +52,8 @@ except IOError:
 
 py_searchtree = BinaryTree.fromkeys(keys)
 cy_searchtree = FastBinaryTree.fromkeys(keys)
+cy_wc_searchtree = FastBinaryTree.fromkeys(sorted(keys))
+
 
 def bintree_build_delete():
     tree = BinaryTree.fromkeys(keys)
@@ -72,6 +78,10 @@ def bintree_search():
 def cbintree_search():
     for key in keys:
         obj = cy_searchtree[key]
+
+def cbintree_wc_search():
+    for key in keys:
+        obj = cy_wc_searchtree[key]
 
 def print_result(time, text):
     print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
@@ -99,6 +109,9 @@ def main():
 
     t = Timer("cbintree_search()", setup_FastBinaryTree_s)
     print_result(t.timeit(COUNT), 'FastBinaryTree search')
+
+    t = Timer("cbintree_wc_search()", setup_FastBinaryTree_swc)
+    print_result(t.timeit(COUNT), 'FastBinaryTree (worst case input: sorted keys) search')
 
 if __name__=='__main__':
     main()
