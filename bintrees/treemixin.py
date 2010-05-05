@@ -441,8 +441,8 @@ class TreeMixin(object):
         """
         node = self.root
         if node is None:
-            raise KeyError("tree is empty")
-        path = []
+            raise KeyError("Tree is empty")
+        prev = None
         compare = self.compare
         while node is not None:
             cval = compare(key, node.key)
@@ -451,7 +451,8 @@ class TreeMixin(object):
             elif cval < 0:
                 node = node.left
             else:
-                path.append(node) # predecessor on path to root?
+                if (prev is None) or (compare(node.key, prev.key) > 0):
+                    prev = node
                 node = node.right
 
         if node is None:
@@ -462,18 +463,13 @@ class TreeMixin(object):
             node = node.left
             while node.right is not None:
                 node = node.right
-            path.append(node)
-        else: # left subtree is None
-            if len(path) == 0: # given key is smallest in tree
-                raise KeyError(unicode(key))
-
-        # find max key on stack
-        nodes = iter(path)
-        node = next(nodes)
-        for pathnode in nodes: # contains only nodes which are < key
-            if compare(pathnode.key, node.key) > 0:
-                node = pathnode
-        return (node.key, node.value)
+            if prev is None:
+                prev = node
+            elif compare(node.key, prev.key) > 0:
+                prev = node
+        elif prev is None: # given key is smallest in tree
+            raise KeyError(unicode(key))
+        return (prev.key, prev.value)
 
     def succ_item(self, key):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
@@ -482,14 +478,15 @@ class TreeMixin(object):
         node = self.root
         if node is None:
             raise KeyError("Tree is empty")
-        path = []
+        succ = None
         compare = self.compare
         while node is not None:
             cval = compare(key, node.key)
             if cval == 0:
                 break
             elif cval < 0:
-                path.append(node) # successor on path to root?
+                if (succ is None) or (compare(node.key, succ.key) < 0):
+                    succ = node
                 node = node.left
             else:
                 node = node.right
@@ -502,18 +499,13 @@ class TreeMixin(object):
             node = node.right
             while node.left is not None:
                 node = node.left
-            path.append(node)
-        else: # right subtree is None
-            if len(path) == 0: # given key is biggest in tree
-                raise KeyError(unicode(key))
-
-        # find min key on stack
-        nodes = iter(path)
-        node = next(nodes)
-        for pathnode in nodes: # contains only nodes which are > key
-            if compare(pathnode.key, node.key) < 0:
-                node = pathnode
-        return (node.key, node.value)
+            if succ is None:
+                succ = node
+            elif compare(node.key, succ.key) < 0:
+                succ = node
+        elif succ is None: # given key is biggest in tree
+            raise KeyError(unicode(key))
+        return (succ.key, succ.value)
 
     def prev_key(self, key):
         """ Get predecessor to key, raises KeyError if key is min key
@@ -602,27 +594,55 @@ class TreeMixin(object):
             self.remove(key)
 
     def index(self, key):
-        """ T.index(k) -> index, raises KeyError if k not in T
-
-        O(n) ... foreach visit all nodes!
-        """
-        indexer = KeyIndexer( (key,) )
-        self.foreach(indexer.func())
-        return indexer.result[key]
+        """ T.index(k) -> index, raises KeyError if k not in T """
+        node = self.root
+        index = 0
+        go_down = True
+        stack = list()
+        while True:
+            if node.left is not None and go_down:
+                stack.append(node)
+                node = node.left
+            else:
+                if self.compare(node.key, key) == 0:
+                    return index
+                index += 1
+                if node.right is not None:
+                    node = node.right
+                    go_down = True
+                else:
+                    if not len(stack): # all done, key not found
+                        raise KeyError(str(key))
+                    node = stack.pop()
+                    go_down = False
 
     def item_at(self, index):
         """ T.item_at(index) -> item (k,v)
-
-        O(n) ... foreach visit all nodes!
         """
         if index < 0:
             index = self.count + index
-        if 0 <= index < self.count:
-            collector = ItemCollector( (index,) )
-            self.foreach(collector.func())
-            return collector.result[0]
-        else:
-            return None
+        if (index < 0) or (index >= self.count):
+            raise IndexError('item_at()')
+        node = self.root
+        counter = 0
+        go_down = True
+        stack = list()
+        while True:
+            if node.left is not None and go_down:
+                stack.append(node)
+                node = node.left
+            else:
+                if counter == index:
+                    return (node.key, node.value)
+                counter += 1
+                if node.right is not None:
+                    node = node.right
+                    go_down = True
+                else:
+                    if not len(stack):
+                        return # all done
+                    node = stack.pop()
+                    go_down = False
 
     def intersection(self, *trees):
         """ x.intersection(t1, t2, ...) -> Tree, with keys *common* to all trees

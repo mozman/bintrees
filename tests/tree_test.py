@@ -52,6 +52,12 @@ class CheckTree(object):
         tree2 = self.TREE(tree1)
         self.assertEqual(len(tree2), 6)
 
+    def test_compare_function(self):
+        compare = lambda a,b: -cmp(a,b)
+        tree = self.TREE(compare=compare)
+        tree.update([(1,1), (2,2), (3,3)])
+        self.assertEqual(tree.keys(), [3, 2, 1])
+
     def test_copy(self):
         tree1 = self.TREE(self.default_values1)
         tree2 = tree1.copy()
@@ -507,6 +513,13 @@ class CheckTree(object):
         expected = [1, 2, 3, 4, 8, 9]
         for index in range(len(tree)):
             self.assertEqual(expected[index], tree.item_at(index)[0])
+        self.assertEqual(9, tree.item_at(-1)[0])
+        self.assertEqual(1, tree.item_at(-6)[0])
+
+    def test_item_at_error(self):
+        tree = self.TREE(self.default_values2)
+        self.assertRaises(IndexError, tree.item_at, 6)
+        self.assertRaises(IndexError, tree.item_at, -7)
 
     def test_index(self):
         tree = self.TREE(self.default_values2)
@@ -515,6 +528,10 @@ class CheckTree(object):
         self.assertEqual(tree.index(2), 1)
         self.assertEqual(tree.index(8), 4)
         self.assertEqual(tree.index(9), 5)
+
+    def test_index_error(self):
+        tree = self.TREE(self.default_values2)
+        self.assertRaises(KeyError, tree.index, 7)
 
     def test_getslice(self):
         tree = self.TREE(self.default_values2)
