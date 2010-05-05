@@ -114,6 +114,7 @@ class TreeMixin(object):
     * index(k) -> index of key k, O(n)
     * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
     * T[s:e:i] -> slicing from start s to end e, step i, O(n)
+    * del T[s:e:i] -> remove items by slicing, O(n)
 
     Set methods (using frozenset)
 
@@ -175,9 +176,12 @@ class TreeMixin(object):
                 return None
         return "{{{0}}}".format(", ".join(_tostr(self.root)))
 
-    def __copy__(self):
-        """ T.__copy__() -> get a shallow copy of T. """
-        return self.copy()
+    def copy(self):
+        """ T.copy() -> get a shallow copy of T. """
+        tree = self.__class__(compare=self.compare)
+        self.foreach(tree.insert, order='preorder')
+        return tree
+    __copy__ = copy
 
     def has_key(self, key):
         """ T.has_key(k) -> True if T has a key k, else False """
@@ -286,7 +290,6 @@ class TreeMixin(object):
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
-        # overwrite this in cython
         if isinstance(key, slice):
             return self._slice(key)
         else:
@@ -297,11 +300,16 @@ class TreeMixin(object):
 
     def __setitem__(self, key, value):
         """ x.__setitem__(i, y) <==> x[i]=y """
+        if isinstance(key, slice):
+            raise ValueError('setslice is unsupported')
         self.insert(key, value)
 
     def __delitem__(self, key):
         """ x.__delitem__(y) <==> del x[y] """
-        self.remove(key)
+        if isinstance(key, slice):
+            self._delslice(key)
+        else:
+            self.remove(key)
 
     def setdefault(self, key, default=None):
         """ T.setdefault(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T """
@@ -562,7 +570,7 @@ class TreeMixin(object):
             return [(key, self.get(key)) for key in keys]
 
     def _slice(self, s):
-        """ T.slice(s) -> list of (k,v) pairs, from slice s
+        """ T._slice(s) -> list of (k,v) pairs, from slice s
 
         O(n) ... foreach visit all nodes!
         """
@@ -580,6 +588,14 @@ class TreeMixin(object):
                 return collector.result
         else:
             return []
+
+    def _delslice(self, s):
+        """ T._delslice(s) -> remove item from T by slice s
+
+        O(n) ... foreach visit all nodes!
+        """
+        for key, value in self._slice(s):
+            self.remove(key)
 
     def index(self, key):
         """ T.index(k) -> index, raises KeyError if k not in T

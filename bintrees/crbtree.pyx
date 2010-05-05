@@ -121,18 +121,16 @@ cdef class cRBTree:
     def find_node(self, key):
         cdef int cval
         cdef Node node
-        compare = self._compare
         node = self._root
-        while True:
-            if node is None:
-                return None
-            cval = <int>compare(key, node._key)
+        while node is not None:
+            cval = <int>self._compare(key, node._key)
             if cval == 0:
                 return node
             elif cval < 0:
                 node = node._left
             else:
                 node = node._right
+        return None
 
     def insert(self, key, value):
         cdef Node head, grand_grand_parent, grand_parent, parent, node
