@@ -20,6 +20,7 @@ COUNT = 100
 try:
     with open('testkeys.txt') as fp:
         keys = eval(fp.read())
+
 except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
