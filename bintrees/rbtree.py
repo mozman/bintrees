@@ -100,7 +100,7 @@ class RBTree(TreeMixin):
 
     RBTree([compare]) -> new empty tree.
     RBTree(mapping, [compare]) -> new tree initialized from a mapping
-    RBTree(seq, [compare]) -> new tree initialized from seq
+    RBTree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
     Methods
     -------

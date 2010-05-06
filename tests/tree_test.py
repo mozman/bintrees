@@ -364,6 +364,11 @@ class CheckTree(object):
                 self.assertEqual(prev_value, prev_item[1])
             prev_value = key
 
+    def test_prev_key_extreme(self):
+        # extreme degenerated binary tree (if unbalanced)
+        tree = self.TREE.fromkeys([1, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2])
+        self.assertEqual(tree.prev_key(2), 1)
+
     def test_prev_item_error(self):
         tree = self.TREE()
         tree[0] = 'NULL'
@@ -380,6 +385,11 @@ class CheckTree(object):
             if succ_value is not None:
                 self.assertEqual(succ_value, succ_item[1])
             succ_value = key
+
+    def test_succ_key_extreme(self):
+        # extreme degenerated binary tree (if unbalanced)
+        tree = self.TREE.fromkeys([15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        self.assertEqual(tree.succ_key(10), 15)
 
     def test_succ_item_error(self):
         tree = self.TREE()

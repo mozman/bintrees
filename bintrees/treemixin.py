@@ -95,13 +95,13 @@ class TreeMixin(object):
     * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
     * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
     * itervalues([reverse]) -> an iterator over the values of T, O(n)
-    * treeiter([rtype, reverse]) -> TreeIterator
+    * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
     Heap methods
 
-    * max_item() -> get biggest (key, value) pair of T, O(log(n))
-    * max_key() -> get biggest key of T, O(log(n))
+    * max_item() -> get largest (key, value) pair of T, O(log(n))
+    * max_key() -> get largest key of T, O(log(n))
     * min_item() -> get smallest (key, value) pair of T, O(log(n))
     * min_key() -> get smallest key of T, O(log(n))
     * pop_min() -> (k, v), remove item with minimum key, O(log(n))
