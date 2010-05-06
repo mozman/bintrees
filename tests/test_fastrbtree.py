@@ -4,7 +4,7 @@
 # Purpose: test RBTrees
 # Created: 28.04.2010
 
-import unittest2 as unittest
+import unittest
 from tree_test import CheckTree
 
 from bintrees import FastRBTree

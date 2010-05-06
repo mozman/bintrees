@@ -46,7 +46,7 @@ class BinaryTree(TreeMixin):
 
     BinaryTree([compare]) -> new empty tree.
     BinaryTree(mapping, [compare]) -> new tree initialized from a mapping
-    BinaryTree(seq, [compare]) -> new tree initialized from seq
+    BinaryTree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
     Methods
     -------

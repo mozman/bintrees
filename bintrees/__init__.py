@@ -13,7 +13,7 @@ Python Trees
 Balanced and unbalance binary trees written in pure Python with a dict-like API.
 
 Classes
--------
+~~~~~~~
 * BinaryTree -- unbalanced binary tree
 * AVLTree -- balanced AVL-Tree
 * RBTree -- balanced Red-Black-Tree
@@ -25,7 +25,7 @@ Basic tree functions written in Cython, merged with TreeMixin to provide the
 full API of the Python Trees.
 
 Classes
--------
+~~~~~~~
 
 * FastBinaryTree -- unbalanced binary tree
 * FastAVLTree -- balanced AVLTree
@@ -36,7 +36,7 @@ Overview of API for all Classes
 
 * TreeClass ([compare]) -> new empty tree.
 * TreeClass(mapping, [compare]) -> new tree initialized from a mapping
-* TreeClass(seq, [compare]) -> new tree initialized from seq
+* TreeClass(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
 Methods
 -------
@@ -122,19 +122,26 @@ from bintree import BinaryTree
 from avltree import AVLTree
 from rbtree import RBTree
 
-import sys
-if not 'IronPython' in sys.version:
+try:
     from cbintree import cBinaryTree
-    from cavltree import cAVLTree
-    from crbtree import cRBTree
     class FastBinaryTree(cBinaryTree, TreeMixin):
         """ Fast unbalanced binary tree. """
+except ImportError: # fall back to Python version
+    FastBinaryTree = BinaryTree
 
+try:
+    from cavltree import cAVLTree
     class FastAVLTree(cAVLTree, TreeMixin):
         """ Fast balanced AVL-Tree. """
+except ImportError: # fall back to Python version
+    FastAVLTree = AVLTree
 
+try:
+    from crbtree import cRBTree
     class FastRBTree(cRBTree, TreeMixin):
         """ Fast balanced Red-Black-Tree. """
+except ImportError: # fall back to Python version
+    FastRBTree = RBTree
 
 __all__ = ['FastBinaryTree', 'FastAVLTree', 'FastRBTree',
            'BinaryTree', 'AVLTree', 'RBTree']

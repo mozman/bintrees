@@ -101,7 +101,7 @@ class AVLTree(TreeMixin):
 
     AVLTree([compare]) -> new empty tree.
     AVLTree(mapping, [compare]) -> new tree initialized from a mapping
-    AVLTree(seq, [compare]) -> new tree initialized from seq
+    AVLTree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
     Methods
     -------
