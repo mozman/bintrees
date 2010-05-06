@@ -22,6 +22,7 @@ setup(
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',
+    download_url='http://bitbucket.org/mozman/bintrees/downloads',
     author_email='mozman@gmx.at',
     cmdclass = {'build_ext': build_ext},
     ext_modules = ext_modules,

@@ -116,8 +116,8 @@ Performance
 
 Profiling with timeit(): 5000 unique random keys, time in seconds
 
-BinartyTrees
-------------
+BinaryTrees
+-----------
 ========================  =============  =============  =========
 unbalanced BinaryTree     cPython 2.6.5  Cython 0.12.1  ipy 2.6.0
 ========================  =============  =============  =========
