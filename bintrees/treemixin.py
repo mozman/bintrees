@@ -173,7 +173,7 @@ class TreeMixin(object):
                     result.extend(right)
                 return result
             else:
-                return None
+                return []
         return "{{{0}}}".format(", ".join(_tostr(self.root)))
 
     def copy(self):

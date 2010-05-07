@@ -4,7 +4,7 @@
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
-__all__ = ['cBinaryTree']
+__all__ = ['cQBinaryTree']
 
 cdef extern from "python.h":
     ctypedef struct PyObject:
@@ -20,8 +20,8 @@ cdef extern from "ctrees.h":
     object ct_get_value(node_t *node)
     void ct_delete_tree(node_t *root)
     node_t *ct_find_node(node_t *root, object key, object cmp)
-    node_t *ct_bintree_insert(node_t *root, object key, object value, object cmp)
-    node_t *ct_bintree_remove(node_t *root, object key, object cmp)
+    int ct_bintree_insert(node_t **root, object key, object value, object cmp)
+    int ct_bintree_remove(node_t **root, object key, object cmp)
 
 cdef class TempNode:
     # temporary object for TreeMixin, only read access from Python
@@ -66,7 +66,7 @@ cdef object from_node_t(node_t *node):
             new_node = None
         return new_node
 
-cdef class cBinaryTree:
+cdef class cQBinaryTree:
     cdef node_t *_root
     cdef int _count
     cdef object _compare
@@ -79,7 +79,6 @@ cdef class cBinaryTree:
 
     @property
     def root(self):
-        cdef TempNode node
         if self._root == NULL:
             return None
         else:
@@ -107,13 +106,13 @@ cdef class cBinaryTree:
             return from_node_t(node)
 
     def insert(self, key, value):
-        self._root = ct_bintree_insert(self._root, key, value, self._compare)
+        self._count += ct_bintree_insert(&self._root, key, value, self._compare)
 
     def remove(self, key):
-        cdef node_t *result
-        result = ct_bintree_remove(self._root, key, self._compare)
-        if result == NULL:
-            raise KeyError(str(key))
+        cdef int result
+        result =  ct_bintree_remove(&self._root, key, self._compare)
+        if result == 0:
+            KeyError(str(key))
         else:
-            self._root = result
+            self._count -= 1
 

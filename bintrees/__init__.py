@@ -125,23 +125,45 @@ from rbtree import RBTree
 try:
     from cbintree import cBinaryTree
     class FastBinaryTree(cBinaryTree, TreeMixin):
-        """ Fast unbalanced binary tree. """
+        """ Fast unbalanced binary tree written in Cython. """
 except ImportError: # fall back to Python version
     FastBinaryTree = BinaryTree
+    
+try:
+    from cbintree2 import cQBinaryTree
+    class QuickBinaryTree(cQBinaryTree, TreeMixin):
+        """ Faster unbalanced binary tree  written in Cython with more C-Code. """
+except ImportError: # fall back to Cython or Python version
+    QuickBinaryTree = FastBinaryTree
 
 try:
     from cavltree import cAVLTree
     class FastAVLTree(cAVLTree, TreeMixin):
-        """ Fast balanced AVL-Tree. """
+        """ Fast balanced AVL-Tree written in Cython. """
 except ImportError: # fall back to Python version
     FastAVLTree = AVLTree
+    
+try:
+    from cavltree2 import cQAVLTree
+    class QuickAVLTree(cQAVLTree, TreeMixin):
+        """ Faster balanced AVL-Tree written in Cython with more C-Code. """
+except ImportError: # fall back to Cython or Python version
+    QuickAVLTree = FastAVLTree
 
 try:
     from crbtree import cRBTree
     class FastRBTree(cRBTree, TreeMixin):
-        """ Fast balanced Red-Black-Tree. """
+        """ Fast balanced Red-Black-Tree written in Cython. """
 except ImportError: # fall back to Python version
     FastRBTree = RBTree
+    
+try:
+    from crbtree2 import cQRBTree
+    class QuickRBTree(cQRBTree, TreeMixin):
+        """ Faster balanced Red-Black-Tree  written in Cython with more C-Code. """
+except ImportError: # fall back to Cython or Python version
+    QuickRBTree = FastRBTree
 
-__all__ = ['FastBinaryTree', 'FastAVLTree', 'FastRBTree',
+__all__ = ['QuickBinaryTree', 'QuickAVLTree', 'QuickRBTree',
+           'FastBinaryTree', 'FastAVLTree', 'FastRBTree',
            'BinaryTree', 'AVLTree', 'RBTree']
