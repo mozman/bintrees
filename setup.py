@@ -9,10 +9,10 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
-ext_modules = [Extension("bintrees.cbintree", ["bintrees/ctrees.c", "bintrees/cbintree.pyx"]),
-               Extension("bintrees.crbtree", ["bintrees/ctrees.c", "bintrees/crbtree.pyx"]),
-               Extension("bintrees.cavltree", ["bintrees/ctrees.c", "bintrees/cavltree.pyx"]),
-               Extension("bintrees.cbintree2", ["bintrees/ctrees.c", "bintrees/cbintree2.pyx"])]
+ext_modules = [Extension("bintrees.cbintree", ["src/ctrees.c", "src/cbintree.pyx"]),
+               Extension("bintrees.crbtree", ["src/ctrees.c", "src/crbtree.pyx"]),
+               Extension("bintrees.cavltree", ["src/ctrees.c", "src/cavltree.pyx"]),
+               Extension("bintrees.cbintree2", ["src/ctrees.c", "src/cbintree2.pyx"])]
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
