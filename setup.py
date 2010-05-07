@@ -9,7 +9,7 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
-ext_modules = [Extension("bintrees.node", ["bintrees/node.c"]),
+ext_modules = [Extension("bintrees.ctrees", ["bintrees/ctrees.c"]),
                Extension("bintrees.cbintree", ["bintrees/cbintree.pyx"]),
                Extension("bintrees.crbtree", ["bintrees/crbtree.pyx"]),
                Extension("bintrees.cavltree", ["bintrees/cavltree.pyx"])]
@@ -19,7 +19,7 @@ def read(fname):
 
 setup(
     name = 'bintrees',
-    version='0.2.1',
+    version='0.3.0',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',
