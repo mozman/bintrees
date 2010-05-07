@@ -1,7 +1,7 @@
-#include "node.h"
+#include "ctrees.h"
 #include <Python.h>
 
-node_t * node_new(PyObject *key, PyObject *value)
+node_t * ct_new_node(PyObject *key, PyObject *value, int xdata)
 {
     node_t * new_node = PyMem_Malloc(sizeof(*new_node));
     if (new_node != NULL)
@@ -12,56 +12,71 @@ node_t * node_new(PyObject *key, PyObject *value)
             Py_INCREF(value);
             LEFT_NODE(new_node) = NULL;
             RIGHT_NODE(new_node) = NULL;
-            new_node->xdata = 0;
+            XDATA(new_node) = xdata;
         }
     return new_node;
 }
 
-void node_delete(node_t *node)
+void ct_delete_node(node_t *node)
 {
     Py_XDECREF(KEY(node));
     Py_XDECREF(VALUE(node));
     PyMem_Free(node);
 }
 
-void tree_clear(node_t * node)
+void ct_delete_tree(node_t * root)
 {
-    if (LEFT_NODE(node) != NULL)
+    if (LEFT_NODE(root) != NULL)
         {
-            tree_clear(LEFT_NODE(node));
+            ct_delete_tree(LEFT_NODE(root));
         };
-    if (RIGHT_NODE(node) != NULL)
+    if (RIGHT_NODE(root) != NULL)
         {
-            tree_clear(RIGHT_NODE(node));
+            ct_delete_tree(RIGHT_NODE(root));
         };
-    node_delete(node);
+    ct_delete_node(root);
 }
 
-PyObject *node_get_value(node_t *node)
+PyObject *ct_get_value(node_t *node)
 {
-    Py_INCREF(NODE_KEY(node))
-    return NODE_KEY(node)
+    /* Py_INCREF(NODE_KEY(node)) is this ok? */
+    return KEY(node);
 }
 
 void node_set_value(node_t *node, PyObject *value)
 {
-    Py_INCREF(value)
-    NODE_VALUE(node) = value
+    Py_INCREF(value);
+    VALUE(node) = value;
 }
 
-PyObject *node_get_key(node_t *node)
+PyObject *ct_get_key(node_t *node)
 {
-    Py_INCREF(NODE_VALUE(node))
-    return NODE_VALUE(node)
+    /* Py_INCREF(NODE_VALUE(node)) is this ok? */
+    return VALUE(node);
 }
 
-void node_swap_data(node_t* node1, node_t* node2)
+void ct_swap_data(node_t* node1, node_t* node2)
 {
-    PyObject *tmp
-    tmp = NODE_KEY(node1);
-    NODE_KEY(node1) = NODE_KEY(node2);
-    NODE_KEY(node2) = tmp
-    tmp = NODE_VALUE(node1);
-    NODE_VALUE(node1) = NODE_VALUE(node2);
-    NODE_VALUE(node2) = tmp
+    PyObject *tmp;
+    tmp = KEY(node1);
+    KEY(node1) = KEY(node2);
+    KEY(node2) = tmp;
+    tmp = VALUE(node1);
+    VALUE(node1) = VALUE(node2);
+    VALUE(node2) = tmp;
+}
+
+node_t *ct_find_node(node_t *root, PyObject *key, PyObject *cmp)
+{
+    return NULL;
+}
+
+node_t *ct_bintree_remove(node_t *root, PyObject *key, PyObject *cmp)
+{
+    return root;
+}
+
+node_t *ct_bintree_insert(node_t *root, PyObject *key, PyObject *value, PyObject *cmp)
+{
+    return root;
 }
