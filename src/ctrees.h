@@ -15,12 +15,10 @@ struct tree_node {
 node_t *ct_new_node(PyObject *key, PyObject *value, int xdata);
 void ct_delete_node(node_t *node);
 void ct_delete_tree(node_t *root);
-PyObject *ct_get_key(node_t *node);
-PyObject *ct_get_value(node_t *node);
-void ct_set_value(node_t* node, PyObject *value);
 void ct_swap_data(node_t* node1, node_t* node2);
 
 /* binary tree functions */
+PyObject *ct_get_item(node_t *root, PyObject *key, PyObject *cmp);
 node_t *ct_find_node(node_t *root, PyObject *key, PyObject *cmp);
 int ct_bintree_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
 int ct_bintree_remove(node_t **root, PyObject *key, PyObject *cmp);

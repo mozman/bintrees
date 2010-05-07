@@ -77,7 +77,6 @@ class CheckTree(object):
         tree = self.TREE(self.default_values2)
         tree.clear()
         self.assertEqual(len(tree), 0)
-        self.assertEqual(tree.root, None)
 
     def test_has_key(self):
         tree1 = self.TREE(self.default_values2)

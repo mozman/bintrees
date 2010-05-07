@@ -63,7 +63,7 @@ except IOError:
     sys.exit()
 
 if do_bstree:
-    bs_searchtree = BStree(bskeys)
+    bs_searchtree = BStree(bskeys, cmp=cmp)
     skeys = list(sorted(keys))
     bs_searchtree_wc = BStree(zip(skeys, skeys))
 
@@ -100,12 +100,12 @@ def crb_wc_search():
         obj = cy_searchtree_wc[key]
 
 def bs_build_delete():
-    tree = BStree(bskeys)
+    tree = BStree(bskeys, cmp=cmp)
     for key in keys:
         del tree[key]
 
 def bs_build():
-    tree = BStree(bskeys)
+    tree = BStree(bskeys, cmp=cmp)
 
 def bs_search():
     for key in keys:

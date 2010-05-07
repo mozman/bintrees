@@ -6,20 +6,18 @@
 
 __all__ = ['cQBinaryTree']
 
-cdef extern from "python.h":
+cdef extern from "ctrees.h":
     ctypedef struct PyObject:
         pass
 
-cdef extern from "ctrees.h":
     ctypedef struct node_t:
         node_t *link[2]
         PyObject *key
         PyObject *value
 
-    object ct_get_key(node_t *node)
-    object ct_get_value(node_t *node)
     void ct_delete_tree(node_t *root)
     node_t *ct_find_node(node_t *root, object key, object cmp)
+    PyObject *ct_get_item(node_t *root, object key, object cmp)
     int ct_bintree_insert(node_t **root, object key, object value, object cmp)
     int ct_bintree_remove(node_t **root, object key, object cmp)
 
@@ -33,12 +31,12 @@ cdef class TempNode:
     @property
     def key(self):
         # return value as python object
-        return ct_get_key(self.ct_node)
+        return <object> self.ct_node.key
 
     @property
     def value(self):
         # return value as python object
-        return ct_get_value(self.ct_node)
+        return <object> self.ct_node.value
 
     @property
     def left(self):
@@ -104,6 +102,20 @@ cdef class cQBinaryTree:
             return None
         else:
             return from_node_t(node)
+
+    def get_value(self, key):
+        result = <object> ct_get_item(self._root, key, self._compare)
+        if result is None:
+            raise KeyError(key)
+        else:
+            return result[1]
+
+    def get_item(self, key):
+        result = <object> ct_get_item(self._root, key, self._compare)
+        if result is None:
+            raise KeyError(key)
+        else:
+            return result
 
     def insert(self, key, value):
         self._count += ct_bintree_insert(&self._root, key, value, self._compare)

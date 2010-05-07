@@ -5,32 +5,12 @@
 # Created: 03.05.2010
 
 from iterator import TreeIterator
+from walker import Walker
 
 class TreeMixin(object):
     """
     Abstract-Base-Class for the pure Python Trees: BinaryTree, AVLTree and RBTree
     Mixin-Class for the Cython based Trees: FastBinaryTree, FastAVLTree, FastRBTree
-
-    The Node Class
-    ==============
-
-    N has to implement following properties
-    ---------------------------------------
-
-        key -- get key object of node
-        value -- get value object of node
-        left -- get left node
-        right -- get right node
-
-    N has to implement following methods
-    ------------------------------------
-
-    free(...)
-        N.free() set all object references to None
-
-    __getitem__(...)
-        N.__getitem(n) <==> N[0] or N[1]
-        N[0] get left node of N, N[1] get right node of N
 
     The TreeMixin Class
     ===================
@@ -38,12 +18,14 @@ class TreeMixin(object):
     T has to implement following properties
     ---------------------------------------
 
-    root -- get root node
     count -- get node count
     compare -- get compare function, behave like builtin cmp()
 
     T has to implement following methods
     ------------------------------------
+    get_walker(...)
+        get a tree walker object, provides methods to traverse the tree see walker.py
+
     insert(...)
         insert(key, value) <==> T[key] = value, insert key into T
 
@@ -53,8 +35,8 @@ class TreeMixin(object):
     clear(...)
         T.clear() -> None.  Remove all items from T.
 
-    Methods
-    -------
+    Methods defined here
+    --------------------
 
     * __contains__(k) -> True if T has a key k, else False, O(log(n))
     * __delitem__(y) <==> del T[y], O(log(n))
@@ -130,63 +112,45 @@ class TreeMixin(object):
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
-
-    def _get_leaf(self):
-        """ get a leaf node """
-        node = self.root
-        while node is not None:
-            if node.left is not None:
-                node = node.left
-            elif node.right is not None:
-                node = node.right
-            else:
-                return node
-        return None
-
-    def find_node(self, key):
-        """ T.find_node(key) -> get treenode of key, returns None if not found.
-        """
-        node = self.root
-        compare = self.compare
-        while node is not None:
-            cval = compare(key, node.key)
-            if cval == 0:
-                return node
-            elif cval < 0:
-                node = node.left
-            else:
-                node = node.right
-        return None
+    def get_walker(self):
+        return Walker(self)
 
     def __repr__(self):
         """ x.__repr__(...) <==> repr(x) """
-        def _tostr(node):
-            if node is not None:
-                result = []
-                left = _tostr(node.left)
-                right = _tostr(node.right)
-                nodestr = repr(node.key)+': '+repr(node.value)
-                if left is not None:
-                    result.extend(left)
-                result.append(nodestr)
-                if right is not None:
-                    result.extend(right)
-                return result
-            else:
-                return []
-        return "{{{0}}}".format(", ".join(_tostr(self.root)))
+        def _tostr():
+            result = []
+            left = None
+            right = None
+            if node.has_left():
+                node.push()
+                node.go_left()
+                left = _tostr()
+                node.pop()
+            if node.has_right():
+                node.push()
+                node.go_right()
+                right = _tostr()
+                node.pop()
+            nodestr = repr(node.key)+': '+repr(node.value)
+            if left is not None:
+                result.extend(left)
+            result.append(nodestr)
+            if right is not None:
+                result.extend(right)
+            return result
+        node = self.get_walker()
+        return "{{{0}}}".format(", ".join(_tostr()))
 
     def copy(self):
         """ T.copy() -> get a shallow copy of T. """
         tree = self.__class__(compare=self.compare)
-        self.foreach(tree.insert, order='preorder')
+        self.foreach(tree.insert, order=-1)
         return tree
     __copy__ = copy
 
     def has_key(self, key):
         """ T.has_key(k) -> True if T has a key k, else False """
-        node = self.find_node(key)
-        return node is not None
+        return self.get_walker().goto(key)
     __contains__ = has_key
 
     def __len__(self):
@@ -229,7 +193,7 @@ class TreeMixin(object):
 
     def is_empty(self):
         """ x.is_empty() -> False if T contains any items else True"""
-        return self.root is None
+        return self.count == 0
 
     def keys(self, reverse=False):
         """ T.keys() -> list of T's keys """
@@ -267,24 +231,23 @@ class TreeMixin(object):
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False
         """
-        node = self.root
+        node = self.get_walker()
         direction = 1 if reverse else 0
         other = 1 - direction
         go_down = True
-        stack = list()
         while True:
-            if node[direction] is not None and go_down:
-                stack.append(node)
-                node = node[direction]
+            if node.has_child(direction) and go_down:
+                node.push()
+                node.down(direction)
             else:
-                yield (node.key, node.value)
-                if node[other] is not None:
-                    node = node[other]
+                yield node.item
+                if node.has_child(other):
+                    node.down(other)
                     go_down = True
                 else:
-                    if not len(stack):
+                    if node.stack_is_empty():
                         return # all done
-                    node = stack.pop()
+                    node.pop()
                     go_down = False
 
     def items(self, reverse=False):
@@ -296,10 +259,11 @@ class TreeMixin(object):
         if isinstance(key, slice):
             return self._slice(key)
         else:
-            node = self.find_node(key)
-            if node is None:
+            walker = self.get_walker()
+            if walker.goto(key):
+                return walker.value
+            else:
                 raise KeyError(unicode(key))
-            return node.value
 
     def __setitem__(self, key, value):
         """ x.__setitem__(i, y) <==> x[i]=y """
@@ -316,11 +280,11 @@ class TreeMixin(object):
 
     def setdefault(self, key, default=None):
         """ T.setdefault(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T """
-        node = self.find_node(key)
-        if node is None:
+        walker = self.get_walker()
+        if not walker.goto(key):
             self.insert(key, default)
             return default
-        return node.value
+        return walker.value
 
     def update(self, *args):
         """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
@@ -346,11 +310,11 @@ class TreeMixin(object):
 
     def get(self, key, default=None):
         """ T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None. """
-        node = self.find_node(key)
-        if node is None:
-            return default
+        walker = self.get_walker()
+        if walker.goto(key):
+            return walker.value
         else:
-            return node.value
+            return default
 
     def pop(self, key, *args):
         """ T.pop(k[,d]) -> v, remove specified key and return the corresponding value
@@ -359,13 +323,13 @@ class TreeMixin(object):
         if len(args) > 1:
             raise TypeError("pop expected at most 2 arguments, got {0}".format(
                               1+len(args)))
-        node = self.find_node(key)
-        if node is None:
+        walker = self.get_walker()
+        if walker.goto(key) is False:
             if len(args) == 0:
                 raise KeyError(unicode(key))
             else:
                 return args[0]
-        value = node.value
+        value = walker.value
         self.remove(key)
         return value
 
@@ -375,52 +339,47 @@ class TreeMixin(object):
         """
         if self.is_empty():
             raise KeyError("popitem(): tree is empty")
-        node = self._get_leaf()
-        result = (node.key, node.value)
-        self.remove(node.key)
+        walker = self.get_walker()
+        walker.goto_leaf()
+        result = (walker.key, walker.value)
+        self.remove(walker.key)
         return result
 
-    def foreach(self, func, order='inorder'):
+    def foreach(self, func, order=0):
         """Visit all tree nodes and process key, value.
 
         func -- function(key, value)
-        order -- 'inorder', 'preorder', 'postorder' default is 'inorder'
+        order -- inorder = 0, preorder = -1, postorder = +1
         """
-        def _traverse_inorder(node):
-            if node is None: return
-            _traverse_inorder(node.left)
-            func(node.key, node.value)
-            _traverse_inorder(node.right)
+        def _traverse():
+            if order == -1:
+                func(node.key, node.value)
+            if node.has_left():
+                node.push()
+                node.go_left()
+                _traverse()
+                node.pop()
+            if order == 0:
+                func(node.key, node.value)
+            if node.has_right():
+                node.push()
+                node.go_right()
+                _traverse()
+                node.pop()
+            if order == +1:
+                func(node.key, node.value)
 
-        def _traverse_preorder(node):
-            if node is None: return
-            func(node.key, node.value)
-            _traverse_preorder(node.left)
-            _traverse_preorder(node.right)
-
-        def _traverse_postorder(node):
-            if node is None: return
-            _traverse_postorder(node.left)
-            _traverse_postorder(node.right)
-            func(node.key, node.value)
-
-        if order=='inorder':
-            _traverse_inorder(self.root)
-        elif order=='postorder':
-            _traverse_postorder(self.root)
-        elif order=='preorder':
-            _traverse_preorder(self.root)
-        else:
-            raise ValueError("foreach(): unknown order '{0}'.".format(order))
+        node = self.get_walker()
+        _traverse()
 
     def min_item(self):
         """ Get item with min key of tree, raises ValueError if tree is empty. """
-        node = self.root
-        if node is None: # root is None
+        walker = self.get_walker()
+        if self.count == 0:
             raise ValueError("Tree is empty")
-        while node.left is not None:
-            node = node.left
-        return (node.key, node.value)
+        while walker.has_left():
+            walker.go_left()
+        return (walker.key, walker.value)
 
     def pop_min(self):
         """ T.pop_min() -> (k, v), remove item with minimum key, raise KeyError
@@ -439,73 +398,19 @@ class TreeMixin(object):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        node = self.root
-        if node is None:
+        if self.count == 0:
             raise KeyError("Tree is empty")
-        prev = None
-        compare = self.compare
-        while node is not None:
-            cval = compare(key, node.key)
-            if cval == 0:
-                break
-            elif cval < 0:
-                node = node.left
-            else:
-                if (prev is None) or (compare(node.key, prev.key) > 0):
-                    prev = node
-                node = node.right
-
-        if node is None:
-            raise KeyError(unicode(key))
-        # found node of key
-        if node.left is not None:
-            # find biggest node of left subtree
-            node = node.left
-            while node.right is not None:
-                node = node.right
-            if prev is None:
-                prev = node
-            elif compare(node.key, prev.key) > 0:
-                prev = node
-        elif prev is None: # given key is smallest in tree
-            raise KeyError(unicode(key))
-        return (prev.key, prev.value)
+        walker = self.get_walker()
+        return walker.prev_item(key)
 
     def succ_item(self, key):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        node = self.root
-        if node is None:
+        if self.count == 0:
             raise KeyError("Tree is empty")
-        succ = None
-        compare = self.compare
-        while node is not None:
-            cval = compare(key, node.key)
-            if cval == 0:
-                break
-            elif cval < 0:
-                if (succ is None) or (compare(node.key, succ.key) < 0):
-                    succ = node
-                node = node.left
-            else:
-                node = node.right
-
-        if node is None:
-            raise KeyError(unicode(key))
-        # found node of key
-        if node.right is not None:
-            # find smallest node of right subtree
-            node = node.right
-            while node.left is not None:
-                node = node.left
-            if succ is None:
-                succ = node
-            elif compare(node.key, succ.key) < 0:
-                succ = node
-        elif succ is None: # given key is biggest in tree
-            raise KeyError(unicode(key))
-        return (succ.key, succ.value)
+        walker = self.get_walker()
+        return walker.succ_item(key)
 
     def prev_key(self, key):
         """ Get predecessor to key, raises KeyError if key is min key
@@ -523,12 +428,13 @@ class TreeMixin(object):
 
     def max_item(self):
         """ Get item with max key of tree, raises ValueError if tree is empty. """
-        node = self.root
-        if node is None: # root is None
+
+        if self.count == 0:
             raise ValueError("Tree is empty")
-        while node.right is not None:
-            node = node.right
-        return (node.key, node.value)
+        walker = self.get_walker()
+        while walker.has_right():
+            walker.go_right()
+        return walker.item
 
     def pop_max(self):
         """ T.pop_max() -> (k, v), remove item with maximum key, raise KeyError
@@ -595,25 +501,24 @@ class TreeMixin(object):
 
     def index(self, key):
         """ T.index(k) -> index, raises KeyError if k not in T """
-        node = self.root
+        node = self.get_walker()
         index = 0
         go_down = True
-        stack = list()
         while True:
-            if node.left is not None and go_down:
-                stack.append(node)
-                node = node.left
+            if node.has_left() and go_down:
+                node.push()
+                node.go_left()
             else:
                 if self.compare(node.key, key) == 0:
                     return index
                 index += 1
-                if node.right is not None:
-                    node = node.right
+                if node.has_right():
+                    node.go_right()
                     go_down = True
                 else:
-                    if not len(stack): # all done, key not found
+                    if node.stack_is_empty(): # all done, key not found
                         raise KeyError(str(key))
-                    node = stack.pop()
+                    node.pop()
                     go_down = False
 
     def item_at(self, index):
@@ -623,25 +528,24 @@ class TreeMixin(object):
             index = self.count + index
         if (index < 0) or (index >= self.count):
             raise IndexError('item_at()')
-        node = self.root
+        node = self.get_walker()
         counter = 0
         go_down = True
-        stack = list()
         while True:
-            if node.left is not None and go_down:
-                stack.append(node)
-                node = node.left
+            if node.has_left() and go_down:
+                node.push()
+                node.go_left()
             else:
                 if counter == index:
-                    return (node.key, node.value)
+                    return node.item
                 counter += 1
-                if node.right is not None:
-                    node = node.right
+                if node.has_right():
+                    node.go_right()
                     go_down = True
                 else:
-                    if not len(stack):
+                    if node.stack_is_empty():
                         return # all done
-                    node = stack.pop()
+                    node.pop()
                     go_down = False
 
     def intersection(self, *trees):
@@ -732,4 +636,3 @@ class ItemCollector(object):
                     self.next_index = -1
             self.index += 1
         return _collector
-
