@@ -9,7 +9,8 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
-ext_modules = [Extension("bintrees.cbintree", ["bintrees/cbintree.pyx"]),
+ext_modules = [Extension("bintrees.node", ["bintrees/node.c"]),
+               Extension("bintrees.cbintree", ["bintrees/cbintree.pyx"]),
                Extension("bintrees.crbtree", ["bintrees/crbtree.pyx"]),
                Extension("bintrees.cavltree", ["bintrees/cavltree.pyx"])]
 
