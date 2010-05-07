@@ -12,7 +12,7 @@
 #define RED(node) (node->xdata)
 #define BALANCE(node) (node->xdata)
 
-node_t * ct_new_node(PyObject *key, PyObject *value, int xdata)
+node_t *ct_new_node(PyObject *key, PyObject *value, int xdata)
 {
   node_t *new_node = PyMem_Malloc(sizeof(node_t));
   if (new_node != NULL)
@@ -30,38 +30,28 @@ node_t * ct_new_node(PyObject *key, PyObject *value, int xdata)
 
 void ct_delete_node(node_t *node)
 {
-  Py_XDECREF(KEY(node));
-  Py_XDECREF(VALUE(node));
-  PyMem_Free(node);
+  if (node != NULL)
+    {
+      Py_XDECREF(KEY(node));
+      Py_XDECREF(VALUE(node));
+      LEFT_NODE(node) = NULL;
+      RIGHT_NODE(node) = NULL;
+      PyMem_Free(node);
+    }
 }
 
 void ct_delete_tree(node_t *root)
 {
+  if (root == NULL) return;
   if (LEFT_NODE(root) != NULL)
     {
       ct_delete_tree(LEFT_NODE(root));
-    };
+    }
   if (RIGHT_NODE(root) != NULL)
     {
       ct_delete_tree(RIGHT_NODE(root));
-    };
+    }
   ct_delete_node(root);
-}
-
-PyObject *ct_get_value(node_t *node)
-{
-  return VALUE(node);
-}
-
-void ct_set_value(node_t *node, PyObject *value)
-{
-  Py_INCREF(value);
-  VALUE(node) = value;
-}
-
-PyObject *ct_get_key(node_t *node)
-{
-  return KEY(node);
 }
 
 void ct_swap_data(node_t *node1, node_t *node2)
@@ -118,6 +108,24 @@ node_t *ct_find_node(node_t *root, PyObject *key, PyObject *cmp)
   return NULL; // key not found
 }
 
+PyObject *ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
+{
+  node_t *node;
+  PyObject *tuple;
+
+  node = ct_find_node(root, key, cmp);
+  if (node != NULL)
+    {
+      tuple = PyTuple_New(2);
+      Py_INCREF(KEY(node));
+      Py_INCREF(VALUE(node));
+      PyTuple_SET_ITEM(tuple, 0, KEY(node));
+      PyTuple_SET_ITEM(tuple, 1, VALUE(node));
+      return tuple;
+    }
+  return Py_None;
+}
+
 node_t *ct_max_node(node_t *root)
 // get node with largest key
 {
@@ -156,15 +164,15 @@ int ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
       while(1)
         {
           cmp_res = ct_compare(cmp, key, KEY(node));
-          if (cmp_res == 0) {
-              // key found, remove node
+          if (cmp_res == 0) // key found, remove node
+            {
               if ((LEFT_NODE(node) != NULL) && (RIGHT_NODE(node) != NULL))
                 {
                   // find replacement node: smallest key in right-subtree
                   parent = node;
                   direction = RIGHT;
                   replacement = RIGHT_NODE(node);
-                  while (LEFT_NODE(replacement)!= NULL)
+                  while (LEFT_NODE(replacement) != NULL)
                     {
                       parent = replacement;
                       direction = LEFT;

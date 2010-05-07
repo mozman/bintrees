@@ -64,8 +64,8 @@ class TreeIterator(object):
         return self._retfunc(self._item)
 
     def goto(self, key):
-        node = self._tree.find_node(key)
-        if node is not None:
-            self._item = (node.key, node.value)
+        node = self._tree.get_walker()
+        if node.goto(key):
+            self._item = node.item
         else:
             raise KeyError(unicode(key))
