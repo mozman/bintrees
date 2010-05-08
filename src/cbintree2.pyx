@@ -6,7 +6,7 @@
 
 __all__ = ['cQBinaryTree']
 
-from cwalker import cWalker
+from bintrees.cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
@@ -34,7 +34,6 @@ cdef class cQBinaryTree:
         ct_delete_tree(self._root)
         self._count = 0
         self._root = NULL
-
 
     def get_value(self, key):
         result = <object> ct_get_item(self._root, key, self._compare)

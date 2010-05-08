@@ -34,6 +34,7 @@ class Walker(object):
 
     def goto(self, key):
         compare = self._tree.compare
+        self._node = self._tree.root
         while self._node is not None:
             cval = compare(key, self._node.key)
             if cval == 0:
@@ -91,7 +92,7 @@ class Walker(object):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        self.reset()
+        self._node = self._tree.root
         succ = None
         compare = self._tree.compare
         while self._node is not None:
@@ -125,7 +126,7 @@ class Walker(object):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        self.reset()
+        self._node = self._tree.root
         prev = None
         compare = self._tree.compare
         while self._node is not None:
