@@ -265,8 +265,8 @@ static node_t *rb_single(node_t *root, int dir)
   root->link[!dir] = save->link[dir];
   save->link[dir] = root;
 
-  root->red = 1;
-  save->red = 0;
+  RED(root) = 1;
+  RED(save) = 0;
 
   return save;
 }
@@ -294,15 +294,16 @@ int avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
     }
   else
     {
-      node_t head = {0}; /* False tree root */
+      node_t head;       /* False tree root */
       node_t *g, *t;     /* Grandparent & parent */
       node_t *p, *q;     /* Iterator & parent */
       int dir = 0, last = 0;
 
       /* Set up our helpers */
       t = &head;
+      LEFT_NODE(t) = NULL;
       g = p = NULL;
-      q = t->link[1] = root;
+      q = RIGHT_NODE(t) = root;
 
       /* Search down the tree for a place to insert */
       for ( ; ; )
@@ -317,9 +318,9 @@ int avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
           else if (is_red(q->link[0]) && is_red(q->link[1]))
             {
               /* Simple red violation: color flip */
-              q->red = 1;
-              q->link[0]->red = 0;
-              q->link[1]->red = 0;
+              RED(q) = 1;
+              RED(q->link[0]) = 0;
+              RED(q->link[1]) = 0;
             }
 
           if (is_red(q) && is_red(p))
@@ -358,26 +359,27 @@ int avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
       *rootaddr = head.link[1];
     }
   /* Make the root black for simplified logic */
-  RED(*rootaddr) = 0;
+
+  RED( (*rootaddr) ) = 0;
   return 1;
 }
 
 int rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 {
-  node_t root = *rootaddr;
-
+  node_t *root = *rootaddr;
 
   if (root != NULL)
     {
-      node_t head = {0}; /* False tree root */
+      node_t head; /* False tree root */
       node_t *q, *p, *g; /* Helpers */
       node_t *f = NULL;  /* Found item */
       int dir = 1;
 
       /* Set up our helpers */
       q = &head;
+      LEFT_NODE(q) = NULL;
       g = p = NULL;
-      q->link[1] = root;
+      RIGHT_NODE(q) = root;
 
       /*
         Search and push a red node down
@@ -392,7 +394,7 @@ int rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
           g = p, p = q;
           q = q->link[dir];
 
-          cmp_res = ct_compare(cmp, q->data, data);
+          cmp_res = ct_compare(cmp, KEY(q), key);
           dir = cmp_res < 0;
 
           /*
@@ -452,7 +454,10 @@ int rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 
       /* Make the root black for simplified logic */
       if (*rootaddr != NULL)
-        RED(*rootaddr) = 0;
+        RED( (*rootaddr) ) = 0;
     }
    return 1;
 }
+
+#define avl_new_node(key, value) ct_new_node(key, value, 0)
+
