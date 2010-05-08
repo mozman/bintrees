@@ -100,10 +100,8 @@ node_t *ct_find_node(node_t *root, PyObject *key, PyObject *cmp)
       res = ct_compare(cmp, key, KEY(root));
       if (res == 0) // key found
         return root;
-      else if (res < 0) // key < root.key
-        root = LEFT_NODE(root);
-      else // key > root.key
-        root = RIGHT_NODE(root);
+      else
+        root = LINK(root, (res > 0));
     }
   return NULL; // key not found
 }
@@ -123,6 +121,7 @@ PyObject *ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
       PyTuple_SET_ITEM(tuple, 1, VALUE(node));
       return tuple;
     }
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
