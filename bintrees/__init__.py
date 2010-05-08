@@ -129,12 +129,12 @@ try:
 except ImportError: # fall back to Python version
     FastBinaryTree = BinaryTree
 
-#try:
-from cbintree2 import cQBinaryTree
-class QuickBinaryTree(cQBinaryTree, TreeMixin):
-    """ Faster unbalanced binary tree  written in Cython with more C-Code. """
-#except ImportError: # fall back to Cython or Python version
-#    QuickBinaryTree = FastBinaryTree
+try:
+    from cbintree2 import cQBinaryTree
+    class QuickBinaryTree(cQBinaryTree, TreeMixin):
+        """ Faster unbalanced binary tree  written in Cython with more C-Code. """
+except ImportError: # fall back to Cython or Python version
+    QuickBinaryTree = FastBinaryTree
 
 try:
     from cavltree import cAVLTree

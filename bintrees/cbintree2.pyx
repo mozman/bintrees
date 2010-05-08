@@ -6,7 +6,7 @@
 
 __all__ = ['cQBinaryTree']
 
-from bintrees.cwalker import cWalker
+from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
