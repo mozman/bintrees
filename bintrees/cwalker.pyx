@@ -46,8 +46,8 @@ cdef class cWalker:
 
     def goto(self, key):
         cdef int cval
-        self._node = self._root
-        while self._node is not None:
+        self.node = self.root
+        while self.node != NULL:
             cval = <int>self.compare(key, <object> self.node.key)
             if cval == 0:
                 return True
@@ -61,6 +61,8 @@ cdef class cWalker:
         stack_push(self.stack, self.node)
 
     cpdef pop(self):
+        if stack_is_empty(self.stack) != 0:
+            raise IndexError('pop(): stack is empty')
         self.node = stack_pop(self.stack)
 
     def stack_is_empty(self):

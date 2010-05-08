@@ -21,7 +21,7 @@ void stack_delete(node_stack_t *stack)
 void stack_push(node_stack_t *stack, node_t *node)
 {
   stack->stack[stack->stackptr++] = node;
-  if (stack->stackptr > stack->size)
+  if (stack->stackptr >= stack->size)
     {
       stack->size *= 2;
       stack->stack = PyMem_Realloc(stack->stack, sizeof(node_t *) * stack->size);
@@ -30,7 +30,7 @@ void stack_push(node_stack_t *stack, node_t *node)
 
 node_t *stack_pop(node_stack_t *stack)
 {
-  return stack->stack[stack->stackptr--];
+  return (stack->stackptr > 0) ? stack->stack[--stack->stackptr] : NULL;
 }
 
 int stack_is_empty(node_stack_t *stack)
