@@ -12,6 +12,8 @@ struct tree_node {
   int xdata;
 };
 
+typedef node_t* nodeptr;
+
 node_t *ct_new_node(PyObject *key, PyObject *value, int xdata);
 void ct_delete_node(node_t *node);
 void ct_delete_tree(node_t *root);

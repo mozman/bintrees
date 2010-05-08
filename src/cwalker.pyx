@@ -4,31 +4,28 @@
 # Purpose: tree walker for cython trees
 # Created: 07.05.2010
 
-DEF MAXSTACK=64
+DEF MAXSTACK=32
 
-cdef extern from "ctrees.h":
-    ctypedef struct PyObject:
-        pass
-
-    ctypedef struct node_t:
-        node_t* link[2]
-        PyObject *key
-        PyObject *value
+from stack cimport *
+from ctrees cimport *
 
 cdef class cWalker:
-    cdef node_t *node
-    cdef node_t *root
-    cdef node_t *stack[MAXSTACK]
-    cdef int stackptr
-    cdef object compare
+    def __cinit__(self):
+        self.root = NULL
+        self.node = NULL
+        self.stack = stack_init(MAXSTACK)
+        self.compare = None
 
-    def __init__(self, node_t *root, object compare):
+    def __dealloc__(self):
+        stack_delete(self.stack)
+
+    cdef void set_tree(self, node_t *root, object compare):
         self.root = root
-        self.node = root
-        self.stackptr = 0
+        self.compare = compare
+        self.reset()
 
-    def reset(self):
-        self.stackptr = 0
+    cpdef reset(self):
+        stack_reset(self.stack)
         self.node = self.root
 
     @property
@@ -60,17 +57,13 @@ cdef class cWalker:
         return False
 
     cpdef push(self):
-        self.stack[stackptr] = self.node
-        self.stackptr += 1
-        if stackptr > MAXSTACK: # raise error, this is a problem for unbalanced trees
-            stackptr = MAXSTACK
+        stack_push(self.stack, self.node)
 
     cpdef pop(self):
-        self.stackptr -= 1
-        self.node = <node_t *>self.stack[stackptr]
+        self.node = stack_pop(self.stack)
 
     def stack_is_empty(self):
-        return self.stackptr == 0
+        return <bint> stack_is_empty(self.stack)
 
     def goto_leaf(self):
         """ get a leaf node """
@@ -108,7 +101,7 @@ cdef class cWalker:
         cdef int cval
 
         self.node = self.root
-        self.stackptr = 0
+        stack_reset(self.stack)
         succ = None
         while self.node != NULL:
             cval = <int> self.compare(key, <object>self.node.key)
@@ -145,7 +138,7 @@ cdef class cWalker:
         cdef int cval
 
         self.node = self.root
-        self.stackptr = 0
+        stack_reset(self.stack)
         prev = None
         while self.node != NULL:
             cval = <int>self.compare(key, <object> self.node.key)
