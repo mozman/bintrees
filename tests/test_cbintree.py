@@ -29,16 +29,15 @@ class TestTree(unittest.TestCase):
         tree.update(self.values)
         self.assertEqual(tree.count, 6)
 
-    def test_find_key(self):
+    def test_get_value(self):
         tree = Tree(self.values)
         for key in self.keys:
-            node = tree.find_node(key)
-            self.assertTrue(node is not None)
+            value = tree.get_value(key)
+            self.assertTrue(value is not None)
 
-    def test_find_key_not(self):
+    def test_get_value_not(self):
         tree = Tree()
-        node = tree.find_node(17)
-        self.assertTrue(node is None)
+        self.assertRaises(KeyError, tree.get_value, 17)
 
     def test_properties(self):
         tree = Tree(self.values)
@@ -56,17 +55,15 @@ class TestTree(unittest.TestCase):
         tree = Tree()
         for key in self.keys:
             tree.insert(key, key)
-            node = tree.find_node(key)
-            self.assertTrue(node is not None)
-            self.assertEqual(node.key, key)
+            value = tree.get_value(key)
+            self.assertEqual(value, key)
         self.assertEqual(tree.count, 6)
 
     def test_remove(self):
         tree = Tree(self.values)
         for key in self.keys:
             tree.remove(key)
-            node = tree.find_node(key)
-            self.assertTrue(node is None)
+            self.assertRaises(KeyError, tree.get_value, key)
         self.assertEqual(tree.count, 0)
 
     def test_remove_random_numbers(self):
@@ -77,6 +74,5 @@ class TestTree(unittest.TestCase):
         for key in keys:
             tree.remove(key)
         self.assertEqual(tree.count, 0)
-
 if __name__=='__main__':
     unittest.main()

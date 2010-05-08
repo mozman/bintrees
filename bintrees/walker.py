@@ -33,7 +33,7 @@ class Walker(object):
         return self._node is not None
 
     def goto(self, key):
-        compare = self._tree._compare
+        compare = self._tree.compare
         while self._node is not None:
             cval = compare(key, self._node.key)
             if cval == 0:
@@ -93,7 +93,7 @@ class Walker(object):
         """
         self.reset()
         succ = None
-        compare = self._tree._compare
+        compare = self._tree.compare
         while self._node is not None:
             cval = compare(key, self._node.key)
             if cval == 0:
@@ -127,7 +127,7 @@ class Walker(object):
         """
         self.reset()
         prev = None
-        compare = self._tree._compare
+        compare = self._tree.compare
         while self._node is not None:
             cval = compare(key, self._node.key)
             if cval == 0:

@@ -12,7 +12,7 @@ from Cython.Distutils import build_ext
 ext_modules = [Extension("bintrees.cbintree", ["src/ctrees.c", "src/cbintree.pyx"]),
                Extension("bintrees.crbtree", ["src/ctrees.c", "src/crbtree.pyx"]),
                Extension("bintrees.cavltree", ["src/ctrees.c", "src/cavltree.pyx"]),
-               Extension("bintrees.cwalker", ["src/ctrees.c", "src/cwalker.pyx"]),
+               #Extension("bintrees.cwalker", ["src/ctrees.c", "src/cwalker.pyx"]),
                Extension("bintrees.cbintree2", ["src/ctrees.c", "src/cbintree2.pyx"])]
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()

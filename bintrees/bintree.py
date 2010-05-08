@@ -145,9 +145,9 @@ class BinaryTree(TreeMixin):
         self._root = None
 
     @property
-    def count(self):
-        """ count of items """
-        return self._count
+    def root(self):
+        """ root node of T """
+        return self._root
 
     @property
     def count(self):
