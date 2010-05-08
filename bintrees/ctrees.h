@@ -14,7 +14,6 @@ struct tree_node {
 
 typedef node_t* nodeptr;
 
-node_t *ct_new_node(PyObject *key, PyObject *value, int xdata);
 void ct_delete_node(node_t *node);
 void ct_delete_tree(node_t *root);
 void ct_swap_data(node_t* node1, node_t* node2);
@@ -26,11 +25,12 @@ int ct_bintree_insert(node_t **root, PyObject *key, PyObject *value, PyObject *c
 int ct_bintree_remove(node_t **root, PyObject *key, PyObject *cmp);
 
 /* avl-tree functions */
-int ct_avltree_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
-int ct_avltree_remove(node_t **root, PyObject *key, PyObject *cmp);
+int avl_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
+int avl_remove(node_t **root, PyObject *key, PyObject *cmp);
 
 /* rb-tree functions */
-int ct_rbtree_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
-int ct_rbtree_remove(node_t **root, PyObject *key, PyObject *cmp);
+node_t *rb_new_node(PyObject *key, PyObject *value);
+int rb_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
+int rb_remove(node_t **root, PyObject *key, PyObject *cmp);
 
 #endif

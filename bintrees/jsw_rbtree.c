@@ -61,7 +61,7 @@ static int is_red ( jsw_rbnode_t *root )
   <summary>
   <param name="root">The original root to rotate around</param>
   <param name="dir">The direction to rotate (0 = left, 1 = right)</param>
-  <returns>The new root ater rotation</returns>
+  <returns>The new root after rotation</returns>
   <remarks>For jsw_rbtree.c internal use only</remarks>
 */
 static jsw_rbnode_t *jsw_single ( jsw_rbnode_t *root, int dir )
