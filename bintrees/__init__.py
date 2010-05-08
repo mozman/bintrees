@@ -128,13 +128,13 @@ try:
         """ Fast unbalanced binary tree written in Cython. """
 except ImportError: # fall back to Python version
     FastBinaryTree = BinaryTree
-    
-try:
-    from cbintree2 import cQBinaryTree
-    class QuickBinaryTree(cQBinaryTree, TreeMixin):
-        """ Faster unbalanced binary tree  written in Cython with more C-Code. """
-except ImportError: # fall back to Cython or Python version
-    QuickBinaryTree = FastBinaryTree
+
+#try:
+from cbintree2 import cQBinaryTree
+class QuickBinaryTree(cQBinaryTree, TreeMixin):
+    """ Faster unbalanced binary tree  written in Cython with more C-Code. """
+#except ImportError: # fall back to Cython or Python version
+#    QuickBinaryTree = FastBinaryTree
 
 try:
     from cavltree import cAVLTree
@@ -142,7 +142,7 @@ try:
         """ Fast balanced AVL-Tree written in Cython. """
 except ImportError: # fall back to Python version
     FastAVLTree = AVLTree
-    
+
 try:
     from cavltree2 import cQAVLTree
     class QuickAVLTree(cQAVLTree, TreeMixin):
@@ -156,7 +156,7 @@ try:
         """ Fast balanced Red-Black-Tree written in Cython. """
 except ImportError: # fall back to Python version
     FastRBTree = RBTree
-    
+
 try:
     from crbtree2 import cQRBTree
     class QuickRBTree(cQRBTree, TreeMixin):

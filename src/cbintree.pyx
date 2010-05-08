@@ -6,8 +6,6 @@
 
 __all__ = ['cBinaryTree']
 
-import walker
-
 cdef class Node:
     cdef Node _left
     cdef Node _right

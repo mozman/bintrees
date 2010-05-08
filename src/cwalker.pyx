@@ -46,6 +46,7 @@ cdef class cWalker:
 
     def goto(self, key):
         cdef int cval
+        self._node = self._root
         while self._node is not None:
             cval = <int>self.compare(key, <object> self.node.key)
             if cval == 0:
@@ -101,7 +102,6 @@ cdef class cWalker:
         cdef int cval
 
         self.node = self.root
-        stack_reset(self.stack)
         succ = None
         while self.node != NULL:
             cval = <int> self.compare(key, <object>self.node.key)
@@ -138,7 +138,6 @@ cdef class cWalker:
         cdef int cval
 
         self.node = self.root
-        stack_reset(self.stack)
         prev = None
         while self.node != NULL:
             cval = <int>self.compare(key, <object> self.node.key)
