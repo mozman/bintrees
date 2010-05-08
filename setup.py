@@ -9,11 +9,17 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
-ext_modules = [Extension("bintrees.cbintree", ["src/ctrees.c", "src/cbintree.pyx"]),
-               Extension("bintrees.crbtree", ["src/ctrees.c", "src/crbtree.pyx"]),
-               Extension("bintrees.cavltree", ["src/ctrees.c", "src/cavltree.pyx"]),
-               #Extension("bintrees.cwalker", ["src/ctrees.c", "src/cwalker.pyx"]),
-               Extension("bintrees.cbintree2", ["src/ctrees.c", "src/cbintree2.pyx"])]
+ext_modules = [Extension("bintrees.cbintree", ["src/ctrees.c", "src/cbintree.pyx"],
+                         include_dirs = ['/src']),
+               Extension("bintrees.crbtree", ["src/ctrees.c", "src/crbtree.pyx"],
+                         include_dirs = ['/src']),
+               Extension("bintrees.cavltree", ["src/ctrees.c", "src/cavltree.pyx"],
+                         include_dirs = ['/src']),
+               Extension("bintrees.cwalker", ["src/ctrees.c", "src/stack.c", "src/cwalker.pyx"],
+                         include_dirs = ['/src']),
+               Extension("bintrees.cbintree2", ["src/ctrees.c", "src/cbintree2.pyx"],
+                         include_dirs = ['/src'])
+]
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
