@@ -259,11 +259,20 @@ class TreeMixin(object):
         if isinstance(key, slice):
             return self._slice(key)
         else:
-            walker = self.get_walker()
-            if walker.goto(key):
-                return walker.value
+            return self.get_value(key)
+
+    def get_value(self, key):
+        node = self.root
+        compare = self.compare
+        while node is not None:
+            cmp_res = compare(key, node.key)
+            if cmp_res == 0:
+                return node.value
+            elif cmp_res < 0:
+                node = node.left
             else:
-                raise KeyError(unicode(key))
+                node = node.right
+        raise KeyError(str(key))
 
     def __setitem__(self, key, value):
         """ x.__setitem__(i, y) <==> x[i]=y """
