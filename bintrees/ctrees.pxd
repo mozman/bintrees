@@ -16,5 +16,12 @@ cdef extern from "ctrees.h":
     void ct_delete_tree(node_t *root)
     node_t *ct_find_node(node_t *root, object key, object cmp)
     PyObject *ct_get_item(node_t *root, object key, object cmp)
+    # binary-tree functions
     int ct_bintree_insert(node_t **root, object key, object value, object cmp)
     int ct_bintree_remove(node_t **root, object key, object cmp)
+    # avl-tree functions
+    int avl_insert(node_t **root, object key, object value, object cmp)
+    int avl_remove(node_t **root, object key, object cmp)
+    # rb-tree functions
+    int rb_insert(node_t **root, object key, object value, object cmp)
+    int rb_remove(node_t **root, object key, object cmp)

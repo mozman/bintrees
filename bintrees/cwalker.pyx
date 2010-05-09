@@ -21,7 +21,7 @@ cdef class cWalker:
 
     cdef void set_tree(self, node_t *root, object compare):
         self.root = root
-        self.compare = compare
+        self.compare = compare if compare is not None else cmp
         self.reset()
 
     cpdef reset(self):
