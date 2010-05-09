@@ -280,7 +280,7 @@ static node_t *rb_double(node_t *root, int dir)
 
 #define rb_new_node(key, value) ct_new_node(key, value, 1)
 
-int avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
+int rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 {
   node_t *root = *rootaddr;
 
@@ -294,14 +294,14 @@ int avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
     }
   else
     {
-      node_t head;       /* False tree root */
+      node_t head = { {NULL} };       /* False tree root */
       node_t *g, *t;     /* Grandparent & parent */
       node_t *p, *q;     /* Iterator & parent */
       int dir = 0, last = 0;
 
       /* Set up our helpers */
       t = &head;
-      LEFT_NODE(t) = NULL;
+      // LEFT_NODE(t) = NULL;
       g = p = NULL;
       q = RIGHT_NODE(t) = root;
 
@@ -370,14 +370,13 @@ int rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 
   if (root != NULL)
     {
-      node_t head; /* False tree root */
+      node_t head = { {NULL} }; /* False tree root */
       node_t *q, *p, *g; /* Helpers */
       node_t *f = NULL;  /* Found item */
       int dir = 1;
 
       /* Set up our helpers */
       q = &head;
-      LEFT_NODE(q) = NULL;
       g = p = NULL;
       RIGHT_NODE(q) = root;
 
