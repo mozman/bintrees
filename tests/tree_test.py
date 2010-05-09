@@ -260,13 +260,18 @@ class CheckTree(object):
         del tree[remove_key]
         self.assertTrue(check_integrity(keys, remove_key, tree))
 
-    def test_037_discard(self):
+    def test_037a_discard(self):
         keys = [50, 25, 12, 33, 34, 75, 60, 61]
         tree = self.TREE.fromkeys(keys)
         try:
             tree.discard(17)
         except KeyError:
             self.assertTrue(False, "Discard raises KeyError")
+
+    def test_037b_remove_keyerror(self):
+        keys = [50, 25, 12, 33, 34, 75, 60, 61]
+        tree = self.TREE.fromkeys(keys)
+        self.assertRaises(KeyError, tree.remove, 17)
 
     def test_038_remove_shuffeld(self):
         keys = [50, 25, 20, 35, 22, 23, 27, 75, 65, 90, 60, 70, 85, 57, 83, 58]

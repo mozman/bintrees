@@ -6,14 +6,14 @@
 import sys
 
 import unittest
+
 from tree_test import CheckTree
+from bintrees import QuickAVLTree
 
-from bintrees import QuickRBTree
-
-class TestQuickRBTree(CheckTree, unittest.TestCase):
+class TestQuickAVLTree(CheckTree, unittest.TestCase):
     @property
     def TREE(self):
-        return QuickRBTree
+        return QuickAVLTree
 
 if __name__=='__main__':
     unittest.main()

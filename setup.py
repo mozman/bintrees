@@ -15,6 +15,7 @@ ext_modules = [Extension("bintrees.cbintree", ["bintrees/ctrees.c", "bintrees/cb
                Extension("bintrees.cwalker", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cwalker.pyx"]),
                Extension("bintrees.qbintree", ["bintrees/ctrees.c", "bintrees/qbintree.pyx"]),
                Extension("bintrees.qrbtree", ["bintrees/ctrees.c", "bintrees/qrbtree.pyx"]),
+               Extension("bintrees.qavltree", ["bintrees/ctrees.c", "bintrees/qavltree.pyx"]),
                ]
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()

@@ -59,7 +59,7 @@ cdef class cQBinaryTree:
         cdef int result
         result =  ct_bintree_remove(&self._root, key, self._compare)
         if result == 0:
-            KeyError(str(key))
+            raise KeyError(str(key))
         else:
             self._count -= 1
 

@@ -337,3 +337,5 @@ class RBTree(TreeMixin):
         self._root = head.right
         if self._root is not None:
             self._root.red = False
+        if not found:
+            raise KeyError(str(key))
