@@ -4,21 +4,20 @@
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
-__all__ = ['cQBinaryTree']
+__all__ = ['cQRBTree']
 
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cQBinaryTree:
+cdef class cQRBTree:
     cdef node_t *_root
     cdef int _count
     cdef object _compare
 
     def __init__(self, items=[], compare=None):
         self._root = NULL
-        #self._compare = compare if compare is not None else cmp
         self._compare = compare # if compare is None use PyObject_compare()
         self._count = 0
         self.update(items)
@@ -50,14 +49,15 @@ cdef class cQBinaryTree:
         return walker
 
     def insert(self, key, value):
-        res = ct_bintree_insert(&self._root, key, value, self._compare)
+        res = rb_insert(&self._root, key, value, self._compare)
         if res < 0:
             raise MemoryError('Can not allocate memory for node structure.')
-        self._count += res
+        else:
+            self._count += res
 
     def remove(self, key):
         cdef int result
-        result =  ct_bintree_remove(&self._root, key, self._compare)
+        result =  rb_remove(&self._root, key, self._compare)
         if result == 0:
             KeyError(str(key))
         else:

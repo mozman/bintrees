@@ -29,7 +29,6 @@ int avl_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
 int avl_remove(node_t **root, PyObject *key, PyObject *cmp);
 
 /* rb-tree functions */
-node_t *rb_new_node(PyObject *key, PyObject *value);
 int rb_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
 int rb_remove(node_t **root, PyObject *key, PyObject *cmp);
 

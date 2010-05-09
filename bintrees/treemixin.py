@@ -139,7 +139,10 @@ class TreeMixin(object):
                 result.extend(right)
             return result
         node = self.get_walker()
-        return "{{{0}}}".format(", ".join(_tostr()))
+        if node.is_valid:
+            return "{{{0}}}".format(", ".join(_tostr()))
+        else:
+            return "{}"
 
     def copy(self):
         """ T.copy() -> get a shallow copy of T. """
