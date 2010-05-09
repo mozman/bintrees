@@ -152,62 +152,53 @@ int ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 
   node = *rootaddr;
 
-  if (node == NULL)
-    {
-      return 0; // root is NULL
-    }
-  else
-    {
-      parent = NULL;
-      direction = 0;
+  if (node == NULL) return 0; // root is NULL
+  parent = NULL;
+  direction = 0;
 
-      while(1)
+  while(1)
+    {
+      cmp_res = ct_compare(cmp, key, KEY(node));
+      if (cmp_res == 0) // key found, remove node
         {
-          cmp_res = ct_compare(cmp, key, KEY(node));
-          if (cmp_res == 0) // key found, remove node
+          if ((LEFT_NODE(node) != NULL) && (RIGHT_NODE(node) != NULL))
             {
-              if ((LEFT_NODE(node) != NULL) && (RIGHT_NODE(node) != NULL))
+              // find replacement node: smallest key in right-subtree
+              parent = node;
+              direction = RIGHT;
+              replacement = RIGHT_NODE(node);
+              while (LEFT_NODE(replacement) != NULL)
                 {
-                  // find replacement node: smallest key in right-subtree
-                  parent = node;
-                  direction = RIGHT;
-                  replacement = RIGHT_NODE(node);
-                  while (LEFT_NODE(replacement) != NULL)
-                    {
-                      parent = replacement;
-                      direction = LEFT;
-                      replacement = LEFT_NODE(replacement);
-                    }
-                  LINK(parent, direction) = RIGHT_NODE(replacement);
-                  // swap places
-                  ct_swap_data(node, replacement);
-                  node = replacement; // delete replacement node
+                  parent = replacement;
+                  direction = LEFT;
+                  replacement = LEFT_NODE(replacement);
                 }
-              else
-                {
-                  down_dir = (LEFT_NODE(node) == NULL) ? RIGHT : LEFT;
-                  if (parent == NULL) // root
-                    {
-                      *rootaddr = LINK(node, down_dir);
-                    }
-                  else
-                    {
-                      LINK(parent, direction) = LINK(node, down_dir);
-                    }
-                }
-              ct_delete_node(node);
-              return 1; // remove was success full
+              LINK(parent, direction) = RIGHT_NODE(replacement);
+              // swap places
+              ct_swap_data(node, replacement);
+              node = replacement; // delete replacement node
             }
           else
             {
-              direction = (cmp_res < 0) ? LEFT : RIGHT;
-              parent = node;
-              node = LINK(node, direction);
-              if (node == NULL)
+              down_dir = (LEFT_NODE(node) == NULL) ? RIGHT : LEFT;
+              if (parent == NULL) // root
                 {
-                  return 0; // error key not found
+                  *rootaddr = LINK(node, down_dir);
+                }
+              else
+                {
+                  LINK(parent, direction) = LINK(node, down_dir);
                 }
             }
+          ct_delete_node(node);
+          return 1; // remove was success full
+        }
+      else
+        {
+          direction = (cmp_res < 0) ? LEFT : RIGHT;
+          parent = node;
+          node = LINK(node, direction);
+          if (node == NULL) return 0; // error key not found
         }
     }
 }
@@ -349,15 +340,12 @@ int rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
                 t->link[dir2] = rb_double(g, !last);
             }
 
-          /*
-            Stop working if we inserted a node. This
-            check also disallows duplicates in the tree
-          */
-          if (new_node)
-            break;
+          //  Stop working if we inserted a new node.
+          if (new_node) break;
+
           int cmp_res;
           cmp_res = ct_compare(cmp, KEY(q), key);
-          if (cmp_res == 0)
+          if (cmp_res == 0) //  key exists?
             {
               Py_XDECREF(VALUE(q)); // release old value object
               VALUE(q) = value; // set new value object
@@ -475,8 +463,211 @@ int rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
   if (root != NULL)
     RED(root) = 0;
   *rootaddr = root;
-   return 1;
+  return (f != NULL);
 }
 
 #define avl_new_node(key, value) ct_new_node(key, value, 0)
+#define height(p) ((p) == NULL ? -1 : (p)->xdata)
+#define avl_max(a, b) ((a) > (b) ? (a) : (b))
 
+node_t *avl_single(node_t *root, int dir)
+{
+  node_t *save = root->link[!dir];
+  int rlh, rrh, slh;
+
+  /* Rotate */
+  root->link[!dir] = save->link[dir];
+  save->link[dir] = root;
+
+  /* Update balance factors */
+  rlh = height ( root->link[0] );
+  rrh = height ( root->link[1] );
+  slh = height ( save->link[!dir] );
+
+  BALANCE(root) = avl_max ( rlh, rrh ) + 1;
+  BALANCE(save) = avl_max ( slh, BALANCE(root)) + 1;
+
+  return save;
+}
+
+node_t *avl_double(node_t *root, int dir)
+{
+  root->link[!dir] = avl_single(root->link[!dir], !dir);
+  return avl_single(root, dir);
+}
+
+int avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
+{
+  node_t *root = *rootaddr;
+
+  if ( root == NULL ) {
+    root = avl_new_node(key, value);
+    if (root == NULL )
+      return -1; // got no memory
+  }
+  else {
+    node_t *it, *up[32];
+    int upd[32], top = 0;
+    int done = 0;
+    int cmp_res;
+
+    it = root;
+
+    /* Search for an empty link, save the path */
+    for ( ; ; ) {
+      /* Push direction and node onto stack */
+      cmp_res = ct_compare(cmp, KEY(it), key);
+      if (cmp_res == 0)
+        {
+          Py_XDECREF(VALUE(it)); // release old value object
+          VALUE(it) = value; // set new value object
+          Py_INCREF(value); // take new value object
+          return 0;
+        }
+      // upd[top] = it->data < data;
+      upd[top] = (cmp_res < 0);
+      up[top++] = it;
+
+      if ( it->link[upd[top - 1]] == NULL )
+        break;
+
+      it = it->link[upd[top - 1]];
+    }
+
+    /* Insert a new node at the bottom of the tree */
+    it->link[upd[top - 1]] = avl_new_node(key, value);
+    if ( it->link[upd[top - 1]] == NULL )
+      return -1; // got no memory
+
+    /* Walk back up the search path */
+    while (--top >= 0 && !done) {
+      cmp_res = ct_compare(cmp, KEY(up[top]), key);
+      // int dir = (cmp_res < 0);
+      int lh, rh, max;
+
+      lh = height(up[top]->link[upd[top]]);
+      rh = height(up[top]->link[!upd[top]]);
+
+      /* Terminate or rebalance as necessary */
+      if (lh - rh == 0)
+        done = 1;
+      if (lh - rh >= 2) {
+        node_t *a = up[top]->link[upd[top]]->link[upd[top]];
+        node_t *b = up[top]->link[upd[top]]->link[!upd[top]];
+
+        if (height( a ) >= height( b ))
+          up[top] = avl_single(up[top], !upd[top]);
+        else
+          up[top] = avl_double(up[top], !upd[top]);
+
+        /* Fix parent */
+        if (top != 0)
+          up[top - 1]->link[upd[top - 1]] = up[top];
+        else
+          root = up[0];
+        done = 1;
+      }
+
+      /* Update balance factors */
+      lh = height( up[top]->link[upd[top]] );
+      rh = height( up[top]->link[!upd[top]] );
+      max = avl_max (lh, rh);
+
+      BALANCE(up[top]) = max + 1;
+    }
+  }
+  (*rootaddr) = root;
+  return 1;
+}
+
+int avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
+{
+  node_t *root = *rootaddr;
+  int cmp_res;
+
+  if (root != NULL) {
+    node_t *it, *up[32];
+    int upd[32], top = 0;
+
+    it = root;
+
+    for ( ; ; ) {
+      /* Terminate if not found */
+      if ( it == NULL )
+        return 0;
+      cmp_res = ct_compare(cmp, KEY(it), key);
+      if (cmp_res == 0)
+        break;
+
+      /* Push direction and node onto stack */
+      upd[top] = (cmp_res < 0);
+      up[top++] = it;
+
+      it = it->link[upd[top - 1]];
+    }
+
+    /* Remove the node */
+    if ( it->link[0] == NULL || it->link[1] == NULL ) {
+      /* Which child is not null? */
+      int dir = it->link[0] == NULL;
+
+      /* Fix parent */
+      if (top != 0)
+        up[top - 1]->link[upd[top - 1]] = it->link[dir];
+      else
+        root = it->link[dir];
+
+      ct_delete_node(it);
+    }
+    else {
+      /* Find the inorder successor */
+      node_t *heir = it->link[1];
+
+      /* Save the path */
+      upd[top] = 1;
+      up[top++] = it;
+
+      while ( heir->link[0] != NULL ) {
+        upd[top] = 0;
+        up[top++] = heir;
+        heir = heir->link[0];
+      }
+      /* Swap data */
+      ct_swap_data(it, heir);
+      /* Unlink successor and fix parent */
+      up[top - 1]->link[up[top - 1] == it] = heir->link[1];
+      ct_delete_node(heir);
+    }
+
+    /* Walk back up the search path */
+    while ( --top >= 0 ) {
+      int lh = height( up[top]->link[upd[top]] );
+      int rh = height( up[top]->link[!upd[top]] );
+      int max = avl_max( lh, rh );
+
+      /* Update balance factors */
+      BALANCE(up[top]) = max + 1;
+
+      /* Terminate or rebalance as necessary */
+      if ( lh - rh == -1 )
+        break;
+      if ( lh - rh <= -2 ) {
+        node_t *a = up[top]->link[!upd[top]]->link[upd[top]];
+        node_t *b = up[top]->link[!upd[top]]->link[!upd[top]];
+
+        if ( height ( a ) <= height ( b ) )
+          up[top] = avl_single ( up[top], upd[top] );
+        else
+          up[top] = avl_double ( up[top], upd[top] );
+
+        /* Fix parent */
+        if ( top != 0 )
+          up[top - 1]->link[upd[top - 1]] = up[top];
+        else
+          root = up[0];
+      }
+    }
+  }
+  (*rootaddr) = root;
+  return 1;
+}

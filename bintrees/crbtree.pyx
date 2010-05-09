@@ -258,6 +258,8 @@ cdef class cRBTree:
         self._root = head._right
         if self._root is not None:
             self._root.red = False
+        if not found:
+            raise KeyError(str(key))
 
     def prev_item(self, key):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key

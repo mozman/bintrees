@@ -4,14 +4,14 @@
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
-__all__ = ['cQRBTree']
+__all__ = ['cQAVLTree']
 
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cQRBTree:
+cdef class cQAVLTree:
     cdef node_t *_root
     cdef int _count
     cdef object _compare
@@ -49,7 +49,7 @@ cdef class cQRBTree:
         return walker
 
     def insert(self, key, value):
-        res = rb_insert(&self._root, key, value, self._compare)
+        res = avl_insert(&self._root, key, value, self._compare)
         if res < 0:
             raise MemoryError('Can not allocate memory for node structure.')
         else:
@@ -57,7 +57,7 @@ cdef class cQRBTree:
 
     def remove(self, key):
         cdef int result
-        result =  rb_remove(&self._root, key, self._compare)
+        result =  avl_remove(&self._root, key, self._compare)
         if result == 0:
             raise KeyError(str(key))
         else:

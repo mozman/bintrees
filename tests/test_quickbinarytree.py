@@ -4,7 +4,6 @@
 # Purpose: test quick binary trees
 # Created:07.05.2010
 import sys
-sys.path.append('d:\user\python\bintrees')
 
 import unittest
 from tree_test import CheckTree
