@@ -1,4 +1,5 @@
 #include "ctrees.h"
+#include "stack.h"
 #include <Python.h>
 
 #define LEFT 0
@@ -670,4 +671,175 @@ int avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
   }
   (*rootaddr) = root;
   return 1;
+}
+
+node_t *ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
+{
+  node_t *succ = NULL;
+  node_t *node = root;
+  int cval;
+
+  while (node != NULL)
+    {
+      cval = ct_compare(key, KEY(node), key);
+      if (cval == 0)
+        break;
+      else if (cval < 0)
+        {
+          if ((succ == NULL) && (ct_compare(cmp, KEY(node), KEY(succ)) < 0))
+              succ = node;
+          node = LEFT_NODE(node);
+        }
+      else node = RIGHT_NODE(node);
+    }
+  if (node == NULL)
+    return NULL;
+  // found node of key
+  if (RIGHT_NODE(node) != NULL)
+    {
+      // find smallest node of right subtree
+      node = RIGHT_NODE(node);
+      while (LEFT_NODE(node) != NULL)
+        node = LEFT_NODE(node);
+      if (succ==NULL)
+        succ = node;
+      else if (ct_compare(cmp, KEY(node), KEY(succ)) < 0)
+        succ = node;
+    }
+  else if (succ == NULL) // given key is biggest in tree
+    return NULL;
+  return succ;
+}
+
+node_t *ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
+{
+  node_t *prev = NULL;
+  node_t *node = root;
+  int cval;
+
+  while (node != NULL)
+    {
+      cval = ct_compare(cmp, key, KEY(node));
+      if (cval == 0)
+          break;
+      else if (cval < 0)
+          node = LEFT_NODE(node);
+      else
+        {
+          if ((prev == NULL) && (ct_compare(cmp, KEY(node), KEY(prev)) > 0))
+              prev = node;
+          node = RIGHT_NODE(node);
+        }
+    }
+  if (node == NULL) // stay at dead end (None)
+    return NULL;
+  // found node of key
+  if (LEFT_NODE(node) != NULL)
+    {
+      // find biggest node of left subtree
+      node = LEFT_NODE(node);
+      while (RIGHT_NODE(node) != NULL)
+          node = RIGHT_NODE(node);
+      if (prev == NULL)
+          prev = node;
+      else if (ct_compare(cmp, KEY(node), KEY(prev)) > 0)
+          prev = node;
+    }
+  else if (prev == NULL) // given key is smallest in tree
+      return NULL; // key has no succ item
+  return prev;
+}
+
+int ct_index_of(node_t *root, PyObject *key, PyObject *cmp)
+/*
+get index of item <key>, returns -1 if key not found.
+*/
+{
+  node_t *node = root;
+  int index = 0;
+  int go_down = 0;
+  node_stack_t *stack;
+  stack = stack_init(32);
+
+  for (;;)
+    {
+      if ((LEFT_NODE(node) != NULL) && (go_down>0))
+        {
+          stack_push(stack, node);
+          node = LEFT_NODE(node);
+        }
+      else
+        {
+          if (ct_compare(cmp, KEY(node), key) == 0)
+            {
+              stack_delete(stack);
+              return index;
+            }
+          index++;
+          if (RIGHT_NODE(node) != NULL)
+            {
+              node = RIGHT_NODE(node);
+              go_down = 1;
+            }
+          else
+            {
+              if (stack_is_empty(stack))
+                {
+                  stack_delete(stack);
+                  return -1;
+                }
+              node = stack_pop(stack);
+              go_down = 0;
+            }
+        }
+    }
+}
+
+node_t *ct_node_at(node_t *root, int index)
+{
+/*
+returns -1 if index out of range
+index < 0 (count from end in python) is not allowed!!!
+*/
+  node_t *node = root;
+  int counter = 0;
+  int go_down = 0;
+
+  if (index < 0)
+      return -1;
+  node_stack_t *stack;
+  stack = stack_init(32);
+
+  for(;;)
+    {
+      if ((LEFT_NODE(node) != NULL) && (go_down>0))
+        {
+          stack_push(stack, node);
+          node = LEFT_NODE(node);
+        }
+      else
+        {
+          if (counter == index)
+            {
+              stack_delete(stack);
+              return node;
+            }
+          counter++;
+          if (RIGHT_NODE(node) != NULL)
+            {
+              node = RIGHT_NODE(node);
+              go_down = 1;
+            }
+          else
+            {
+              if (stack_is_empty(stack))
+                { // this should never happen
+                  stack_delete(stack);
+                  return -1;
+                }
+              node = stack_pop(stack);
+              go_down = 0;
+            }
+        }
+    }
 }

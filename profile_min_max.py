@@ -9,14 +9,7 @@ from random import shuffle
 
 from bintrees import RBTree
 from bintrees import FastRBTree
-
-try:
-    # compare with Benjamin Saller's really damn fast RBTree implementation
-    from bsrbtree.rbtree import rbtree as BStree
-    do_bstree = True
-except ImportError:
-    print("Benjamin Sallers RBTrees not available.")
-    do_bstree =False
+from bintrees import QuickRBTree
 
 COUNT = 100
 
@@ -25,6 +18,9 @@ from __main__ import rb_pop_min, rb_pop_max
 """
 setup_FastRBTree = """
 from __main__ import keys, crb_pop_min, crb_pop_max
+"""
+setup_QuickRBTree = """
+from __main__ import keys, qrb_pop_min, qrb_pop_max
 """
 
 try:
@@ -55,6 +51,16 @@ def crb_pop_max():
     while tree.count:
         tree.pop_max()
 
+def qrb_pop_min():
+    tree = QuickRBTree.fromkeys(keys)
+    while tree.count:
+        tree.pop_min()
+
+def qrb_pop_max():
+    tree = QuickRBTree.fromkeys(keys)
+    while tree.count:
+        tree.pop_max()
+
 
 def print_result(time, text):
     print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
@@ -77,6 +83,12 @@ def main():
 
     t = Timer("crb_pop_max()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree pop_max')
+
+    t = Timer("qrb_pop_min()", setup_QuickRBTree)
+    print_result(t.timeit(COUNT), 'QuickRBTree pop_min')
+
+    t = Timer("qrb_pop_max()", setup_QuickRBTree)
+    print_result(t.timeit(COUNT), 'QuickRBTree pop_max')
 
 if __name__=='__main__':
     main()
