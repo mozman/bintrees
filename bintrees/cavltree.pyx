@@ -303,3 +303,157 @@ cdef class cAVLTree:
                     else:
                         self._root = node_stack[0]
                 top -= 1
+
+    def prev_item(self, key):
+        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
+        or key does not exist.
+        """
+        cdef Node node, prev
+        cdef int cval
+
+        node = self._root
+        if node is None:
+            raise KeyError("Tree is empty")
+        prev = None
+        while node is not None:
+            cval = <int>self._compare(key, node._key)
+            if cval == 0:
+                break
+            elif cval < 0:
+                node = node._left
+            else:
+                if (prev is None) or (<int>self._compare(node._key, prev._key) > 0):
+                    prev = node
+                node = node._right
+
+        if node is None:
+            raise KeyError(unicode(key))
+        # found node of key
+        if node._left is not None:
+            # find biggest node of left subtree
+            node = node._left
+            while node._right is not None:
+                node = node._right
+            if prev is None:
+                prev = node
+            elif <int>self._compare(node._key, prev._key) > 0:
+                prev = node
+        elif prev is None: # given key is smallest in tree
+            raise KeyError(unicode(key))
+        return (prev._key, prev._value)
+
+    def succ_item(self, key):
+        """ Get successor (k,v) pair of key, raises KeyError if key is max key
+        or key does not exist.
+        """
+        cdef Node node, succ
+        cdef int cval
+
+        node = self._root
+        if node is None:
+            raise KeyError("Tree is empty")
+        succ = None
+        while node is not None:
+            cval = <int>self._compare(key, node._key)
+            if cval == 0:
+                break
+            elif cval < 0:
+                if (succ is None) or (<int>self._compare(node._key, succ._key) < 0):
+                    succ = node
+                node = node._left
+            else:
+                node = node._right
+
+        if node is None:
+            raise KeyError(unicode(key))
+        # found node of key
+        if node._right is not None:
+            # find smallest node of right subtree
+            node = node._right
+            while node._left is not None:
+                node = node._left
+            if succ is None:
+                succ = node
+            elif <int>self._compare(node._key, succ._key) < 0:
+                succ = node
+        elif succ is None: # given key is biggest in tree
+            raise KeyError(unicode(key))
+        return (succ._key, succ._value)
+
+    def max_item(self):
+        """ Get item with max key of tree, raises ValueError if tree is empty. """
+        cdef Node node
+        node = self._root
+        if node is None: # root is None
+            raise ValueError("Tree is empty")
+        while node._right is not None:
+            node = node._right
+        return (node._key, node._value)
+
+    def min_item(self):
+        """ Get item with min key of tree, raises ValueError if tree is empty. """
+        cdef Node node
+        node = self._root
+        if node is None: # root is None
+            raise ValueError("Tree is empty")
+        while node._left is not None:
+            node = node._left
+        return (node._key, node._value)
+
+    def index(self, key):
+        """ T.index(k) -> index, raises KeyError if k not in T """
+        cdef Node node
+        cdef int index
+        cdef bint go_down
+
+        node = self._root
+        index = 0
+        go_down = True
+        stack = list()
+        while True:
+            if node._left is not None and go_down:
+                stack.append(node)
+                node = node._left
+            else:
+                if <int>self._compare(node._key, key) == 0:
+                    return index
+                index += 1
+                if node._right is not None:
+                    node = node._right
+                    go_down = True
+                else:
+                    if not len(stack):
+                        raise KeyError(str(key))
+                    node = stack.pop()
+                    go_down = False
+
+    def item_at(self, int index):
+        """ T.item_at(index) -> item (k,v) """
+        cdef Node node
+        cdef int counter
+        cdef bint go_down
+
+        if index < 0:
+            index = self._count + index
+        if (index < 0) or (index >= self._count):
+            raise IndexError('item_at()')
+        node = self._root
+        counter = 0
+        go_down = True
+        stack = list()
+        while True:
+            if node._left is not None and go_down:
+                stack.append(node)
+                node = node._left
+            else:
+                if counter == index:
+                    return (node._key, node._value)
+                counter += 1
+                if node._right is not None:
+                    node = node._right
+                    go_down = True
+                else:
+                    if not len(stack):
+                        return # all done
+                    node = stack.pop()
+                    go_down = False
