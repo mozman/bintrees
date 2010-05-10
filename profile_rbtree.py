@@ -9,7 +9,6 @@ from random import shuffle
 
 from bintrees import RBTree
 from bintrees import FastRBTree
-from bintrees import QuickRBTree
 
 try:
     # compare with Benjamin Saller's really damn fast RBTree implementation
@@ -26,9 +25,6 @@ from __main__ import rb_build_delete, rb_build, rb_search
 """
 setup_FastRBTree = """
 from __main__ import crb_build_delete, crb_build, crb_search
-"""
-setup_QuickRBTree = """
-from __main__ import qrb_build_delete, qrb_build, qrb_search
 """
 setup_BStree = """
 from __main__ import bs_build_delete, bs_build, bs_search
@@ -48,7 +44,6 @@ if do_bstree:
 
 py_searchtree = RBTree.fromkeys(keys)
 cy_searchtree = FastRBTree.fromkeys(keys)
-q_searchtree = QuickRBTree.fromkeys(keys)
 
 def rb_build_delete():
     tree = RBTree.fromkeys(keys)
@@ -60,19 +55,11 @@ def crb_build_delete():
     for key in keys:
         del tree[key]
 
-def qrb_build_delete():
-    tree = QuickRBTree.fromkeys(keys)
-    for key in keys:
-        del tree[key]
-
 def rb_build():
     tree = RBTree.fromkeys(keys)
 
 def crb_build():
     tree = FastRBTree.fromkeys(keys)
-
-def qrb_build():
-    tree = QuickRBTree.fromkeys(keys)
 
 def rb_search():
     for key in keys:
@@ -81,10 +68,6 @@ def rb_search():
 def crb_search():
     for key in keys:
         obj = cy_searchtree[key]
-
-def qrb_search():
-    for key in keys:
-        obj = q_searchtree[key]
 
 def bs_build_delete():
     tree = BStree(bskeys)
@@ -112,9 +95,6 @@ def main():
     t = Timer("crb_build()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree build only')
 
-    t = Timer("qrb_build()", setup_QuickRBTree)
-    print_result(t.timeit(COUNT), 'QuickRBTree build only')
-
     if do_bstree:
         t = Timer("bs_build()", setup_BStree)
         print_result(t.timeit(COUNT), 'Benjamin Saller RBTree build only')
@@ -124,9 +104,6 @@ def main():
 
     t = Timer("crb_build_delete()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree build & delete')
-
-    t = Timer("qrb_build_delete()", setup_QuickRBTree)
-    print_result(t.timeit(COUNT), 'QuickRBTree build & delete')
 
     if do_bstree:
         t = Timer("bs_build_delete()", setup_BStree)
@@ -139,9 +116,6 @@ def main():
 
     t = Timer("crb_search()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree search')
-
-    t = Timer("qrb_search()", setup_QuickRBTree)
-    print_result(t.timeit(COUNT), 'QuickRBTree search')
 
     if do_bstree:
         t = Timer("bs_search()", setup_BStree)

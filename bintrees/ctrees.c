@@ -117,8 +117,8 @@ PyObject *ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
   if (node != NULL)
     {
       tuple = PyTuple_New(2);
-      Py_INCREF(KEY(node));
-      Py_INCREF(VALUE(node));
+      //Py_INCREF(KEY(node)); ???
+      //Py_INCREF(VALUE(node)); ???
       PyTuple_SET_ITEM(tuple, 0, KEY(node));
       PyTuple_SET_ITEM(tuple, 1, VALUE(node));
       return tuple;
@@ -681,12 +681,12 @@ node_t *ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
 
   while (node != NULL)
     {
-      cval = ct_compare(key, KEY(node), key);
+      cval = ct_compare(cmp, key, KEY(node));
       if (cval == 0)
         break;
       else if (cval < 0)
         {
-          if ((succ == NULL) && (ct_compare(cmp, KEY(node), KEY(succ)) < 0))
+          if ((succ == NULL) || (ct_compare(cmp, KEY(node), KEY(succ)) < 0))
               succ = node;
           node = LEFT_NODE(node);
         }
@@ -701,13 +701,11 @@ node_t *ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
       node = RIGHT_NODE(node);
       while (LEFT_NODE(node) != NULL)
         node = LEFT_NODE(node);
-      if (succ==NULL)
+      if (succ == NULL)
         succ = node;
       else if (ct_compare(cmp, KEY(node), KEY(succ)) < 0)
         succ = node;
     }
-  else if (succ == NULL) // given key is biggest in tree
-    return NULL;
   return succ;
 }
 
@@ -726,7 +724,7 @@ node_t *ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
           node = LEFT_NODE(node);
       else
         {
-          if ((prev == NULL) && (ct_compare(cmp, KEY(node), KEY(prev)) > 0))
+          if ((prev == NULL) || (ct_compare(cmp, KEY(node), KEY(prev)) > 0))
               prev = node;
           node = RIGHT_NODE(node);
         }
@@ -745,8 +743,6 @@ node_t *ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
       else if (ct_compare(cmp, KEY(node), KEY(prev)) > 0)
           prev = node;
     }
-  else if (prev == NULL) // given key is smallest in tree
-      return NULL; // key has no succ item
   return prev;
 }
 
@@ -795,18 +791,24 @@ get index of item <key>, returns -1 if key not found.
     }
 }
 
-node_t *ct_node_at(node_t *root, int index)
+node_t *ct_node_at(node_t *root, int index, int count)
 {
 /*
-returns -1 if index out of range
-index < 0 (count from end in python) is not allowed!!!
+root -- root node of tree
+index -- index of wanted node
+count -- item count of tree
+
+return NULL if index out of range
 */
   node_t *node = root;
   int counter = 0;
   int go_down = 0;
 
   if (index < 0)
-      return -1;
+    index = count + index;
+  if ((index < 0) || (index >= count))
+      return NULL;
+
   node_stack_t *stack;
   stack = stack_init(32);
 
@@ -835,7 +837,7 @@ index < 0 (count from end in python) is not allowed!!!
               if (stack_is_empty(stack))
                 { // this should never happen
                   stack_delete(stack);
-                  return -1;
+                  return NULL;
                 }
               node = stack_pop(stack);
               go_down = 0;

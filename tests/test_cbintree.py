@@ -8,7 +8,7 @@ import unittest
 
 from random import randint, shuffle
 
-from bintrees.cbintree import cBinaryTree
+from bintrees.qbintree import cBinaryTree
 
 class Tree(cBinaryTree):
     def update(self, items):
@@ -41,14 +41,12 @@ class TestTree(unittest.TestCase):
 
     def test_properties(self):
         tree = Tree(self.values)
-        self.assertTrue(tree.root is not None)
         self.assertEqual(tree.count, 6)
         self.assertEqual(tree.compare, cmp)
 
     def test_clear_tree(self):
         tree = Tree(self.values)
         tree.clear()
-        self.assertTrue(tree.root is None)
         self.assertEqual(tree.count, 0)
 
     def test_insert(self):

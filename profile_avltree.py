@@ -9,7 +9,6 @@ from random import shuffle
 
 from bintrees import AVLTree
 from bintrees import FastAVLTree
-from bintrees import QuickAVLTree
 
 COUNT = 100
 
@@ -18,9 +17,6 @@ from __main__ import avl_build_delete, avl_build, avl_search
 """
 setup_FastAVLTree = """
 from __main__ import cavl_build_delete, cavl_build, cavl_search
-"""
-setup_QuickAVLTree = """
-from __main__ import qavl_build_delete, qavl_build, qavl_search
 """
 
 try:
@@ -32,7 +28,6 @@ except IOError:
 
 py_searchtree = AVLTree.fromkeys(keys)
 cy_searchtree = FastAVLTree.fromkeys(keys)
-q_searchtree = QuickAVLTree.fromkeys(keys)
 
 def avl_build_delete():
     tree = AVLTree.fromkeys(keys)
@@ -44,19 +39,11 @@ def cavl_build_delete():
     for key in keys:
         del tree[key]
 
-def qavl_build_delete():
-    tree = QuickAVLTree.fromkeys(keys)
-    for key in keys:
-        del tree[key]
-
 def avl_build():
     tree = AVLTree.fromkeys(keys)
 
 def cavl_build():
     tree = FastAVLTree.fromkeys(keys)
-
-def qavl_build():
-    tree = QuickAVLTree.fromkeys(keys)
 
 def avl_search():
     for key in keys:
@@ -65,10 +52,6 @@ def avl_search():
 def cavl_search():
     for key in keys:
         obj = cy_searchtree[key]
-
-def qavl_search():
-    for key in keys:
-        obj = q_searchtree[key]
 
 def print_result(time, text):
     print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
@@ -84,17 +67,11 @@ def main():
     t = Timer("cavl_build()", setup_FastAVLTree)
     print_result(t.timeit(COUNT), 'FastAVLTree build only')
 
-    t = Timer("qavl_build()", setup_QuickAVLTree)
-    print_result(t.timeit(COUNT), 'QuickAVLTree build only')
-
     t = Timer("avl_build_delete()", setup_AVLTree)
     print_result(t.timeit(COUNT), 'AVLTree build & delete')
 
     t = Timer("cavl_build_delete()", setup_FastAVLTree)
     print_result(t.timeit(COUNT), 'FastAVLTree build & delete')
-
-    t = Timer("qavl_build_delete()", setup_QuickAVLTree)
-    print_result(t.timeit(COUNT), 'QuickAVLTree build & delete')
 
     # shuffle search keys
     shuffle(keys)
@@ -103,9 +80,6 @@ def main():
 
     t = Timer("cavl_search()", setup_FastAVLTree)
     print_result(t.timeit(COUNT), 'FastAVLTree search')
-
-    t = Timer("qavl_search()", setup_QuickAVLTree)
-    print_result(t.timeit(COUNT), 'QuickAVLTree search')
 
 if __name__=='__main__':
     main()

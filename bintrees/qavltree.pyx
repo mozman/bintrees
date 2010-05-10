@@ -4,14 +4,14 @@
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
-__all__ = ['cQAVLTree']
+__all__ = ['cAVLTree']
 
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cQAVLTree:
+cdef class cAVLTree:
     cdef node_t *_root
     cdef int _count
     cdef object _compare

@@ -123,47 +123,25 @@ from avltree import AVLTree
 from rbtree import RBTree
 
 try:
-    from cbintree import cBinaryTree
+    from qbintree import cBinaryTree
     class FastBinaryTree(cBinaryTree, TreeMixin):
-        """ Fast unbalanced binary tree written in Cython. """
-except ImportError: # fall back to Python version
+        """ Faster unbalanced binary tree  written in Cython with C-Code. """
+except ImportError: # fall back to Cython or Python version
     FastBinaryTree = BinaryTree
 
 try:
-    from qbintree import cQBinaryTree
-    class QuickBinaryTree(cQBinaryTree, TreeMixin):
-        """ Faster unbalanced binary tree  written in Cython with more C-Code. """
-except ImportError: # fall back to Cython or Python version
-    QuickBinaryTree = FastBinaryTree
-
-try:
-    from cavltree import cAVLTree
+    from qavltree import cAVLTree
     class FastAVLTree(cAVLTree, TreeMixin):
-        """ Fast balanced AVL-Tree written in Cython. """
-except ImportError: # fall back to Python version
+        """ Faster balanced AVL-Tree written in Cython with C-Code. """
+except ImportError: # fall back to Cython or Python version
     FastAVLTree = AVLTree
 
 try:
-    from qavltree import cQAVLTree
-    class QuickAVLTree(cQAVLTree, TreeMixin):
-        """ Faster balanced AVL-Tree written in Cython with more C-Code. """
-except ImportError: # fall back to Cython or Python version
-    QuickAVLTree = FastAVLTree
-
-try:
-    from crbtree import cRBTree
+    from qrbtree import cRBTree
     class FastRBTree(cRBTree, TreeMixin):
-        """ Fast balanced Red-Black-Tree written in Cython. """
-except ImportError: # fall back to Python version
+        """ Faster balanced Red-Black-Tree  written in Cython with C-Code. """
+except ImportError: # fall back to Cython or Python version
     FastRBTree = RBTree
 
-try:
-    from qrbtree import cQRBTree
-    class QuickRBTree(cQRBTree, TreeMixin):
-        """ Faster balanced Red-Black-Tree  written in Cython with more C-Code. """
-except ImportError: # fall back to Cython or Python version
-    QuickRBTree = FastRBTree
-
-__all__ = ['QuickBinaryTree', 'QuickAVLTree', 'QuickRBTree',
-           'FastBinaryTree', 'FastAVLTree', 'FastRBTree',
+__all__ = ['FastBinaryTree', 'FastAVLTree', 'FastRBTree',
            'BinaryTree', 'AVLTree', 'RBTree']

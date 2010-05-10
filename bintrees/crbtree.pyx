@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: cython red-black-tree module
+# Purpose: DEPRICATED FastRBTree
 # Created: 28.04.2010
-
+#
+# no longer maintained
+#
 __all__ = ['cRBTree']
 
 cdef class Node:

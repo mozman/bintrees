@@ -7,16 +7,8 @@ import sys
 from timeit import Timer
 from random import shuffle
 
-from bintrees import RBTree
-from bintrees import FastRBTree
-
-try:
-    # compare with Benjamin Saller's really damn fast RBTree implementation
-    from bsrbtree.rbtree import rbtree as BStree
-    do_bstree = True
-except ImportError:
-    print("Benjamin Sallers RBTrees not available.")
-    do_bstree =False
+from bintrees import RBTree as PTree
+from bintrees import FastRBTree as FTree
 
 COUNT = 100
 
@@ -35,37 +27,34 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-if do_bstree:
-    bstree = BStree(bskeys)
-pytree = RBTree.fromkeys(keys)
-cytree = FastRBTree.fromkeys(keys)
-
+ptree = PTree.fromkeys(keys)
+ftree = FTree.fromkeys(keys)
 
 def rb_prev():
     for key in keys:
         try:
-            item = pytree.prev_item(key)
+            item = ptree.prev_item(key)
         except KeyError:
             pass
 
 def rb_succ():
     for key in keys:
         try:
-            item = pytree.succ_item(key)
+            item = ptree.succ_item(key)
         except KeyError:
             pass
 
 def crb_prev():
     for key in keys:
         try:
-            item = cytree.prev_item(key)
+            item = ftree.prev_item(key)
         except KeyError:
             pass
 
 def crb_succ():
     for key in keys:
         try:
-            item = cytree.succ_item(key)
+            item = ftree.succ_item(key)
         except KeyError:
             pass
 
@@ -80,16 +69,16 @@ def main():
     shuffle(keys)
 
     t = Timer("rb_prev()", setup_RBTree_ps)
-    print_result(t.timeit(COUNT), 'RBTree prev')
+    print_result(t.timeit(COUNT), 'PythonTree prev')
 
     t = Timer("rb_succ()", setup_RBTree_ps)
-    print_result(t.timeit(COUNT), 'RBTree succ')
+    print_result(t.timeit(COUNT), 'PythonTree succ')
 
     t = Timer("crb_prev()", setup_FastRBTree_ps)
-    print_result(t.timeit(COUNT), 'FastRBTree prev')
+    print_result(t.timeit(COUNT), 'FastXTree prev')
 
     t = Timer("crb_succ()", setup_FastRBTree_ps)
-    print_result(t.timeit(COUNT), 'FastRBTree succ')
+    print_result(t.timeit(COUNT), 'FastXTree succ')
 
 if __name__=='__main__':
     main()

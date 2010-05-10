@@ -6,7 +6,7 @@
 import sys
 import unittest
 
-from bintrees.cavltree import cAVLTree
+from bintrees.qavltree import cAVLTree
 
 from random import randint, shuffle
 
@@ -41,14 +41,12 @@ class TestTree(unittest.TestCase):
 
     def test_properties(self):
         tree = Tree(self.values)
-        self.assertTrue(tree.root is not None)
         self.assertEqual(tree.count, 6)
         self.assertEqual(tree.compare, cmp)
 
     def test_clear_tree(self):
         tree = Tree(self.values)
         tree.clear()
-        self.assertTrue(tree.root is None)
         self.assertEqual(tree.count, 0)
 
     def test_insert(self):
