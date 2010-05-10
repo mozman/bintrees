@@ -4,14 +4,14 @@
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
 
-__all__ = ['cQRBTree']
+__all__ = ['cRBTree']
 
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cQRBTree:
+cdef class cRBTree:
     cdef node_t *_root
     cdef int _count
     cdef object _compare

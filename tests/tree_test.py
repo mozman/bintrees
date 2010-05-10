@@ -670,5 +670,40 @@ class CheckTree(object):
         self.assertTrue(15 not in i)
         self.assertTrue(29 not in i)
 
+    def test_084_refcount_get(self):
+        tree = self.TREE(self.default_values1) # key == value
+        tree[700] = 701
+        chk = tree[700]
+        count = sys.getrefcount(chk)
+        for _ in xrange(10):
+            chk = tree[700]
+
+        self.assertEqual(sys.getrefcount(chk), count)
+
+    def test_085_refcount_set(self):
+        tree = self.TREE(self.default_values1) # key == value
+        chk = 800
+        count = sys.getrefcount(chk)
+        tree[801] = chk
+        self.assertEqual(sys.getrefcount(chk), count+1)
+
+    def test_086_refcount_del(self):
+        tree = self.TREE(self.default_values1) # key == value
+        chk = 900
+        count = sys.getrefcount(chk)
+        tree[901] = chk
+        self.assertEqual(sys.getrefcount(chk), count+1)
+        del tree[901]
+        self.assertEqual(sys.getrefcount(chk), count)
+
+    def test_087_refcount_replace(self):
+        tree = self.TREE(self.default_values1) # key == value
+        chk = 910
+        count = sys.getrefcount(chk)
+        tree[911] = chk
+        self.assertEqual(sys.getrefcount(chk), count+1)
+        tree[911] = 912 # replace 910 with 912
+        self.assertEqual(sys.getrefcount(chk), count)
+
 if __name__=='__main__':
     unittest.main()

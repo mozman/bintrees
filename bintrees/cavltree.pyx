@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: cython avltree module
+# Purpose: DEPRICATED FastAVLTree
 # Created: 28.04.2010
+#
+# no longer maintained
 
 __all__ = ['cAVLTree']
 

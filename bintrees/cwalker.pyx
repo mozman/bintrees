@@ -21,7 +21,7 @@ cdef class cWalker:
 
     cdef void set_tree(self, node_t *root, object compare):
         self.root = root
-        self.compare = compare if compare is not None else cmp
+        self.compare = compare
         self.reset()
 
     cpdef reset(self):
@@ -48,7 +48,7 @@ cdef class cWalker:
         cdef int cval
         self.node = self.root
         while self.node != NULL:
-            cval = <int>self.compare(key, <object> self.node.key)
+            cval = ct_compare(self.compare, key, <object> self.node.key)
             if cval == 0:
                 return True
             elif cval < 0:
@@ -100,70 +100,16 @@ cdef class cWalker:
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        cdef object succ
-        cdef int cval
-
-        self.node = self.root
-        succ = None
-        while self.node != NULL:
-            cval = <int> self.compare(key, <object>self.node.key)
-            if cval == 0:
-                break
-            elif cval < 0:
-                if (succ is None) or (<int>self.compare(<object>self.node.key, succ[0]) < 0):
-                    succ = self.item
-                self.node = self.node.link[0]
-            else:
-                self.node = self.node.link[1]
-
-        if self.node == NULL: # stay at dead end
-            raise KeyError(unicode(key))
-        # found node of key
-        if self.node.link[1] != NULL:
-            # find smallest node of right subtree
-            self.node = self.node.link[1]
-            while self.node.link[0] != NULL:
-                self.node = self.node.link[0]
-            if succ is None:
-                succ = self.item
-            elif <int>self.compare(<object> self.node.key, succ[0]) < 0:
-                succ = self.item
-        elif succ is None: # given key is biggest in tree
-            raise KeyError(unicode(key))
-        return succ
+        self.node = ct_succ_node(self.root, key, self.compare)
+        if self.node == NULL: # given key is biggest in tree
+            raise KeyError(str(key))
+        return (<object> self.node.key, <object> self.node.value)
 
     def prev_item(self, key):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        cdef object prev
-        cdef int cval
-
-        self.node = self.root
-        prev = None
-        while self.node != NULL:
-            cval = <int>self.compare(key, <object> self.node.key)
-            if cval == 0:
-                break
-            elif cval < 0:
-                self.node = self.node.link[0]
-            else:
-                if (prev is None) or (<int> self.compare(<object> self.node.key, prev[0]) > 0):
-                    prev = self.item
-                self.node = self.node.link[1]
-
-        if self.node == NULL: # stay at dead end (None)
-            raise KeyError(unicode(key))
-        # found node of key
-        if self.node.link[0] != NULL:
-            # find biggest node of left subtree
-            self.node = self.node.link[0]
-            while self.node.link[1] != NULL:
-                self.node = self.node.link[1]
-            if prev is None:
-                prev = self.item
-            elif <int>self.compare(<object>self.node.key, prev[0]) > 0:
-                prev = self.item
-        elif prev is None: # given key is smallest in tree
-            raise KeyError(unicode(key))
-        return prev
+        self.node = ct_prev_node(self.root, key, self.compare)
+        if self.node == NULL: # given key is smallest in tree
+            raise KeyError(str(key))
+        return (<object> self.node.key, <object> self.node.value)

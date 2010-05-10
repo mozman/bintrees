@@ -5,7 +5,7 @@ Abstract
 ========
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
 
-This Classes are much slower than the built-in dict class, but they have always 
+This Classes are much slower than the built-in dict class, but they have always
 sorted keys, and all results of iterators and list returning functions are also sorted.
 
 All trees provides the same API.
@@ -20,35 +20,17 @@ Trees written in Python (only standard library)
     - *AVLTree* -- balanced AVL-Tree
     - *RBTree* -- balanced Red-Black-Tree
 
-Trees written in Cython 0.12.1
-------------------------------
+Trees written with C-Functions and Cython 0.12.1 as wrapper
+-----------------------------------------------------------
     - *FastBinaryTree* -- unbalanced binary tree
     - *FastAVLTree* -- balanced AVL-Tree
     - *FastRBTree* -- balanced Red-Black-Tree
-	
-Trees written with C-Functions and Cython 0.12.1 as wrapper
------------------------------------------------------------
-    - *QuickBinaryTree* -- unbalanced binary tree
-    - *QuickAVLTree* -- balanced AVL-Tree
-    - *QuickRBTree* -- balanced Red-Black-Tree
-	
-The difference between FastXTree and QuickXTree is the tree-node structure and the implementation 
-of the low level operations insert, remove, get_value and so on. But the biggest performance boost
-was to use the PyObject_Compare() function from the C-API as default for the QuickXTrees. 
-If you have to use a user-defined compare function you will lost this performance advantage. 
 
-But QuickXTrees also use much less memory than FastXTrees because of the usage of c-structs instead
-of python objects for the tree-node structure.
-
-Tree-node structure
-~~~~~~~~~~~~~~~~~~~
-	- FastXTree uses Python Object
-	- QuickXTree uses a c-struct (PyMem_Malloc)
-	
-Implementation
-~~~~~~~~~~~~~~
-	- FastXTree as Cython code
-	- QuickXTree uses Cython as wrapper for c-functions
+FastXTrees has C-structs as tree-node structure and C-implementation of low level
+operations like insert, remove, get_value and so on.
+The biggest performance boost is to use the PyObject_Compare() function from the
+C-API as default compare function. If you have to use a user-defined compare
+function you will lost this performance advantage.
 
 Constructor
 ~~~~~~~~~~~
@@ -135,7 +117,7 @@ Classmethods
 Performance
 ===========
 
-Profiling with timeit(): 5000 unique random keys, time in seconds
+Profiling with timeit(): 5000 unique random int keys, time in seconds
 
 BinaryTrees
 -----------
@@ -167,17 +149,14 @@ RBTree                    cPython 2.6.5  FastRBTree     ipy 2.6.0  bcsaller
 search 100x all keys         2,53          1,14           1,35      0,36
 ========================  =============  =============  =========  =========
 
+Memory usage for 100x5000 int keys (Binary/AVL&RB)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    * cPython-Trees (20/22) MByte (using __slots__)
+    * FastXTrees (20 Bytes/Node on 32 bit systems) x 500.000 = ~9,5 MByte
+    * dict 10 MByte
+
 builtin.dict
 ------------
-
-*dict* is a really, really fast datatype, and it uses also less than half of the memory:
-
-Memory usage for 100x5000 keys (Binary/AVL&RB)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	* cPython-Trees (20/22) MByte (using __slots__)
-	* FastXTrees (22/24) MByte
-	* QuickXTrees (20 Bytes/Node) x 500.000 = ~9,5 MByte
-	* dict 10 MByte
 
 ========================  =============  =========
 builtin.dict              cPython 2.6.5  ipy 2.6.0

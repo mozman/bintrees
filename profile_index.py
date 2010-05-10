@@ -10,14 +10,6 @@ from random import shuffle
 from bintrees import RBTree
 from bintrees import FastRBTree
 
-try:
-    # compare with Benjamin Saller's really damn fast RBTree implementation
-    from bsrbtree.rbtree import rbtree as BStree
-    do_bstree = True
-except ImportError:
-    print("Benjamin Sallers RBTrees not available.")
-    do_bstree =False
-
 COUNT = 1
 
 setup_RBTree = """
@@ -35,11 +27,8 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-if do_bstree:
-    bstree = BStree(bskeys)
 pytree = RBTree.fromkeys(keys)
 cytree = FastRBTree.fromkeys(keys)
-
 
 def rb_index():
     for key in keys:
