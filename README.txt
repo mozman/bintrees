@@ -5,13 +5,10 @@ Abstract
 ========
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
 
-This Classes are much slower than the bulitin.dict class and uses twice as much memory, but
-they have always sorted keys, and all results of iterators and list returning functions are also sorted.
+This Classes are much slower than the built-in dict class, but they have always 
+sorted keys, and all results of iterators and list returning functions are also sorted.
 
 All trees provides the same API.
-
-If you looking for a really fast RBTree see also http://pypi.python.org/pypi/rbtree written by Benjamin Saller.
-His rbtree class is 3x .. 4x times faster than my FastRBTree class.
 
 Source of Algorithms
 --------------------
@@ -28,6 +25,30 @@ Trees written in Cython 0.12.1
     - *FastBinaryTree* -- unbalanced binary tree
     - *FastAVLTree* -- balanced AVL-Tree
     - *FastRBTree* -- balanced Red-Black-Tree
+	
+Trees written with C-Functions and Cython 0.12.1 as wrapper
+-----------------------------------------------------------
+    - *QuickBinaryTree* -- unbalanced binary tree
+    - *QuickAVLTree* -- balanced AVL-Tree
+    - *QuickRBTree* -- balanced Red-Black-Tree
+	
+The difference between FastXTree and QuickXTree is the tree-node structure and the implementation 
+of the low level operations insert, remove, get_value and so on. But the biggest performance boost
+was to use the PyObject_Compare() function from the C-API as default for the QuickXTrees. 
+If you have to use a user-defined compare function you will lost this performance advantage. 
+
+But QuickXTrees also use much less memory than FastXTrees because of the usage of c-structs instead
+of python objects for the tree-node structure.
+
+Tree-node structure
+~~~~~~~~~~~~~~~~~~~
+	- FastXTree uses Python Object
+	- QuickXTree uses a c-struct (PyMem_Malloc)
+	
+Implementation
+~~~~~~~~~~~~~~
+	- FastXTree as Cython code
+	- QuickXTree uses Cython as wrapper for c-functions
 
 Constructor
 ~~~~~~~~~~~
@@ -118,18 +139,18 @@ Profiling with timeit(): 5000 unique random keys, time in seconds
 
 BinaryTrees
 -----------
-========================  =============  =============  =========
-unbalanced BinaryTree     cPython 2.6.5  Cython 0.12.1  ipy 2.6.0
-========================  =============  =============  =========
-100x build time               6,85           0,90          2,85
-100x build & delete time     12,55           1,88          5,09
-search 100x all keys          2,91           0,67          1,35
-========================  =============  =============  =========
+========================  =============  ==============  =========
+unbalanced BinaryTree     cPython 2.6.5  FastBinaryTree  ipy 2.6.0
+========================  =============  ==============  =========
+100x build time               6,85           0,90           2,85
+100x build & delete time     12,55           1,88           5,09
+search 100x all keys          2,91           0,67           1,35
+========================  =============  ==============  =========
 
 AVLTrees
 --------
 ========================  =============  =============  =========
-AVLTree                   cPython 2.6.5  Cython 0.12.1  ipy 2.6.0
+AVLTree                   cPython 2.6.5  FastAVLTree    ipy 2.6.0
 ========================  =============  =============  =========
 100x build time             18,33          1,50           11,45
 100x build & delete time    31,50          3,54           23,07
@@ -139,7 +160,7 @@ search 100x all keys         2,33          1,03           1,33
 RBTrees
 -------
 ========================  =============  =============  =========  =========
-RBTree                    cPython 2.6.5  Cython 0.12.1  ipy 2.6.0  bcsaller
+RBTree                    cPython 2.6.5  FastRBTree     ipy 2.6.0  bcsaller
 ========================  =============  =============  =========  =========
 100x build time             12,63          1,13           5,27      0,54
 100x build & delete time    35,37          2,90          13,73      0,89
@@ -153,8 +174,9 @@ builtin.dict
 
 Memory usage for 100x5000 keys (Binary/AVL&RB)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	* cPython-Trees (20/22) MByte
-	* Cython-Trees (22/24) MByte
+	* cPython-Trees (20/22) MByte (using __slots__)
+	* FastXTrees (22/24) MByte
+	* QuickXTrees (20 Bytes/Node) x 500.000 = ~9,5 MByte
 	* dict 10 MByte
 
 ========================  =============  =========
@@ -172,7 +194,9 @@ from source::
 
     python setup.py install
 
-Binary packages for 32-bit Win and Linux will be available on http://bitbucket.org/mozman/bintrees/downloads
+Download
+========
+http://bitbucket.org/mozman/bintrees/downloads
 
 Documentation
 =============

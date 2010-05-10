@@ -18,7 +18,6 @@ cdef class cQBinaryTree:
 
     def __init__(self, items=[], compare=None):
         self._root = NULL
-        #self._compare = compare if compare is not None else cmp
         self._compare = compare # if compare is None use PyObject_compare()
         self._count = 0
         self.update(items)
@@ -62,4 +61,20 @@ cdef class cQBinaryTree:
             raise KeyError(str(key))
         else:
             self._count -= 1
+
+    def max_item(self):
+        """ Get item with max key of tree, raises ValueError if tree is empty. """
+        cdef node_t *node
+        node = ct_max_node(self._root)
+        if node == NULL: # root is None
+            raise ValueError("Tree is empty")
+        return (<object>node.key, <object>node.value)
+
+    def min_item(self):
+        """ Get item with min key of tree, raises ValueError if tree is empty. """
+        cdef node_t *node
+        node = ct_min_node(self._root)
+        if node == NULL: # root is None
+            raise ValueError("Tree is empty")
+        return (<object>node.key, <object>node.value)
 
