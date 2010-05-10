@@ -123,8 +123,7 @@ PyObject *ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
       PyTuple_SET_ITEM(tuple, 1, VALUE(node));
       return tuple;
     }
-  Py_INCREF(Py_None);
-  return Py_None;
+  Py_RETURN_NONE;
 }
 
 node_t *ct_max_node(node_t *root)
