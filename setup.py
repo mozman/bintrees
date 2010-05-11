@@ -33,7 +33,7 @@ setup(
     platforms="OS Independent",
     license="GPLv3",
     classifiers=[
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.6",
