@@ -27,7 +27,7 @@ node_t *ct_prev_node(node_t *root, PyObject *key, PyObject *cmp);
 node_t *ct_max_node(node_t *root);
 node_t *ct_min_node(node_t *root);
 int ct_index_of(node_t *root, PyObject *key, PyObject *cmp);
-node_t *ct_node_at(node_t *root, int index, int count);
+node_t *ct_node_at(node_t *root, int index);
 
 int ct_bintree_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
 int ct_bintree_remove(node_t **root, PyObject *key, PyObject *cmp);

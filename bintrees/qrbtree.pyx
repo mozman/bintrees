@@ -16,11 +16,15 @@ cdef class cRBTree:
     cdef int _count
     cdef object _compare
 
-    def __init__(self, items=[], compare=None):
+    def __cinit__(self, items=None, compare=None):
         self._root = NULL
         self._compare = compare # if compare is None use PyObject_compare()
         self._count = 0
-        self.update(items)
+        if items:
+            self.update(items)
+
+    def __dealloc__(self):
+        ct_delete_tree(self._root)
 
     @property
     def compare(self):
@@ -29,6 +33,14 @@ cdef class cRBTree:
     @property
     def count(self):
         return self._count
+
+    def __getstate__(self):
+        data = dict(self.iteritems())
+        return {'data': data, 'cmp': self._compare}
+
+    def __setstate__(self, state):
+        self._compare = state['cmp']
+        self.update(state['data'])
 
     def clear(self):
         ct_delete_tree(self._root)
@@ -78,4 +90,31 @@ cdef class cRBTree:
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
         return (<object>node.key, <object>node.value)
+
+    def index(self, key):
+        """ T.index(k) -> index, raises KeyError if k not in T """
+        cdef int result
+        result = ct_index_of(self._root, key, self._compare)
+        if result >= 0:
+            return result
+        else:
+            raise KeyError(str(key))
+
+    def item_at(self, index):
+        """ T.item_at(index) -> item (k,v) """
+        cdef node_t *result
+        cdef int n
+        n = <int> index
+        if n < 0:
+            n = self._count + n
+        if (n < 0) or (n >= self._count):
+            raise IndexError('item_at()')
+        result = ct_node_at(self._root, n)
+        if result == NULL:
+            # index is in valid range so NULL should not be returned,
+            # implementation error in ct_node_at(...) function!
+            raise SystemError('got NULL from ct_node_at(...)')
+        else:
+            return (<object>result.key, <object>result.value)
+
 
