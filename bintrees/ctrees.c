@@ -13,7 +13,7 @@
 #define RED(node) (node->xdata)
 #define BALANCE(node) (node->xdata)
 
-node_t *
+static node_t *
 ct_new_node(PyObject *key, PyObject *value, int xdata)
 {
 	node_t *new_node = PyMem_Malloc(sizeof(node_t));
@@ -29,7 +29,7 @@ ct_new_node(PyObject *key, PyObject *value, int xdata)
 	return new_node;
 }
 
-void
+static void
 ct_delete_node(node_t *node)
 {
 	if (node != NULL) {
@@ -41,7 +41,7 @@ ct_delete_node(node_t *node)
 	}
 }
 
-void
+extern void
 ct_delete_tree(node_t *root)
 {
 	if (root == NULL)
@@ -55,7 +55,7 @@ ct_delete_tree(node_t *root)
 	ct_delete_node(root);
 }
 
-void
+static void
 ct_swap_data(node_t *node1, node_t *node2)
 {
 	PyObject *tmp;
@@ -67,7 +67,7 @@ ct_swap_data(node_t *node1, node_t *node2)
 	VALUE(node2) = tmp;
 }
 
-int
+extern int
 ct_compare(PyObject *compare, PyObject *key1, PyObject *key2)
 {
 	if (compare == Py_None)
@@ -98,7 +98,7 @@ ct_compare(PyObject *compare, PyObject *key1, PyObject *key2)
 	return i;
 }
 
-node_t *
+extern node_t *
 ct_find_node(node_t *root, PyObject *key, PyObject *cmp)
 {
 	int res;
@@ -112,7 +112,7 @@ ct_find_node(node_t *root, PyObject *key, PyObject *cmp)
 	return NULL; /* key not found */
 }
 
-PyObject *
+extern PyObject *
 ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
 {
 	node_t *node;
@@ -132,7 +132,7 @@ ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
 	Py_RETURN_NONE;
 }
 
-node_t *
+extern node_t *
 ct_max_node(node_t *root)
 /* get node with largest key */
 {
@@ -143,7 +143,7 @@ ct_max_node(node_t *root)
 	return root;
 }
 
-node_t *
+extern node_t *
 ct_min_node(node_t *root)
 // get node with smallest key
 {
@@ -154,7 +154,7 @@ ct_min_node(node_t *root)
 	return root;
 }
 
-int
+extern int
 ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 /* attention: rootaddr is the address of the root pointer */
 {
@@ -210,7 +210,7 @@ ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 	}
 }
 
-int
+extern int
 ct_bintree_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 /* attention: rootaddr is the address of the root pointer */
 {
@@ -252,7 +252,7 @@ ct_bintree_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *c
 	return 1;
 }
 
-int
+static int
 is_red (node_t *node)
 {
 	return (node != NULL) && (RED(node) == 1);
@@ -260,7 +260,7 @@ is_red (node_t *node)
 
 #define rb_new_node(key, value) ct_new_node(key, value, 1)
 
-node_t *
+static node_t *
 rb_single(node_t *root, int dir)
 {
 	node_t *save = root->link[!dir];
@@ -273,7 +273,7 @@ rb_single(node_t *root, int dir)
 	return save;
 }
 
-node_t *
+static node_t *
 rb_double(node_t *root, int dir)
 {
 	root->link[!dir] = rb_single(root->link[!dir], !dir);
@@ -282,7 +282,7 @@ rb_double(node_t *root, int dir)
 
 #define rb_new_node(key, value) ct_new_node(key, value, 1)
 
-int
+extern int
 rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 {
 	node_t *root = *rootaddr;
@@ -345,11 +345,10 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 
 			int cmp_res;
 			cmp_res = ct_compare(cmp, KEY(q), key);
-			if (cmp_res == 0) /*  key exists? */
-			{
+			if (cmp_res == 0) {       /* key exists?              */
 				Py_XDECREF(VALUE(q)); /* release old value object */
-				VALUE(q) = value; /* set new value object */
-				Py_INCREF(value); /* take new value object */
+				VALUE(q) = value;     /* set new value object     */
+				Py_INCREF(value);     /* take new value object    */
 				return 0;
 			}
 			last = dir;
@@ -373,7 +372,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 	return 1;
 }
 
-int
+extern int
 rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 {
 	node_t *root = *rootaddr;
@@ -419,7 +418,8 @@ rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 				node_t *s = p->link[!last];
 
 				if (s != NULL) {
-					if (!is_red(s->link[!last]) && !is_red(s->link[last])) {
+					if (!is_red(s->link[!last]) &&
+						!is_red(s->link[last])) {
 						/* Color flip */
 						RED(p) = 0;
 						RED(s) = 1;
@@ -464,7 +464,7 @@ rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 #define height(p) ((p) == NULL ? -1 : (p)->xdata)
 #define avl_max(a, b) ((a) > (b) ? (a) : (b))
 
-node_t *
+static node_t *
 avl_single(node_t *root, int dir)
 {
   node_t *save = root->link[!dir];
@@ -475,24 +475,24 @@ avl_single(node_t *root, int dir)
 	save->link[dir] = root;
 
 	/* Update balance factors */
-	rlh = height (root->link[0]);
-	rrh = height (root->link[1]);
-	slh = height (save->link[!dir]);
+	rlh = height(root->link[0]);
+	rrh = height(root->link[1]);
+	slh = height(save->link[!dir]);
 
-	BALANCE(root) = avl_max (rlh, rrh) + 1;
-	BALANCE(save) = avl_max (slh, BALANCE(root)) + 1;
+	BALANCE(root) = avl_max(rlh, rrh) + 1;
+	BALANCE(save) = avl_max(slh, BALANCE(root)) + 1;
 
 	return save;
 }
 
-node_t *
+static node_t *
 avl_double(node_t *root, int dir)
 {
 	root->link[!dir] = avl_single(root->link[!dir], !dir);
 	return avl_single(root, dir);
 }
 
-int
+extern int
 avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 {
 	node_t *root = *rootaddr;
@@ -509,7 +509,6 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 		int cmp_res;
 
 		it = root;
-
 		/* Search for an empty link, save the path */
 		for (;;) {
 			/* Push direction and node onto stack */
@@ -526,7 +525,6 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 
 			if (it->link[upd[top - 1]] == NULL)
 				break;
-
 			it = it->link[upd[top - 1]];
 		}
 
@@ -563,12 +561,10 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 					root = up[0];
 				done = 1;
 			}
-
 			/* Update balance factors */
 			lh = height(up[top]->link[upd[top]]);
 			rh = height(up[top]->link[!upd[top]]);
-			max = avl_max (lh, rh);
-
+			max = avl_max(lh, rh);
 			BALANCE(up[top]) = max + 1;
 		}
 	}
@@ -576,7 +572,7 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 	return 1;
 }
 
-int
+extern int
 avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 {
 	node_t *root = *rootaddr;
@@ -598,12 +594,12 @@ avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 			/* Push direction and node onto stack */
 			upd[top] = (cmp_res < 0);
 			up[top++] = it;
-
 			it = it->link[upd[top - 1]];
 		}
 
 		/* Remove the node */
-		if (it->link[0] == NULL || it->link[1] == NULL) {
+		if (it->link[0] == NULL ||
+			it->link[1] == NULL) {
 			/* Which child is not null? */
 			int dir = it->link[0] == NULL;
 
@@ -668,7 +664,7 @@ avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 	return 1;
 }
 
-node_t *
+extern node_t *
 ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
 {
 	node_t *succ = NULL;
@@ -680,7 +676,8 @@ ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
 		if (cval == 0)
 			break;
 		else if (cval < 0) {
-			if ((succ == NULL) || (ct_compare(cmp, KEY(node), KEY(succ)) < 0))
+			if ((succ == NULL) ||
+				(ct_compare(cmp, KEY(node), KEY(succ)) < 0))
 				succ = node;
 			node = LEFT_NODE(node);
 		} else
@@ -702,7 +699,7 @@ ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
 	return succ;
 }
 
-node_t *
+extern node_t *
 ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
 {
 	node_t *prev = NULL;
@@ -737,7 +734,7 @@ ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
 	return prev;
 }
 
-int
+extern int
 ct_index_of(node_t *root, PyObject *key, PyObject *cmp)
 /*
 get index of item <key>, returns -1 if key not found.
@@ -753,7 +750,8 @@ get index of item <key>, returns -1 if key not found.
 		if ((LEFT_NODE(node) != NULL) && go_down) {
 			stack_push(stack, node);
 			node = LEFT_NODE(node);
-		} else {
+		}
+		else {
 			if (ct_compare(cmp, KEY(node), key) == 0) {
 				stack_delete(stack);
 				return index;
@@ -762,7 +760,8 @@ get index of item <key>, returns -1 if key not found.
 			if (RIGHT_NODE(node) != NULL) {
 				node = RIGHT_NODE(node);
 				go_down = 1;
-			} else {
+			}
+			else {
 				if (stack_is_empty(stack)) {
 					stack_delete(stack);
 					return -1;
@@ -774,7 +773,7 @@ get index of item <key>, returns -1 if key not found.
 	}
 }
 
-node_t *
+extern node_t *
 ct_node_at(node_t *root, int index)
 {
 /*
