@@ -1,7 +1,7 @@
 #include "ctrees.h"
 #include "stack.h"
 
-node_stack_t *
+extern node_stack_t *
 stack_init(int size)
 {
 	node_stack_t *stack;
@@ -13,37 +13,37 @@ stack_init(int size)
 	return stack;
 }
 
-void
+extern void
 stack_delete(node_stack_t *stack)
 {
 	PyMem_Free(stack->stack);
 	PyMem_Free(stack);
 }
 
-void
+extern void
 stack_push(node_stack_t *stack, node_t *node)
 {
 	stack->stack[stack->stackptr++] = node;
 	if (stack->stackptr >= stack->size) {
 		stack->size *= 2;
-		stack->stack = PyMem_Realloc(stack->stack, sizeof(node_t *)
-				* stack->size);
+		stack->stack = PyMem_Realloc(stack->stack,
+				sizeof(node_t *) * stack->size);
 	}
 }
 
-node_t *
+extern node_t *
 stack_pop(node_stack_t *stack)
 {
 	return (stack->stackptr > 0) ? stack->stack[--stack->stackptr] : NULL;
 }
 
-int
+extern int
 stack_is_empty(node_stack_t *stack)
 {
 	return (stack->stackptr == 0);
 }
 
-void
+extern void
 stack_reset(node_stack_t *stack)
 {
 	stack->stackptr = 0;
