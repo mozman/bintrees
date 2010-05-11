@@ -708,7 +708,7 @@ class CheckTree(object):
         tree[911] = 912 # replace 910 with 912
         self.assertEqual(sys.getrefcount(chk), count)
 
-    def test_088_pickle_protocol(self):
+    def test_088a_pickle_protocol_std_cmp(self):
         tree = self.TREE(self.default_values1) # key == value
         pickle_str = cPickle.dumps(tree, -1)
         tree2 = cPickle.loads(pickle_str)
@@ -716,8 +716,20 @@ class CheckTree(object):
         self.assertEqual(tree.keys(), tree2.keys())
         self.assertEqual(tree.values(), tree2.values())
 
+    def test_088b_pickle_protocol_usr_cmp(self):
+        tree = self.TREE(self.default_values1, compare=cmpx) # key == value
+        pickle_str = cPickle.dumps(tree, -1)
+        tree2 = cPickle.loads(pickle_str)
+        self.assertEqual(len(tree), len(tree2))
+        self.assertEqual(tree.keys(), tree2.keys())
+        self.assertEqual(tree.values(), tree2.values())
 
+    def test_088c_pickle_protocol_lambda_cmp(self):
+        tree = self.TREE(self.default_values1, compare=lambda a,b: -cmp(a,b)) # key == value
+        self.assertRaises(cPickle.PickleError, cPickle.dumps, tree, -1)
 
+def cmpx(a,b):
+    return -cmp(a, b)
 
 if __name__=='__main__':
     unittest.main()

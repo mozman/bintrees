@@ -8,8 +8,6 @@ This package provides Binary- RedBlack- and AVL-Trees written in Python and Cyth
 This Classes are much slower than the built-in dict class, but they have always
 sorted keys, and all results of iterators and list returning functions are also sorted.
 
-All trees provides the same API.
-
 Source of Algorithms
 --------------------
 AVL- and RBTree algorithms taken from Julienne Walker: http://eternallyconfuzzled.com/jsw_home.aspx
@@ -26,9 +24,12 @@ Trees written with C-Functions and Cython 0.12.1 as wrapper
     - *FastAVLTree* -- balanced AVL-Tree
     - *FastRBTree* -- balanced Red-Black-Tree
 
-FastXTrees has C-structs as tree-node structure and C-implementation of low level
-operations like insert, remove, get_value and so on.
-The biggest performance boost is to use the PyObject_Compare() function from the
+All trees provides the same API, the pickle protocol is supported, but not lambda
+functions as user defined compare functions.
+
+FastXTrees has C-structs as tree-node structure and C-implementation for low level
+operations: insert, remove, get_value, max_item, min_item, index, item_at.
+The biggest performance boost was to use the PyObject_Compare() function from the
 C-API as default compare function. If you have to use a user-defined compare
 function you will lost this performance advantage.
 
@@ -136,18 +137,18 @@ AVLTree                   cPython 2.6.5  FastAVLTree    ipy 2.6.0
 ========================  =============  =============  =========
 100x build time             19,51          0,44           10,77
 100x build & delete time    32,20          1,05           22,04
-search 100x all keys         2,45          0,62           1,31
+search 100x all keys         2,45          0,62            1,31
 ========================  =============  =============  =========
 
 RBTrees
 -------
-========================  =============  =============  =========  =========
-RBTree                    cPython 2.6.5  FastRBTree     ipy 2.6.0  bcsaller
-========================  =============  =============  =========  =========
-100x build time             12,41          0,50           5,27      0,54
-100x build & delete time    35,28          1,23          13,57      0,89
-search 100x all keys         2,49          0,61           1,35      0,35
-========================  =============  =============  =========  =========
+========================  =============  =============  =========
+RBTree                    cPython 2.6.5  FastRBTree     ipy 2.6.0
+========================  =============  =============  =========
+100x build time             12,41          0,50           5,17
+100x build & delete time    35,28          1,23          13,57
+search 100x all keys         2,49          0,61           1,35
+========================  =============  =============  =========
 
 Memory usage for 100x5000 int keys (Binary/AVL&RB)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

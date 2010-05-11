@@ -1,5 +1,7 @@
-Version 0.3.0 ??.05.2010
-  * low level functions written as c-module only interface to python is a cython module
+Version 0.3.0 11.05.2010
+  * low level functions written as c-module only interface to python is a cython
+    module
+  * support for the pickle protocol
 Version 0.2.1 06.05.2010
   * added delslice del T[0:3] -> remove treenodes 0, 1, 2
   * added discard -> remove key without KeyError if not found
