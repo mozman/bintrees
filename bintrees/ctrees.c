@@ -752,13 +752,13 @@ get index of item <key>, returns -1 if key not found.
 {
   node_t *node = root;
   int index = 0;
-  int go_down = 0;
+  int go_down = 1;
   node_stack_t *stack;
   stack = stack_init(32);
 
   for (;;)
     {
-      if ((LEFT_NODE(node) != NULL) && (go_down>0))
+      if ((LEFT_NODE(node) != NULL) && go_down)
         {
           stack_push(stack, node);
           node = LEFT_NODE(node);
@@ -790,30 +790,26 @@ get index of item <key>, returns -1 if key not found.
     }
 }
 
-node_t *ct_node_at(node_t *root, int index, int count)
+node_t *ct_node_at(node_t *root, int index)
 {
 /*
 root -- root node of tree
 index -- index of wanted node
-count -- item count of tree
 
 return NULL if index out of range
 */
   node_t *node = root;
   int counter = 0;
-  int go_down = 0;
+  int go_down = 1;
 
-  if (index < 0)
-    index = count + index;
-  if ((index < 0) || (index >= count))
-      return NULL;
+  if (index < 0) return NULL;
 
   node_stack_t *stack;
   stack = stack_init(32);
 
   for(;;)
     {
-      if ((LEFT_NODE(node) != NULL) && (go_down>0))
+      if ((LEFT_NODE(node) != NULL) && go_down)
         {
           stack_push(stack, node);
           node = LEFT_NODE(node);
@@ -834,7 +830,7 @@ return NULL if index out of range
           else
             {
               if (stack_is_empty(stack))
-                { // this should never happen
+                { // index out of range
                   stack_delete(stack);
                   return NULL;
                 }

@@ -290,6 +290,16 @@ class TreeMixin(object):
         else:
             self.remove(key)
 
+    def __getstate__(self):
+        data = dict(self.iteritems())
+        return {'data': data, 'cmp': self._compare}
+
+    def __setstate__(self, state):
+        self._root = None
+        self._count = 0
+        self._compare = state['cmp']
+        self.update(state['data'])
+
     def setdefault(self, key, default=None):
         """ T.setdefault(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T """
         walker = self.get_walker()
@@ -534,8 +544,7 @@ class TreeMixin(object):
                     go_down = False
 
     def item_at(self, index):
-        """ T.item_at(index) -> item (k,v)
-        """
+        """ T.item_at(index) -> item (k,v) """
         if index < 0:
             index = self.count + index
         if (index < 0) or (index >= self.count):

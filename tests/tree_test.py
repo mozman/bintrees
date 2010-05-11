@@ -6,7 +6,10 @@
 
 import sys
 import unittest
+import cPickle
 from itertools import izip
+from StringIO import StringIO
+
 
 from random import randint, shuffle
 
@@ -704,6 +707,17 @@ class CheckTree(object):
         self.assertEqual(sys.getrefcount(chk), count+1)
         tree[911] = 912 # replace 910 with 912
         self.assertEqual(sys.getrefcount(chk), count)
+
+    def test_088_pickle_protocol(self):
+        tree = self.TREE(self.default_values1) # key == value
+        pickle_str = cPickle.dumps(tree, -1)
+        tree2 = cPickle.loads(pickle_str)
+        self.assertEqual(len(tree), len(tree2))
+        self.assertEqual(tree.keys(), tree2.keys())
+        self.assertEqual(tree.values(), tree2.values())
+
+
+
 
 if __name__=='__main__':
     unittest.main()

@@ -22,7 +22,7 @@ cdef extern from "ctrees.h":
     node_t *ct_succ_node(node_t *root, object key, object cmp)
     node_t *ct_prev_node(node_t *root, object key, object cmp)
     int ct_index_of(node_t *root, object key, object cmp)
-    node_t *ct_node_at(node_t *root, int index, int count)
+    node_t *ct_node_at(node_t *root, int index)
 
     # binary-tree functions
     int ct_bintree_insert(node_t **root, object key, object value, object cmp)
