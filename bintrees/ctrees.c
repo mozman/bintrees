@@ -77,17 +77,19 @@ ct_compare(PyObject *compare, PyObject *key1, PyObject *key2)
 	PyObject *res;
 	PyObject *args;
 	int i;
-	args = PyTuple_New(2);
+	args = PyTuple_Pack(2, key1, key2);
 	if (args == NULL)
 		return -1;
+	/*
 	Py_INCREF(key1);
 	Py_INCREF(key2);
 	PyTuple_SET_ITEM(args, 0, key1);
 	PyTuple_SET_ITEM(args, 1, key2);
+	*/
 	res = PyObject_Call(compare, args, NULL);
 	Py_DECREF(args);
 	if (res == NULL)
-		return -1; /* get no result object, compare is not callable? */
+		return -1; /* got no result object, compare is not callable? */
 	if (!PyInt_Check(res)) {
 		Py_DECREF(res);
 		PyErr_SetString(PyExc_TypeError, "comparison function must return int");
@@ -121,10 +123,6 @@ ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
 	node = ct_find_node(root, key, cmp);
 	if (node != NULL) {
 		tuple = PyTuple_New(2);
-		/*
-		 Py_INCREF(KEY(node)); ???
-		 Py_INCREF(VALUE(node)); ???
-		 */
 		PyTuple_SET_ITEM(tuple, 0, KEY(node));
 		PyTuple_SET_ITEM(tuple, 1, VALUE(node));
 		return tuple;
