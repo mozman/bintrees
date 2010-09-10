@@ -10,14 +10,6 @@ from random import shuffle
 from bintrees import RBTree
 from bintrees import FastRBTree
 
-try:
-    # compare with Benjamin Saller's really damn fast RBTree implementation
-    from bsrbtree.rbtree import rbtree as BStree
-    do_bstree = True
-except ImportError:
-    print("Benjamin Sallers RBTrees not available.")
-    do_bstree =False
-
 COUNT = 100
 
 setup_RBTree = """
@@ -25,9 +17,6 @@ from __main__ import rb_build_delete, rb_build, rb_search
 """
 setup_FastRBTree = """
 from __main__ import crb_build_delete, crb_build, crb_search
-"""
-setup_BStree = """
-from __main__ import bs_build_delete, bs_build, bs_search
 """
 
 try:
@@ -37,10 +26,6 @@ try:
 except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
-
-if do_bstree:
-    bs_searchtree = BStree(bskeys)
-    skeys = list(sorted(keys))
 
 py_searchtree = RBTree.fromkeys(keys)
 cy_searchtree = FastRBTree.fromkeys(keys)
@@ -69,18 +54,6 @@ def crb_search():
     for key in keys:
         obj = cy_searchtree[key]
 
-def bs_build_delete():
-    tree = BStree(bskeys)
-    for key in keys:
-        del tree[key]
-
-def bs_build():
-    tree = BStree(bskeys)
-
-def bs_search():
-    for key in keys:
-        obj = bs_searchtree[key]
-
 def print_result(time, text):
     print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
 
@@ -95,19 +68,11 @@ def main():
     t = Timer("crb_build()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree build only')
 
-    if do_bstree:
-        t = Timer("bs_build()", setup_BStree)
-        print_result(t.timeit(COUNT), 'Benjamin Saller RBTree build only')
-
     t = Timer("rb_build_delete()", setup_RBTree)
     print_result(t.timeit(COUNT), 'RBTree build & delete')
 
     t = Timer("crb_build_delete()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree build & delete')
-
-    if do_bstree:
-        t = Timer("bs_build_delete()", setup_BStree)
-        print_result(t.timeit(COUNT), 'Benjamin Saller RBTree build & delete')
 
     # shuffle search keys
     shuffle(keys)
@@ -116,11 +81,6 @@ def main():
 
     t = Timer("crb_search()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree search')
-
-    if do_bstree:
-        t = Timer("bs_search()", setup_BStree)
-        print_result(t.timeit(COUNT), 'Benjamin Saller RBTree search')
-
 
 if __name__=='__main__':
     main()

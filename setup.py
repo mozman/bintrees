@@ -2,7 +2,7 @@
 #coding:utf-8
 # Author:  mozman
 # to build c-extension:
-# setup.py build_ext --inplace
+# setup.py build_ext --inplace --force
 
 import os
 from distutils.core import setup
@@ -19,7 +19,7 @@ def read(fname):
 
 setup(
     name = 'bintrees',
-    version='0.3.0',
+    version='0.3.1',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',
@@ -33,10 +33,11 @@ setup(
     platforms="OS Independent",
     license="GPLv3",
     classifiers=[
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.6",
+    "Programming Language :: Python :: 2.7",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
     ]

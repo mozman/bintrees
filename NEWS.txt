@@ -1,3 +1,5 @@
+Version 0.3.1 10.09.2010
+  * runs with Python 2.7
 Version 0.3.0 11.05.2010
   * low level functions written as c-module only interface to python is a cython
     module
