@@ -36,7 +36,7 @@ function you will lost this performance advantage.
 Constructor
 ~~~~~~~~~~~
     * Tree([compare]) -> new empty tree, compare(a, b) -> -1, 0, +1; like builtin.cmp
-    * Tree(mapping, [compare]) -> new tree initialized from a mapping (requires only a iteritems() method)
+    * Tree(mapping, [compare]) -> new tree initialized from a mapping (requires only an iteritems() method)
     * Tree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
 Methods
@@ -54,7 +54,7 @@ Methods
     * __xor__(other) <==> T ^ other, symmetric_difference
     * __repr__() <==> repr(T)
     * __setitem__(k, v) <==> T[k] = v, O(log(n))
-    * clear() -> None, remove all items from T, , O(n)
+    * clear() -> None, remove all items from T, O(n)
     * copy() -> a shallow copy of T, O(n*log(n))
     * discard(k) -> None, remove k from T, if k is present, O(log(n))
     * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
@@ -81,7 +81,7 @@ traverse tree
     * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
     * itervalues([reverse]) -> an iterator over the values of T, O(n)
     * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
-    * foreach(f, [order]) -> visit all nodes of tree ('inorder', 'preorder' or 'postorder') and call f(k, v) for each node, O(n)
+    * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
 
 Heap methods
 ~~~~~~~~~~~~
@@ -122,33 +122,33 @@ Profiling with timeit(): 5000 unique random int keys, time in seconds
 
 BinaryTrees
 -----------
-========================  =============  ==============  =========
-unbalanced BinaryTree     cPython 2.6.5  FastBinaryTree  ipy 2.6.0
-========================  =============  ==============  =========
-100x build time               7,14           0,40           2,98
-100x build & delete time     12,87           1,00           5,04
-search 100x all keys          2,96           0,67           1,32
-========================  =============  ==============  =========
+========================  =============  =========  ==============
+unbalanced BinaryTree     cPython 2.6.5  ipy 2.6.0  FastBinaryTree
+========================  =============  =========  ==============
+100x build time               7,14          2,98        0,40
+100x build & delete time     12,87          5,04        1,00
+search 100x all keys          2,96          1,32        0,67
+========================  =============  =========  ==============
 
 AVLTrees
 --------
-========================  =============  =============  =========
-AVLTree                   cPython 2.6.5  FastAVLTree    ipy 2.6.0
-========================  =============  =============  =========
-100x build time             19,51          0,44           10,77
-100x build & delete time    32,20          1,05           22,04
-search 100x all keys         2,45          0,62            1,31
-========================  =============  =============  =========
+========================  =============  =========  =============
+AVLTree                   cPython 2.6.5  ipy 2.6.0  FastAVLTree
+========================  =============  =========  =============
+100x build time             19,51          10,77      0,44
+100x build & delete time    32,20          22,04      1,05
+search 100x all keys         2,45           1,31      0,62
+========================  =============  =========  =============
 
 RBTrees
 -------
-========================  =============  =============  =========
-RBTree                    cPython 2.6.5  FastRBTree     ipy 2.6.0
-========================  =============  =============  =========
-100x build time             12,41          0,50           5,17
-100x build & delete time    35,28          1,23          13,57
-search 100x all keys         2,49          0,61           1,35
-========================  =============  =============  =========
+========================  =============  =========  =============
+RBTree                    cPython 2.6.5  ipy 2.6.0  FastRBTree
+========================  =============  =========  =============
+100x build time             12,41          5,17       0,50
+100x build & delete time    35,28         13,57       1,23
+search 100x all keys         2,49          1,35       0,61
+========================  =============  =========  =============
 
 Memory usage for 100x5000 int keys (Binary/AVL&RB)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
