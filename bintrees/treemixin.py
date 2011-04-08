@@ -59,6 +59,7 @@ class TreeMixin(object):
     * is_empty() -> True if len(T) == 0, O(1)
     * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
     * keys([reverse]) -> list of T's keys, O(n)
+    * keyslice(startkey, endkey, [rtype, reverse]) -> Iterator: startkey <= key <= endkey, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
@@ -212,8 +213,17 @@ class TreeMixin(object):
     __iter__ = iterkeys
 
     def treeiter(self, rtype='key', reverse=False):
-        """ T.treeiter([rtype, reverse]) -> TreeIterator """
-        return TreeIterator(self)
+        """ T.treeiter([rtype, reverse]) -> TreeIterator,
+        rtype in ('key', 'value', 'item').
+        """
+        return TreeIterator(self, rtype, reverse)
+
+    def keyslice(self, startkey, endkey, rtype='key', reverse=False):
+        """ T.keyslice(startkey, endkey, [rtype, reverse]) -> Iterator from
+        key >= startkey to key <= endkey. rtype in ('key', 'value', 'item').
+        """
+        treeiter = self.treeiter(rtype, reverse)
+        return treeiter.keyslice(startkey, endkey)
 
     def __reversed__(self):
         return self.iterkeys(reverse=True)
