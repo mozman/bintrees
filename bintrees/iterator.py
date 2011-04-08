@@ -71,7 +71,10 @@ class TreeIterator(object):
             raise KeyError(unicode(key))
 
     def keyslice(self, startkey, endkey):
+        compare = self._tree.compare
         while True:
             item = self.next()
-            if startkey <= self._item[0] < endkey:
+            key = self._item[0]
+            if compare(startkey, key) < 1 and \
+               compare(key, endkey) < 0:
                 yield item
