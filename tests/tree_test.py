@@ -743,6 +743,51 @@ class CheckTree(object):
         tree = self.TREE(self.default_values1, compare=lambda a,b: -cmp(a,b)) # key == value
         self.assertRaises(cPickle.PickleError, cPickle.dumps, tree, -1)
 
+    def test_089a_lower_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertEqual(12 , tree.lower_bound(12))
+
+    def test_089b_lower_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertEqual(16 , tree.lower_bound(13))
+
+    def test_089c_lower_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertRaises(KeyError,  tree.lower_bound, 58)
+
+    def test_089d_lower_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertEqual(34 , tree.lower_bound(20))
+
+    def test_089e_lower_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE.fromkeys([10, 8, 4, 6])
+        self.assertEqual(6 , tree.lower_bound(5))
+
+    def test_090a_upper_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertEqual(12 , tree.upper_bound(13))
+
+    def test_090b_upper_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertEqual(12 , tree.upper_bound(16))
+
+    def test_090c_upper_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertEqual(57 , tree.upper_bound(99))
+
+    def test_090d_upper_bound(self):
+        # 12, 34, 45, 16, 35, 57
+        tree = self.TREE(self.default_values1)
+        self.assertRaises(KeyError, tree.upper_bound, 12)
+
 def cmpx(a,b):
     return -cmp(a, b)
 
