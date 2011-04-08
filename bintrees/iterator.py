@@ -73,5 +73,5 @@ class TreeIterator(object):
     def keyslice(self, startkey, endkey):
         while True:
             item = self.next()
-            if startkey <= self._item[0] <= endkey:
+            if startkey <= self._item[0] < endkey:
                 yield item

@@ -72,6 +72,12 @@ class TestTreeIterator(unittest.TestCase):
         result = list(treeiter.keyslice(3, 6))
         self.assertEqual([5], result)
 
+    def test_keyslice_normal_2(self):
+        tree = BinaryTree.fromkeys([5, 8, 2, 9, 7, 1])
+        treeiter = TreeIterator(tree, rtype='key')
+        result = list(treeiter.keyslice(3, 7))
+        self.assertEqual([5], result)
+
     def test_keyslice_no_keys_1(self):
         tree = BinaryTree.fromkeys([5, 8, 2, 9, 7, 1])
         treeiter = TreeIterator(tree, rtype='key')
@@ -88,7 +94,7 @@ class TestTreeIterator(unittest.TestCase):
         tree = BinaryTree.fromkeys([5, 8, 2, 9, 7, 1])
         treeiter = TreeIterator(tree, rtype='key', reverse=True)
         result = list(treeiter.keyslice(2, 7))
-        self.assertEqual([7, 5, 2], result)
+        self.assertEqual([5, 2], result)
 
 if __name__=='__main__':
     unittest.main()
