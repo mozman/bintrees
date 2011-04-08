@@ -59,7 +59,9 @@ class TreeMixin(object):
     * is_empty() -> True if len(T) == 0, O(1)
     * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
     * keys([reverse]) -> list of T's keys, O(n)
+    * itemslice(startkey, endkey, [reverse]) -> item iterator: startkey <= key < endkey, O(n)
     * keyslice(startkey, endkey, [reverse]) -> key iterator: startkey <= key < endkey, O(n)
+    * valueslice(startkey, endkey, [reverse]) -> value iterator: startkey <= key < endkey, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
@@ -218,15 +220,27 @@ class TreeMixin(object):
         """
         return TreeIterator(self, rtype, reverse)
 
-    def keyslice(self, startkey, endkey, reverse=False):
-        """ T.keyslice(startkey, endkey, [reverse=False]) -> key iterator:
+    def itemslice(self, startkey, endkey, reverse=False):
+        """ T.itemslice(startkey, endkey, [reverse=False]) -> item iterator:
         startkey <= key < endkey.
         """
         def inrange(key):
             return compare(startkey, key) < 1 and compare(key, endkey) < 0
 
         compare = self.compare
-        return ( key for key in self.iterkeys(reverse) if inrange(key) )
+        return ( item for item in self.iteritems(reverse) if inrange(item[0]) )
+
+    def keyslice(self, startkey, endkey, reverse=False):
+        """ T.keyslice(startkey, endkey, [reverse=False]) -> key iterator:
+        startkey <= key < endkey.
+        """
+        return ( item[0] for item in self.itemslice(startkey, endkey, reverse) )
+
+    def valueslice(self, startkey, endkey, reverse=False):
+        """ T.valueslice(startkey, endkey, [reverse=False]) -> value iterator:
+        startkey <= key < endkey.
+        """
+        return ( item[1] for item in self.itemslice(startkey, endkey, reverse) )
 
     def __reversed__(self):
         return self.iterkeys(reverse=True)
