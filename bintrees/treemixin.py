@@ -59,7 +59,7 @@ class TreeMixin(object):
     * is_empty() -> True if len(T) == 0, O(1)
     * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
     * keys([reverse]) -> list of T's keys, O(n)
-    * keyslice(startkey, endkey, [rtype, reverse]) -> Iterator: startkey <= key < endkey, O(n)
+    * keyslice(startkey, endkey, [reverse]) -> key iterator: startkey <= key < endkey, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
@@ -218,12 +218,15 @@ class TreeMixin(object):
         """
         return TreeIterator(self, rtype, reverse)
 
-    def keyslice(self, startkey, endkey, rtype='key', reverse=False):
-        """ T.keyslice(startkey, endkey, [rtype, reverse]) -> Iterator
-        startkey <= key < endkey. rtype in ('key', 'value', 'item').
+    def keyslice(self, startkey, endkey, reverse=False):
+        """ T.keyslice(startkey, endkey, [reverse=False]) -> key iterator:
+        startkey <= key < endkey.
         """
-        treeiter = self.treeiter(rtype, reverse)
-        return treeiter.keyslice(startkey, endkey)
+        def inrange(key):
+            return compare(startkey, key) < 1 and compare(key, endkey) < 0
+
+        compare = self.compare
+        return ( key for key in self.iterkeys(reverse) if inrange(key) )
 
     def __reversed__(self):
         return self.iterkeys(reverse=True)
@@ -286,6 +289,48 @@ class TreeMixin(object):
             else:
                 node = node.right
         raise KeyError(str(key))
+
+    def lower_bound(self, key):
+        """ Get first existing key >= key. """
+        node = self.get_walker()
+        compare = self.compare
+        lower_bound = self.max_key()
+        if compare(key, lower_bound) > 0:
+            raise KeyError(key)
+
+        while node.is_valid:
+            nodekey = node.key
+            cmp_res = compare(key, nodekey)
+            if cmp_res == 0:
+                return nodekey
+            elif cmp_res < 0:
+                if compare(nodekey, lower_bound) < 0:
+                    lower_bound = nodekey
+                node.go_left()
+            else:
+                node.go_right()
+        return lower_bound
+
+    def upper_bound(self, key):
+        """ Get last existing key < key. """
+        node = self.get_walker()
+        compare = self.compare
+        upper_bound = self.min_key()
+        if compare(key, upper_bound) < 1:
+            raise KeyError(key)
+
+        while node.is_valid:
+            nodekey = node.key
+            cmp_res = compare(key, nodekey)
+            if cmp_res == 0:
+                return upper_bound
+            elif cmp_res > 0:
+                if compare(nodekey, upper_bound) > 0:
+                    upper_bound = nodekey
+                node.go_right()
+            else:
+                node.go_left()
+        return upper_bound
 
     def __setitem__(self, key, value):
         """ x.__setitem__(i, y) <==> x[i]=y """
