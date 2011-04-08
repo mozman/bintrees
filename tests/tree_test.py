@@ -146,6 +146,16 @@ class CheckTree(object):
         self.assertEqual(result, [12, 16, 34, 35, 45, 57])
         self.assertEqual(result, tree.keys())
 
+    def test_018a_keyslice(self):
+        tree = self.TREE(self.default_values1)
+        result = list(tree.keyslice(15, 36))
+        self.assertEqual(result, [16, 34, 35])
+
+    def test_018b_keyslice_reverse(self):
+        tree = self.TREE(self.default_values1)
+        result = list(tree.keyslice(15, 36, reverse=True))
+        self.assertEqual(result, [35, 34, 16])
+
     def test_019_iter_values(self):
         tree = self.TREE(self.default_values1)
         result = list(tree.itervalues())
