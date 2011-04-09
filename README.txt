@@ -4,6 +4,7 @@ Binary Tree Package
 Abstract
 ========
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
+No Cython implementation for Python 3.
 
 This Classes are much slower than the built-in dict class, but they have always
 sorted keys, and all results of iterators and list returning functions are also sorted.

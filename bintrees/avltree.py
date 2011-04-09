@@ -25,7 +25,13 @@
 # items, a splay tree is theoretically better than all of the balanced trees
 # because of its move-to-front design.
 
-from treemixin import TreeMixin
+from __future__ import absolute_import
+
+from .compat import PY3
+if PY3:
+    from .compat import cmp
+
+from .treemixin import TreeMixin
 from array import array
 
 __all__ = ['AVLTree']
@@ -342,7 +348,7 @@ class AVLTree(TreeMixin):
                 node.value = heir.value
 
                 # Unlink successor and fix parent
-                xdir = 1 if compare(node_stack[top-1], node) == 0 else 0
+                xdir = 1 if compare(node_stack[top-1].key, node.key) == 0 else 0
                 node_stack[top-1][xdir] = heir.right
                 heir.free()
                 self._count -= 1

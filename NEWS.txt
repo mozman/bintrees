@@ -3,7 +3,8 @@ Version 0.3.2
   * added itemslice(startkey, endkey, reverse=False), keyslice(startkey, endkey, reverse=False),
     valueslice(startkey, endkey, reverse=False) - slicing by keys
   * tested with pypy 1.4.1, damn fast
-  * TODO: Python 3 support
+  * Pure Python trees are working with Python 3
+  * TODO: Cython implementation for Python 3
 
 Version 0.3.1 10.09.2010
 
