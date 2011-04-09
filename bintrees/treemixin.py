@@ -78,9 +78,9 @@ class TreeMixin(object):
     * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
     * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
     * itervalues([reverse]) -> an iterator over the values of T, O(n)
-    * itemslice(startkey, endkey, [reverse]) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
-    * keyslice(startkey, endkey, [reverse]) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
-    * valueslice(startkey, endkey, [reverse]) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
+    * itemslice(startkey, endkey) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
+    * keyslice(startkey, endkey) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
+    * valueslice(startkey, endkey) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
     * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
@@ -221,27 +221,30 @@ class TreeMixin(object):
         """
         return TreeIterator(self, rtype, reverse)
 
-    def itemslice(self, startkey, endkey, reverse=False):
-        """ T.itemslice(startkey, endkey, [reverse=False]) -> item iterator:
+    def itemslice(self, startkey, endkey):
+        """ T.itemslice(startkey, endkey) -> item iterator:
         startkey <= key < endkey.
         """
-        def inrange(key):
-            return compare(startkey, key) < 1 and compare(key, endkey) < 0
+        for item in self.iteritems():
+            key = item[0]
+            if key < startkey:
+                pass
+            elif key >= endkey:
+                return
+            else:
+                yield item
 
-        compare = self.compare
-        return ( item for item in self.iteritems(reverse) if inrange(item[0]) )
-
-    def keyslice(self, startkey, endkey, reverse=False):
-        """ T.keyslice(startkey, endkey, [reverse=False]) -> key iterator:
+    def keyslice(self, startkey, endkey):
+        """ T.keyslice(startkey, endkey) -> key iterator:
         startkey <= key < endkey.
         """
-        return ( item[0] for item in self.itemslice(startkey, endkey, reverse) )
+        return ( item[0] for item in self.itemslice(startkey, endkey) )
 
-    def valueslice(self, startkey, endkey, reverse=False):
-        """ T.valueslice(startkey, endkey, [reverse=False]) -> value iterator:
+    def valueslice(self, startkey, endkey):
+        """ T.valueslice(startkey, endkey) -> value iterator:
         startkey <= key < endkey.
         """
-        return ( item[1] for item in self.itemslice(startkey, endkey, reverse) )
+        return ( item[1] for item in self.itemslice(startkey, endkey) )
 
     def __reversed__(self):
         return self.iterkeys(reverse=True)

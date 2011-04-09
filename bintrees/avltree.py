@@ -151,9 +151,9 @@ class AVLTree(TreeMixin):
     * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
     * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
     * itervalues([reverse]) -> an iterator over the values of T, O(n)
-    * itemslice(startkey, endkey, [reverse]) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
-    * keyslice(startkey, endkey, [reverse]) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
-    * valueslice(startkey, endkey, [reverse]) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
+    * itemslice(startkey, endkey) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
+    * keyslice(startkey, endkey) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
+    * valueslice(startkey, endkey) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
     * treeiter([rtype, reverse]) -> TreeIterator
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
