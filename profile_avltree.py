@@ -20,8 +20,9 @@ from __main__ import cavl_build_delete, cavl_build, cavl_search
 """
 
 try:
-    with open('testkeys.txt') as fp:
-        keys = eval(fp.read())
+    fp = open('testkeys.txt')
+    keys = eval(fp.read())
+    fp.close()
 except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
@@ -54,12 +55,13 @@ def cavl_search():
         obj = cy_searchtree[key]
 
 def print_result(time, text):
-    print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
+    print("Operation: %s takes %.2f seconds\n" % (text, time))
 
 def main():
-    with open('testkeys.txt', 'w') as fp:
-        fp.write(repr(keys))
-    print ("Nodes: {0}".format(len(keys)))
+    fp = open('testkeys.txt', 'w')
+    fp.write(repr(keys))
+    fp.close()
+    print ("Nodes: %d" % len(keys))
 
     t = Timer("avl_build()", setup_AVLTree)
     print_result(t.timeit(COUNT), 'AVLTree build only')
