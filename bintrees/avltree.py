@@ -27,10 +27,6 @@
 
 from __future__ import absolute_import
 
-from .compat import PY3
-if PY3:
-    from .compat import cmp
-
 from .treemixin import TreeMixin
 from array import array
 
@@ -105,9 +101,9 @@ class AVLTree(TreeMixin):
     Landis, who published it in their 1962 paper "An algorithm for the
     organization of information."
 
-    AVLTree([compare]) -> new empty tree.
-    AVLTree(mapping, [compare]) -> new tree initialized from a mapping
-    AVLTree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
+    AVLTree() -> new empty tree.
+    AVLTree(mapping) -> new tree initialized from a mapping
+    AVLTree(seq) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
     Methods
     -------
@@ -189,10 +185,9 @@ class AVLTree(TreeMixin):
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
-    def __init__(self, items=None, compare=None):
+    def __init__(self, items=None):
         """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
         self._root = None
-        self._compare = compare if compare is not None else cmp
         self._count = 0
         if items is not None:
             self.update(items)
@@ -218,11 +213,6 @@ class AVLTree(TreeMixin):
         """ root node of T """
         return self._root
 
-    @property
-    def compare(self):
-        """ compare function of T """
-        return self._compare
-
     def _new_node(self, key, value):
         """ Create a new treenode """
         self._count += 1
@@ -240,11 +230,10 @@ class AVLTree(TreeMixin):
             node = self._root
             # search for an empty link, save path
             while True:
-                cmp_res = self._compare(key, node.key)
-                if cmp_res == 0: # update existing item
+                if key == node.key: # update existing item
                     node.value = value
                     return
-                direction = 1 if cmp_res > 0 else 0
+                direction = 1 if key > node.key else 0
                 dir_stack.append(direction)
                 node_stack.append(node)
                 if node[direction] is None:
@@ -295,7 +284,6 @@ class AVLTree(TreeMixin):
         if self._root is None:
             raise KeyError(str(key))
         else:
-            compare = self._compare
             node_stack = [None] * MAXSTACK # node stack
             dir_stack = array('I', [0] * MAXSTACK) # direction stack
             top = 0
@@ -305,11 +293,11 @@ class AVLTree(TreeMixin):
                 # Terminate if not found
                 if node is None:
                     raise KeyError(str(key))
-                elif compare(node.key, key)==0:
+                elif node.key == key:
                     break
 
                 # Push direction and node onto stack
-                direction = 1 if compare(key, node.key) > 0 else 0
+                direction = 1 if key > node.key else 0
                 dir_stack[top] = direction
 
                 node_stack[top] = node
@@ -348,7 +336,7 @@ class AVLTree(TreeMixin):
                 node.value = heir.value
 
                 # Unlink successor and fix parent
-                xdir = 1 if compare(node_stack[top-1].key, node.key) == 0 else 0
+                xdir = 1 if node_stack[top-1].key == node.key else 0
                 node_stack[top-1][xdir] = heir.right
                 heir.free()
                 self._count -= 1

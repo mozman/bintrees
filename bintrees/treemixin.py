@@ -20,7 +20,6 @@ class TreeMixin(object):
     ---------------------------------------
 
     count -- get node count
-    compare -- get compare function, behave like builtin cmp()
 
     T has to implement following methods
     ------------------------------------
@@ -150,7 +149,7 @@ class TreeMixin(object):
 
     def copy(self):
         """ T.copy() -> get a shallow copy of T. """
-        tree = self.__class__(compare=self.compare)
+        tree = self.__class__()
         self.foreach(tree.insert, order=-1)
         return tree
     __copy__ = copy
@@ -297,12 +296,10 @@ class TreeMixin(object):
 
     def get_value(self, key):
         node = self.root
-        compare = self.compare
         while node is not None:
-            cmp_res = compare(key, node.key)
-            if cmp_res == 0:
+            if key == node.key:
                 return node.value
-            elif cmp_res < 0:
+            elif key < node.key:
                 node = node.left
             else:
                 node = node.right
@@ -311,18 +308,16 @@ class TreeMixin(object):
     def lower_bound(self, key):
         """ Get first existing key >= key. """
         node = self.get_walker()
-        compare = self.compare
         lower_bound = self.max_key()
-        if compare(key, lower_bound) > 0:
+        if key > lower_bound:
             raise KeyError(key)
 
         while node.is_valid:
             nodekey = node.key
-            cmp_res = compare(key, nodekey)
-            if cmp_res == 0:
+            if key == nodekey:
                 return nodekey
-            elif cmp_res < 0:
-                if compare(nodekey, lower_bound) < 0:
+            elif key < nodekey:
+                if nodekey < lower_bound:
                     lower_bound = nodekey
                 node.go_left()
             else:
@@ -332,18 +327,16 @@ class TreeMixin(object):
     def upper_bound(self, key):
         """ Get last existing key < key. """
         node = self.get_walker()
-        compare = self.compare
         upper_bound = self.min_key()
-        if compare(key, upper_bound) < 1:
+        if key <= upper_bound:
             raise KeyError(key)
 
         while node.is_valid:
             nodekey = node.key
-            cmp_res = compare(key, nodekey)
-            if cmp_res == 0:
+            if key == nodekey:
                 return upper_bound
-            elif cmp_res > 0:
-                if compare(nodekey, upper_bound) > 0:
+            elif key > nodekey:
+                if nodekey > upper_bound:
                     upper_bound = nodekey
                 node.go_right()
             else:
@@ -365,12 +358,11 @@ class TreeMixin(object):
 
     def __getstate__(self):
         data = dict(self.iteritems())
-        return {'data': data, 'cmp': self._compare}
+        return { 'data': data }
 
     def __setstate__(self, state):
         self._root = None
         self._count = 0
-        self._compare = state['cmp']
         self.update(state['data'])
 
     def setdefault(self, key, default=None):
@@ -385,7 +377,7 @@ class TreeMixin(object):
         """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
         for items in args:
             try:
-                generator = items.iteritems()
+                generator = items.items()
             except AttributeError:
                 generator = iter(items)
 
@@ -421,7 +413,7 @@ class TreeMixin(object):
         walker = self.get_walker()
         if walker.goto(key) is False:
             if len(args) == 0:
-                raise KeyError(unicode(key))
+                raise KeyError(str(key))
             else:
                 return args[0]
         value = walker.value
@@ -552,7 +544,7 @@ class TreeMixin(object):
             return [self.pop_min() for _ in xrange(min(len(self), n))]
         else:
             gen = self.iterkeys()
-            keys = (next(gen) for _ in xrange(min(len(self), n)))
+            keys = (next(gen) for _ in range(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
 
     def nlargest(self, n, pop=False):
@@ -563,7 +555,7 @@ class TreeMixin(object):
             return [self.pop_max() for _ in xrange(min(len(self), n))]
         else:
             gen = self.iterkeys(reverse=True)
-            keys = (next(gen) for _ in xrange(min(len(self), n)))
+            keys = (next(gen) for _ in range(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
 
     def _slice(self, s):
@@ -604,7 +596,7 @@ class TreeMixin(object):
                 node.push()
                 node.go_left()
             else:
-                if self.compare(node.key, key) == 0:
+                if node.key == key:
                     return index
                 index += 1
                 if node.has_right():
@@ -717,7 +709,7 @@ class ItemCollector(object):
     def __init__(self, indices):
         self.index = 0
         self.wanted = iter(indices)
-        self.next_index = self.wanted.next()
+        self.next_index = next(self.wanted)
         self.result = [] # result list is sorted by key
 
     def func(self):
@@ -725,7 +717,7 @@ class ItemCollector(object):
             if self.index == self.next_index:
                 self.result.append( (key, value) )
                 try:
-                    self.next_index = self.wanted.next()
+                    self.next_index = next(self.wanted)
                 except StopIteration:
                     self.next_index = -1
             self.index += 1
