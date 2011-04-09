@@ -83,9 +83,9 @@ traverse tree
     * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
     * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
     * itervalues([reverse]) -> an iterator over the values of T, O(n)
-    * itemslice(startkey, endkey, [reverse]) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
-    * keyslice(startkey, endkey, [reverse]) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
-    * valueslice(startkey, endkey, [reverse]) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
+    * itemslice(startkey, endkey) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
+    * keyslice(startkey, endkey) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
+    * valueslice(startkey, endkey) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
     * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
     * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
 
