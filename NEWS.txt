@@ -1,10 +1,20 @@
-Version 0.3.2
+Version 0.4.0 planned - someday
+
+  * API change!!!
+  * full Python 3 support, also Cython
+  * replacing compare() by a key() function
+  * removing reverse argument from all methods, use reversed() instead
+  * replacing index slicing by key slicing
+  * keys(), items(), values() generating 'views'
+  * removing iter...() methods
+
+Version 0.3.2 not released
 
   * added itemslice(startkey, endkey, reverse=False), keyslice(startkey, endkey, reverse=False),
     valueslice(startkey, endkey, reverse=False) - slicing by keys
   * tested with pypy 1.4.1, damn fast
   * Pure Python trees are working with Python 3
-  * TODO: Cython implementation for Python 3
+  * No Cython implementation for Python 3
 
 Version 0.3.1 10.09.2010
 
@@ -28,11 +38,11 @@ Version 0.2.1 06.05.2010
   * added item_at: T.item_at(0) -> get item at position (not key!) 0
           T.item_at(0) O(n)! <==> T.min_item() O(log(n))
 
-Version 0.2.0 - 03 Mai 2010
+Version 0.2.0 - 03.05.2010
 
   * TreeMixin Class as base for Python-Trees and as Mixin for Cython-Trees
 
-Version 0.1.0 - 27 April 2010
+Version 0.1.0 - 27.04.2010
 
   * Alpha status
   * Initial release
