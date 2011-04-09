@@ -3,6 +3,7 @@ Binary Tree Package
 
 Abstract
 ========
+
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
 No Cython implementation for Python 3.
 
@@ -11,16 +12,19 @@ sorted keys, and all results of iterators and list returning functions are also 
 
 Source of Algorithms
 --------------------
+
 AVL- and RBTree algorithms taken from Julienne Walker: http://eternallyconfuzzled.com/jsw_home.aspx
 
 Trees written in Python (only standard library)
 -----------------------------------------------
+
     - *BinaryTree* -- unbalanced binary tree
     - *AVLTree* -- balanced AVL-Tree
     - *RBTree* -- balanced Red-Black-Tree
 
 Trees written with C-Functions and Cython 0.12.1 as wrapper
 -----------------------------------------------------------
+
     - *FastBinaryTree* -- unbalanced binary tree
     - *FastAVLTree* -- balanced AVL-Tree
     - *FastRBTree* -- balanced Red-Black-Tree
@@ -36,12 +40,14 @@ function you will lost this performance advantage.
 
 Constructor
 ~~~~~~~~~~~
+
     * Tree([compare]) -> new empty tree, compare(a, b) -> -1, 0, +1; like builtin.cmp
     * Tree(mapping, [compare]) -> new tree initialized from a mapping (requires only an iteritems() method)
     * Tree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
 Methods
 ~~~~~~~
+
     * __contains__(k) -> True if T has a key k, else False, O(log(n))
     * __delitem__(y) <==> del T[y], O(log(n))
     * __getitem__(y) <==> T[y], O(log(n))
@@ -134,7 +140,7 @@ BinaryTrees
 -----------
 
 ========================  =============  ==============  ==============  ==============
-                          CPython 2.7.1  FastBinaryTree  ipy 2.7.0       pypy 1.4.1
+unbalanced Trees          CPython 2.7.1  FastBinaryTree  ipy 2.7.0       pypy 1.4.1
 ========================  =============  ==============  ==============  ==============
 build time 100x            6,59           0,39            2,62            0,46
 build & delete time 100x  11,82           0,98            4,66            0,70
@@ -142,10 +148,10 @@ search 100x all keys       2,99           0,66            1,23            0,24
 ========================  =============  ==============  ==============  ==============
 
 AVLTrees
--------
+--------
 
 ========================  =============  ==============  ==============  ==============
-                          CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
+AVLTrees                  CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
 ========================  =============  ==============  ==============  ==============
 build time 100x	          18,89           0,42           11,45           1,88
 build & delete time 100x  31,66           1,02           23,46           3,86
@@ -156,7 +162,7 @@ RBTrees
 -------
 
 ========================  =============  ==============  ==============  ==============
-                          CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
+RBTrees                   CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
 ========================  =============  ==============  ==============  ==============
 build time 100x	          11,62           0,49            4,80            0,77
 build & delete time 100x  31,45           1,20           13,04            1,90
@@ -165,6 +171,7 @@ search 100x all keys       2,60           0,60            1,03            0,23
 
 Memory usage for 100x5000 int keys (Binary/AVL&RB)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     * CPython-Trees (20/22) MByte (using __slots__)
     * FastXTrees (20 Bytes/Node on 32 bit systems) x 500.000 = ~9,5 MByte
     * dict 10 MByte
@@ -189,10 +196,12 @@ from source::
 
 Download
 ========
+
 http://bitbucket.org/mozman/bintrees/downloads
 
 Documentation
 =============
+
 http://bitbucket.org/mozman/bintrees/wiki/Home
 
 bintrees can be found on bitbucket.org at:
