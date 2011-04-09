@@ -3,6 +3,7 @@
 # Author:  Mozman
 # Purpose: treemixin provides top level functions for binary trees
 # Created: 03.05.2010
+
 from __future__ import absolute_import
 
 from .iterator import TreeIterator
@@ -23,6 +24,7 @@ class TreeMixin(object):
 
     T has to implement following methods
     ------------------------------------
+
     get_walker(...)
         get a tree walker object, provides methods to traverse the tree see walker.py
 
@@ -39,8 +41,8 @@ class TreeMixin(object):
     --------------------
 
     * __contains__(k) -> True if T has a key k, else False, O(log(n))
-    * __delitem__(y) <==> del T[y], O(log(n))
-    * __getitem__(y) <==> T[y], O(log(n))
+    * __delitem__(y) <==> del T[y], del T[s:e], O(log(n))
+    * __getitem__(y) <==> T[y], T[s:e], O(log(n))
     * __iter__() <==> iter(T)
     * __len__() <==> len(T), O(1)
     * __max__() <==> max(T), get max item (k,v) of T, O(log(n))
@@ -55,15 +57,25 @@ class TreeMixin(object):
     * copy() -> a shallow copy of T, O(n*log(n))
     * discard(k) -> None, remove k from T, if k is present, O(log(n))
     * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
-    * has_key(k) -> True if T has a key k, else False, O(log(n))
     * is_empty() -> True if len(T) == 0, O(1)
-    * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
-    * keys([reverse]) -> list of T's keys, O(n)
+    * items([reverse]) -> generator for (k, v) items of T, O(n)
+    * keys([reverse]) -> generator for keys of T, O(n)
+    * values([reverse]) -> generator for values of  T, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
-    * values([reverse]) -> list of T's values, O(n)
+
+    Key slicing methods
+
+    * itemslice(s, e) -> generator for (k, v) items of T for key: s <= key < e, O(n)
+    * keyslice(s, e) -> generator for keys of T, key: s <= key < e, O(n)
+    * valueslice(s, e) -> generator for values of T, key: s <= key < e, O(n)
+    * T[s:e] -> key generator, for key if s <= key < e, O(n), uses keyslice(s, e)
+    * del T[s:e] -> remove items by key slicing, for key if s <= key < e, O(n)
+
+    If 's' is None or T[:e], generator starts with min_key(), if 'e' is None
+    or T[s:] generator ends with max_key(), T[:] for all keys, same as T.keys().
 
     walk forward/backward, O(log(n))
 
@@ -74,12 +86,6 @@ class TreeMixin(object):
 
     traverse tree
 
-    * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
-    * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
-    * itervalues([reverse]) -> an iterator over the values of T, O(n)
-    * itemslice(startkey, endkey) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
-    * keyslice(startkey, endkey) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
-    * valueslice(startkey, endkey) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
     * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
@@ -94,13 +100,6 @@ class TreeMixin(object):
     * nlargest(i[,pop]) -> get list of i largest items (k, v), O(i*log(n))
     * nsmallest(i[,pop]) -> get list of i smallest items (k, v), O(i*log(n))
 
-    Index methods (access by index slow)
-
-    * index(k) -> index of key k, O(n)
-    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
-    * T[s:e:i] -> list of (k,v) pairs, from start s to end e, step i, O(n)
-    * del T[s:e:i] -> remove items by slicing, O(n)
-
     Set methods (using frozenset)
 
     * intersection(t1, t2, ...) -> Tree with keys *common* to all trees
@@ -114,6 +113,7 @@ class TreeMixin(object):
     Classmethods
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
+
     """
     def get_walker(self):
         return Walker(self)
@@ -154,10 +154,9 @@ class TreeMixin(object):
         return tree
     __copy__ = copy
 
-    def has_key(self, key):
-        """ T.has_key(k) -> True if T has a key k, else False """
+    def __contains__(self, key):
+        """ k in T -> True if T has a key k, else False """
         return self.get_walker().goto(key)
-    __contains__ = has_key
 
     def __len__(self):
         """ x.__len__() <==> len(x) """
@@ -202,17 +201,12 @@ class TreeMixin(object):
         return self.count == 0
 
     def keys(self, reverse=False):
-        """ T.keys() -> list of T's keys """
-        return list(self.iterkeys(reverse))
-
-    def iterkeys(self, reverse=False):
         """ T.iterkeys([reverse]) -> an iterator over the keys of T, in ascending
         order if reverse is True, iterate in descending order, reverse defaults
         to False
         """
-        for item in self.iteritems(reverse):
-            yield item[0]
-    __iter__ = iterkeys
+        return ( item[0] for item in self.items(reverse) )
+    __iter__ = keys
 
     def treeiter(self, rtype='key', reverse=False):
         """ T.treeiter([rtype, reverse]) -> TreeIterator,
@@ -220,50 +214,22 @@ class TreeMixin(object):
         """
         return TreeIterator(self, rtype, reverse)
 
-    def itemslice(self, startkey, endkey):
-        """ T.itemslice(startkey, endkey) -> item iterator:
-        startkey <= key < endkey.
-        """
-        for item in self.iteritems():
-            key = item[0]
-            if key < startkey:
-                pass
-            elif key >= endkey:
-                return
-            else:
-                yield item
-
-    def keyslice(self, startkey, endkey):
-        """ T.keyslice(startkey, endkey) -> key iterator:
-        startkey <= key < endkey.
-        """
-        return ( item[0] for item in self.itemslice(startkey, endkey) )
-
-    def valueslice(self, startkey, endkey):
-        """ T.valueslice(startkey, endkey) -> value iterator:
-        startkey <= key < endkey.
-        """
-        return ( item[1] for item in self.itemslice(startkey, endkey) )
-
     def __reversed__(self):
-        return self.iterkeys(reverse=True)
+        return self.keys(reverse=True)
 
     def values(self, reverse=False):
-        """ T.values() -> list of T's values """
-        return list(self.itervalues(reverse))
-
-    def itervalues(self, reverse=False):
-        """ T.itervalues([reverse]) -> an iterator over the values of T, in ascending order
+        """ T.values([reverse]) -> an iterator over the values of T, in ascending order
         if reverse is True, iterate in descending order, reverse defaults to False
         """
-        for item in self.iteritems(reverse):
-            yield item[1]
+        return ( item[1] for item in self.items(reverse) )
 
-    def iteritems(self, reverse=False):
-        """ T.iteritems([reverse]) -> an iterator over the (key, value) items of T,
+    def items(self, reverse=False):
+        """ T.items([reverse]) -> an iterator over the (key, value) items of T,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False
         """
+        if self.is_empty():
+            return
         node = self.get_walker()
         direction = 1 if reverse else 0
         other = 1 - direction
@@ -283,16 +249,73 @@ class TreeMixin(object):
                     node.pop()
                     go_down = False
 
-    def items(self, reverse=False):
-        """ T.items() -> list of T's (key, value) pairs, as 2-tuples """
-        return list(self.iteritems(reverse))
-
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
         if isinstance(key, slice):
-            return self._slice(key)
+            return self.keyslice(key.start, key.stop)
         else:
             return self.get_value(key)
+
+    def keyslice(self, startkey, endkey):
+        """ T.keyslice(startkey, endkey) -> key iterator:
+        startkey <= key < endkey.
+        """
+        return ( item[0] for item in self.itemslice(startkey, endkey) )
+
+    def itemslice(self, startkey, endkey):
+        """ T.getitems(s, e) -> item iterator: s <= key < e.
+
+        if s is None: start with min element -> T[:e]
+        if e is None: end with max element. -> T[s:]
+        T[:] -> all elements
+        """
+        def has_upper_bound(key):
+            return key >= endkey
+
+        def has_lower_bound(key):
+            return key < startkey
+
+        def no_bounds(key):
+            return False
+
+        lower_than_lower_bound = no_bounds if startkey is None else has_lower_bound
+        greater_equal_upper_bound = no_bounds if endkey is None else has_upper_bound
+
+        for item in self.items():
+            key = item[0]
+            if lower_than_lower_bound(key):
+                pass
+            elif greater_equal_upper_bound(key):
+                return
+            else:
+                yield item
+
+    def valueslice(self, startkey, endkey):
+        """ T.valueslice(startkey, endkey) -> value iterator:
+        startkey <= key < endkey.
+        """
+        return ( item[1] for item in self.itemslice(startkey, endkey) )
+
+    def __setitem__(self, key, value):
+        """ x.__setitem__(i, y) <==> x[i]=y """
+        if isinstance(key, slice):
+            raise ValueError('setslice is not supported')
+        self.insert(key, value)
+
+    def __delitem__(self, key):
+        """ x.__delitem__(y) <==> del x[y] """
+        if isinstance(key, slice):
+            self.delitems(self.keyslice(key.start, key.stop))
+        else:
+            self.remove(key)
+
+    def delitems(self, keys):
+        """ T.delitems(keys) -> remove all items by keys
+        """
+        # convert generator to list, because the content of the
+        # tree will be modified!
+        for key in list(keys):
+            self.remove(key)
 
     def get_value(self, key):
         node = self.root
@@ -305,59 +328,8 @@ class TreeMixin(object):
                 node = node.right
         raise KeyError(str(key))
 
-    def lower_bound(self, key):
-        """ Get first existing key >= key. """
-        node = self.get_walker()
-        lower_bound = self.max_key()
-        if key > lower_bound:
-            raise KeyError(key)
-
-        while node.is_valid:
-            nodekey = node.key
-            if key == nodekey:
-                return nodekey
-            elif key < nodekey:
-                if nodekey < lower_bound:
-                    lower_bound = nodekey
-                node.go_left()
-            else:
-                node.go_right()
-        return lower_bound
-
-    def upper_bound(self, key):
-        """ Get last existing key < key. """
-        node = self.get_walker()
-        upper_bound = self.min_key()
-        if key <= upper_bound:
-            raise KeyError(key)
-
-        while node.is_valid:
-            nodekey = node.key
-            if key == nodekey:
-                return upper_bound
-            elif key > nodekey:
-                if nodekey > upper_bound:
-                    upper_bound = nodekey
-                node.go_right()
-            else:
-                node.go_left()
-        return upper_bound
-
-    def __setitem__(self, key, value):
-        """ x.__setitem__(i, y) <==> x[i]=y """
-        if isinstance(key, slice):
-            raise ValueError('setslice is unsupported')
-        self.insert(key, value)
-
-    def __delitem__(self, key):
-        """ x.__delitem__(y) <==> del x[y] """
-        if isinstance(key, slice):
-            self._delslice(key)
-        else:
-            self.remove(key)
-
     def __getstate__(self):
-        data = dict(self.iteritems())
+        data = dict(self.items())
         return { 'data': data }
 
     def __setstate__(self, state):
@@ -543,7 +515,7 @@ class TreeMixin(object):
         if pop:
             return [self.pop_min() for _ in xrange(min(len(self), n))]
         else:
-            gen = self.iterkeys()
+            gen = self.keys()
             keys = (next(gen) for _ in range(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
 
@@ -554,90 +526,14 @@ class TreeMixin(object):
         if pop:
             return [self.pop_max() for _ in xrange(min(len(self), n))]
         else:
-            gen = self.iterkeys(reverse=True)
+            gen = self.keys(reverse=True)
             keys = (next(gen) for _ in range(min(len(self), n)))
             return [(key, self.get(key)) for key in keys]
-
-    def _slice(self, s):
-        """ T._slice(s) -> list of (k,v) pairs, from slice s
-
-        O(n) ... foreach visit all nodes!
-        """
-        start, end, step = s.indices(self.count)
-        reverse = True if start > end else False
-        indices = range(start, end, step)
-        if len(indices) > 0 :
-            if reverse:
-                indices = reversed(indices) # indices have to be ascending !!!
-            collector = ItemCollector(indices)
-            self.foreach(collector.func())
-            if reverse:
-                return list(reversed(collector.result))
-            else:
-                return collector.result
-        else:
-            return []
-
-    def _delslice(self, s):
-        """ T._delslice(s) -> remove item from T by slice s
-
-        O(n) ... foreach visit all nodes!
-        """
-        for key, value in self._slice(s):
-            self.remove(key)
-
-    def index(self, key):
-        """ T.index(k) -> index, raises KeyError if k not in T """
-        node = self.get_walker()
-        index = 0
-        go_down = True
-        while True:
-            if node.has_left() and go_down:
-                node.push()
-                node.go_left()
-            else:
-                if node.key == key:
-                    return index
-                index += 1
-                if node.has_right():
-                    node.go_right()
-                    go_down = True
-                else:
-                    if node.stack_is_empty(): # all done, key not found
-                        raise KeyError(str(key))
-                    node.pop()
-                    go_down = False
-
-    def item_at(self, index):
-        """ T.item_at(index) -> item (k,v) """
-        if index < 0:
-            index = self.count + index
-        if (index < 0) or (index >= self.count):
-            raise IndexError('item_at()')
-        node = self.get_walker()
-        counter = 0
-        go_down = True
-        while True:
-            if node.has_left() and go_down:
-                node.push()
-                node.go_left()
-            else:
-                if counter == index:
-                    return node.item
-                counter += 1
-                if node.has_right():
-                    node.go_right()
-                    go_down = True
-                else:
-                    if node.stack_is_empty():
-                        return # all done
-                    node.pop()
-                    go_down = False
 
     def intersection(self, *trees):
         """ x.intersection(t1, t2, ...) -> Tree, with keys *common* to all trees
         """
-        thiskeys = frozenset(self.iterkeys())
+        thiskeys = frozenset(self.keys())
         sets = _make_sets(trees)
         rkeys = thiskeys.intersection(*sets)
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
@@ -645,7 +541,7 @@ class TreeMixin(object):
     def union(self, *trees):
         """ x.union(t1, t2, ...) -> Tree with keys from *either* trees
         """
-        thiskeys = frozenset(self.iterkeys())
+        thiskeys = frozenset(self.keys())
         sets = _make_sets(trees)
         rkeys = thiskeys.union(*sets)
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
@@ -654,7 +550,7 @@ class TreeMixin(object):
         """ x.difference(t1, t2, ...) -> Tree with keys in T but not any of t1,
         t2, ...
         """
-        thiskeys = frozenset(self.iterkeys())
+        thiskeys = frozenset(self.keys())
         sets = _make_sets(trees)
         rkeys = thiskeys.difference(*sets)
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
@@ -663,62 +559,27 @@ class TreeMixin(object):
         """ x.symmetric_difference(t1) -> Tree with keys in either T and t1  but
         not both
         """
-        thiskeys = frozenset(self.iterkeys())
-        rkeys = thiskeys.symmetric_difference(frozenset(tree.iterkeys()))
+        thiskeys = frozenset(self.keys())
+        rkeys = thiskeys.symmetric_difference(frozenset(tree.keys()))
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
 
     def issubset(self, tree):
         """ x.issubset(tree) -> True if every element in x is in tree """
-        thiskeys = frozenset(self.iterkeys())
-        return thiskeys.issubset(frozenset(tree.iterkeys()))
+        thiskeys = frozenset(self.keys())
+        return thiskeys.issubset(frozenset(tree.keys()))
 
     def issuperset(self, tree):
         """ x.issubset(tree) -> True if every element in tree is in x """
-        thiskeys = frozenset(self.iterkeys())
-        return thiskeys.issuperset(frozenset(tree.iterkeys()))
+        thiskeys = frozenset(self.keys())
+        return thiskeys.issuperset(frozenset(tree.keys()))
 
     def isdisjoint(self, tree):
         """ x.isdisjoint(S) ->  True if x has a null intersection with tree """
-        thiskeys = frozenset(self.iterkeys())
-        return thiskeys.isdisjoint(frozenset(tree.iterkeys()))
+        thiskeys = frozenset(self.keys())
+        return thiskeys.isdisjoint(frozenset(tree.keys()))
 
 def _make_sets(trees):
     sets = []
     for tree in trees:
-        sets.append(frozenset(tree.iterkeys()))
+        sets.append(frozenset(tree.keys()))
     return sets
-
-class KeyIndexer(object):
-    """ Get numeric index of keys.
-    """
-    def __init__(self, keys):
-        self.index = 0
-        self.keys = frozenset(keys)
-        self.result = {} # result[key] = index
-
-    def func(self):
-        def _indexer(key, value):
-            if key in self.keys:
-                self.result[key] = self.index
-            self.index += 1
-        return _indexer
-
-class ItemCollector(object):
-    """Collector object, collect all items defined by numeric indices.
-    """
-    def __init__(self, indices):
-        self.index = 0
-        self.wanted = iter(indices)
-        self.next_index = next(self.wanted)
-        self.result = [] # result list is sorted by key
-
-    def func(self):
-        def _collector(key, value):
-            if self.index == self.next_index:
-                self.result.append( (key, value) )
-                try:
-                    self.next_index = next(self.wanted)
-                except StopIteration:
-                    self.next_index = -1
-            self.index += 1
-        return _collector

@@ -56,7 +56,7 @@ class CheckTree(object):
     def test_006_copy(self):
         tree1 = self.TREE(self.default_values1)
         tree2 = tree1.copy()
-        self.assertEqual(tree1.items(), tree2.items())
+        self.assertEqual(list(tree1.items()), list(tree2.items()))
 
     def test_007_to_dict(self):
         tree = self.TREE(self.default_values2)
@@ -77,14 +77,12 @@ class CheckTree(object):
         tree.clear()
         self.assertEqual(len(tree), 0)
 
-    def test_010_has_key(self):
+    def test_010_contains(self):
         tree1 = self.TREE(self.default_values2)
         tree2 = self.TREE(self.default_values1)
-        for key in tree1.iterkeys():
-            self.assertFalse(tree2.has_key(key))
-            self.assertTrue(key not in tree2)
-        for key in tree2.iterkeys():
-            self.assertTrue(tree2.has_key(key))
+        for key in tree1.keys():
+            self.assertFalse(key in tree2)
+        for key in tree2.keys():
             self.assertTrue(key in tree2)
 
     def test_011_is_empty(self):
@@ -97,14 +95,14 @@ class CheckTree(object):
         tree = self.TREE()
         tree.update({1:'one', 2: 'two'})
         tree.update([(3, 'three'), (2, 'zwei')])
-        self.assertEqual(tree.keys(), [1, 2, 3])
-        self.assertEqual(tree.values(), ['one','zwei', 'three'])
+        self.assertEqual(list(tree.keys()), [1, 2, 3])
+        self.assertEqual(list(tree.values()), ['one','zwei', 'three'])
 
     def test_013_update_2(self):
         tree = self.TREE()
         tree.update({1:'one', 2: 'two'}, [(3, 'three'), (2, 'zwei')])
-        self.assertEqual(tree.keys(), [1, 2, 3])
-        self.assertEqual(tree.values(), ['one','zwei', 'three'])
+        self.assertEqual(list(tree.keys()), [1, 2, 3])
+        self.assertEqual(list(tree.values()), ['one','zwei', 'three'])
 
     def test_014_unique_keys(self):
         tree = self.TREE()
@@ -132,11 +130,11 @@ class CheckTree(object):
         value = tree.setdefault(99, 77)
         self.assertEqual(value, 77)
 
-    def test_018_iter_keys(self):
+    def test_018_keys(self):
         tree = self.TREE(self.default_values1)
         result = list(iter(tree))
         self.assertEqual(result, [12, 16, 34, 35, 45, 57])
-        self.assertEqual(result, tree.keys())
+        self.assertEqual(result, list(tree.keys()))
 
     def test_018a_keyslice(self):
         tree = self.TREE(self.default_values1)
@@ -153,35 +151,49 @@ class CheckTree(object):
         result = reversed(list(tree.keyslice(15, 36)))
         self.assertEqual(list(result), [35, 34, 16])
 
-    def test_019_iter_values(self):
+    def test_018d_keyslice_from_start(self):
+        tree = self.TREE.fromkeys([1, 2, 3, 4, 8, 9, 10, 11])
+        result = list(tree[:4])
+        self.assertEqual(list(result), [1, 2, 3])
+
+    def test_018e_keyslice_til_end(self):
+        tree = self.TREE.fromkeys([1, 2, 3, 4, 8, 9, 10, 11])
+        result = list(tree[8:])
+        self.assertEqual(list(result), [8, 9, 10, 11])
+
+    def test_018f_keyslice_from_start_til_end(self):
+        tree = self.TREE.fromkeys([1, 2, 3, 4, 8, 9, 10, 11])
+        result = list(tree[:])
+        self.assertEqual(list(result), [1, 2, 3, 4, 8, 9, 10, 11])
+
+    def test_019_values(self):
         tree = self.TREE(self.default_values1)
-        result = list(tree.itervalues())
+        result = list(tree.values())
         self.assertEqual(result, [12, 16, 34, 35, 45, 57])
-        self.assertEqual(result, tree.values())
+        self.assertEqual(result, list(tree.values()))
 
-    def test_020_iter_items(self):
+    def test_020_items(self):
         tree = self.TREE(self.default_values1)
-        result = list(tree.iteritems())
+        result = list(tree.items())
         self.assertEqual(result, list(sorted(self.default_values1)))
-        self.assertEqual(result, tree.items())
+        self.assertEqual(result, list(tree.items()))
 
-    def test_021_iter_keys_reverse(self):
+    def test_021_keys_reverse(self):
         tree = self.TREE(self.default_values1)
-        result = list(tree.iterkeys(reverse=True))
+        result = list(tree.keys(reverse=True))
         self.assertEqual(result, list(reversed([12, 16, 34, 35, 45, 57])))
-        self.assertEqual(result, tree.keys(reverse=True))
+        self.assertEqual(result, list(tree.keys(reverse=True)))
 
-    def test_022_iter_values_reverse(self):
+    def test_022_values_reverse(self):
         tree = self.TREE(self.default_values1)
-        result = list(tree.itervalues(reverse=True))
+        result = list(tree.values(reverse=True))
         self.assertEqual(result, list(reversed([12, 16, 34, 35, 45, 57])))
-        self.assertEqual(result, tree.values(reverse=True))
+        self.assertEqual(result, list(tree.values(reverse=True)))
 
-    def test_023_iter_items_reverse(self):
+    def test_023_items_reverse(self):
         tree = self.TREE(self.default_values1)
-        result = list(tree.iteritems(reverse=True))
-        #self.assertEqual(result, list(reversed(sorted(self.default_values1))))
-        self.assertEqual(result, tree.items(reverse=True))
+        result = list(tree.items(reverse=True))
+        self.assertEqual(result, list(tree.items(reverse=True)))
 
     def test_024_get(self):
         tree = self.TREE(self.default_values1)
@@ -374,7 +386,7 @@ class CheckTree(object):
     def test_051_prev_item(self):
         tree = self.TREE(zip(set3, set3))
         prev_value = None
-        for key in tree.iterkeys():
+        for key in tree.keys():
             try:
                 prev_item = tree.prev_item(key)
             except KeyError: # only on first key
@@ -396,7 +408,7 @@ class CheckTree(object):
     def test_054_succ_item(self):
         tree = self.TREE(zip(set3, set3))
         succ_value = None
-        for key in reversed(tree.keys()):
+        for key in tree.keys(reverse=True):
             try:
                 succ_item = tree.succ_item(key)
             except KeyError: # only on last key
@@ -418,7 +430,7 @@ class CheckTree(object):
     def test_057_prev_key(self):
         tree = self.TREE(zip(set3, set3))
         pkey = None
-        for key in tree.iterkeys():
+        for key in tree.keys():
             try:
                 prev_key = tree.prev_key(key)
             except KeyError: # only on first key
@@ -435,7 +447,7 @@ class CheckTree(object):
     def test_059_succ_key(self):
         tree = self.TREE(zip(set3, set3))
         skey = None
-        for key in reversed(tree.keys()):
+        for key in tree.keys(reverse=True):
             try:
                 succ_key = tree.succ_key(key)
             except KeyError: # only on last key
@@ -462,7 +474,7 @@ class CheckTree(object):
         tree = self.TREE.fromkeys(keys)
 
         skey = None
-        for key in reversed(tree.keys()):
+        for key in tree.keys(reverse=True):
             try:
                 succ_key = tree.succ_key(key)
             except KeyError: # only on last key
@@ -472,7 +484,7 @@ class CheckTree(object):
             skey = key
 
         pkey = None
-        for key in tree.iterkeys():
+        for key in tree.keys():
             try:
                 prev_key = tree.prev_key(key)
             except KeyError: # only on first key
@@ -537,97 +549,35 @@ class CheckTree(object):
         for key, chk in zip(reversed(tree), result):
             self.assertEqual(chk, key)
 
-    def test_072_item_at(self):
-        tree = self.TREE(self.default_values2)
-        expected = [1, 2, 3, 4, 8, 9]
-        for index in range(len(tree)):
-            self.assertEqual(expected[index], tree.item_at(index)[0])
-        self.assertEqual(9, tree.item_at(-1)[0])
-        self.assertEqual(1, tree.item_at(-6)[0])
-
-    def test_073_item_at_error(self):
-        tree = self.TREE(self.default_values2)
-        self.assertRaises(IndexError, tree.item_at, 6)
-        self.assertRaises(IndexError, tree.item_at, -7)
-
-    def test_074_index(self):
-        tree = self.TREE(self.default_values2)
-        expected = [1, 2, 3, 4, 8, 9]
-        self.assertEqual(tree.index(1), 0)
-        self.assertEqual(tree.index(2), 1)
-        self.assertEqual(tree.index(8), 4)
-        self.assertEqual(tree.index(9), 5)
-
-    def test_075_index_error(self):
-        tree = self.TREE(self.default_values2)
-        self.assertRaises(KeyError, tree.index, 7)
-
     def test_076_getslice(self):
         tree = self.TREE(self.default_values2)
         expected = [1, 2, 3, 4, 8, 9]
-        result = tree[0:1]
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0][0], 1)
+        result = list(tree[2:4])
+        self.assertEqual(result, [2, 3])
 
-        result = tree[1: 3] # 2, 3
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[1][0], 3)
+        result = list(tree[:4])
+        self.assertEqual(result, [1, 2, 3])
 
-        result = tree[3:]# 4, 8, 9
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[2][0], 9)
+        result = list(tree[4:])
+        self.assertEqual(result, [4, 8, 9])
 
-        result = tree[:3] #  1, 2, 3
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0][0], 1)
-
-        result = tree[5:2:-1]
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0][0], 9)
-
-        result = self.TREE(tree[::2]) # 1, 3, 8
-        self.assertEqual(result.keys(), [1, 3, 8])
-
-        result = tree[6::-2] # 9, 4, 2
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0][0], 9)
-        self.assertEqual(result[1][0], 4)
-        self.assertEqual(result[2][0], 2)
+        result = list(tree[:])
+        self.assertEqual(result, [1, 2, 3, 4, 8, 9])
 
     def test_077_delslice(self):
-        T = self.TREE(self.default_values2)
-        expected = [1, 2, 3, 4, 8, 9]
+        T = self.TREE.fromkeys([1, 2, 3, 4, 8, 9])
         tree = T.copy()
-        del tree[0:1]
-        self.assertEqual(tree.keys(), [2, 3, 4, 8, 9])
+        del tree[:2]
+        self.assertEqual(list(tree.keys()), [2, 3, 4, 8, 9])
         tree = T.copy()
         del tree[1:3]
-        self.assertEqual(tree.keys(), [1, 4, 8, 9])
+        self.assertEqual(list(tree.keys()), [3, 4, 8, 9])
         tree = T.copy()
         del tree[3:]
-        self.assertEqual(tree.keys(), [1, 2, 3])
+        self.assertEqual(list(tree.keys()), [1, 2])
         tree = T.copy()
-        del tree[5:2:-1]  # 9, 8, 4
-        self.assertEqual(tree.keys(), [1, 2, 3])
-        tree = T.copy()
-        del tree[::2] # 1, 3, 8
-        self.assertEqual(tree.keys(), [2, 4, 9])
-
-    def test_078_nlargest_by_slicing(self):
-        l = list(range(30))
-        shuffle(l)
-        tree = self.TREE(zip(l, l))
-        result1 = tree.nlargest(10)
-        result2 = list(reversed(tree[-10:]))
-        self.assertEqual(result1, result2)
-
-    def test_079_nsmallest_by_slicing(self):
-        l = list(range(30))
-        shuffle(l)
-        tree = self.TREE(zip(l, l))
-        result1 = tree.nsmallest(10)
-        result2 = tree[0:10]
-        self.assertEqual(result1, result2)
+        del tree[:]
+        self.assertEqual(list(tree.keys()), [])
 
     def test_080_intersection(self):
         l1 = list(range(30))
@@ -716,66 +666,13 @@ class CheckTree(object):
         tree[911] = 912 # replace 910 with 912
         self.assertEqual(sys.getrefcount(chk), count)
 
-    def test_088a_pickle_protocol_std_cmp(self):
+    def test_088_pickle_protocol(self):
         tree = self.TREE(self.default_values1) # key == value
         pickle_str = pickle.dumps(tree, -1)
         tree2 = pickle.loads(pickle_str)
         self.assertEqual(len(tree), len(tree2))
-        self.assertEqual(tree.keys(), tree2.keys())
-        self.assertEqual(tree.values(), tree2.values())
-
-    def test_088b_pickle_protocol_usr_cmp(self):
-        tree = self.TREE(self.default_values1) # key == value
-        pickle_str = pickle.dumps(tree, -1)
-        tree2 = pickle.loads(pickle_str)
-        self.assertEqual(len(tree), len(tree2))
-        self.assertEqual(tree.keys(), tree2.keys())
-        self.assertEqual(tree.values(), tree2.values())
-
-    def test_089a_lower_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertEqual(12 , tree.lower_bound(12))
-
-    def test_089b_lower_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertEqual(16 , tree.lower_bound(13))
-
-    def test_089c_lower_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertRaises(KeyError,  tree.lower_bound, 58)
-
-    def test_089d_lower_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertEqual(34 , tree.lower_bound(20))
-
-    def test_089e_lower_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE.fromkeys([10, 8, 4, 6])
-        self.assertEqual(6 , tree.lower_bound(5))
-
-    def test_090a_upper_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertEqual(12 , tree.upper_bound(13))
-
-    def test_090b_upper_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertEqual(12 , tree.upper_bound(16))
-
-    def test_090c_upper_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertEqual(57 , tree.upper_bound(99))
-
-    def test_090d_upper_bound(self):
-        # 12, 34, 45, 16, 35, 57
-        tree = self.TREE(self.default_values1)
-        self.assertRaises(KeyError, tree.upper_bound, 12)
+        self.assertEqual(list(tree.keys()), list(tree2.keys()))
+        self.assertEqual(list(tree.values()), list(tree2.values()))
 
 if __name__=='__main__':
     unittest.main()

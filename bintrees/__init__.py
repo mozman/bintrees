@@ -61,7 +61,6 @@ Methods
 * copy() -> a shallow copy of T, O(n*log(n))
 * discard(k) -> None, remove k from T, if k is present, O(log(n))
 * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
-* has_key(k) -> True if T has a key k, else False, O(log(n))
 * is_empty() -> True if len(T) == 0, O(1)
 * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
 * keys([reverse]) -> list of T's keys, O(n)
@@ -80,9 +79,6 @@ walk forward/backward, O(log(n))
 
 traverse tree
 
-* iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
-* iterkeys([reverse]) -> an iterator over the keys of T, O(n)
-* itervalues([reverse]) -> an iterator over the values of T, O(n)
 * itemslice(startkey, endkey, [reverse]) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
 * keyslice(startkey, endkey, [reverse]) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
 * valueslice(startkey, endkey, [reverse]) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
