@@ -30,7 +30,13 @@
 # misconceptions floating around, but for the most part the hype about red black
 # trees is accurate.
 
-from treemixin import TreeMixin
+from __future__ import absolute_import
+
+from .compat import PY3
+if PY3:
+    from .compat import cmp
+
+from .treemixin import TreeMixin
 
 __all__ = ['RBTree']
 

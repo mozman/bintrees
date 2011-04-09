@@ -4,7 +4,13 @@
 # Purpose: binary tree module
 # Created: 28.04.2010
 
-from treemixin import TreeMixin
+from __future__ import absolute_import
+
+from .compat import PY3
+if PY3:
+    from .compat import cmp
+
+from .treemixin import TreeMixin
 
 __all__ = ['BinaryTree']
 

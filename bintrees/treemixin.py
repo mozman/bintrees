@@ -3,9 +3,10 @@
 # Author:  Mozman
 # Purpose: treemixin provides top level functions for binary trees
 # Created: 03.05.2010
+from __future__ import absolute_import
 
-from iterator import TreeIterator
-from walker import Walker
+from .iterator import TreeIterator
+from .walker import Walker
 
 class TreeMixin(object):
     """

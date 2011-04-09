@@ -3,6 +3,9 @@
 # Author:  mozman
 # Purpose: binary trees package
 # Created: 03.05.2010
+
+from __future__ import absolute_import
+
 """
 Binary Tree Package
 ===================
@@ -119,31 +122,37 @@ Classmethods
 * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
 """
 
-from treemixin import TreeMixin
-from iterator import TreeIterator
-from bintree import BinaryTree
-from avltree import AVLTree
-from rbtree import RBTree
+from .treemixin import TreeMixin
+from .iterator import TreeIterator
+from .bintree import BinaryTree
+from .avltree import AVLTree
+from .rbtree import RBTree
 
 try:
-    from qbintree import cBinaryTree
+    from .qbintree import cBinaryTree
     class FastBinaryTree(cBinaryTree, TreeMixin):
         """ Faster unbalanced binary tree  written in Cython with C-Code. """
-except ImportError: # fall back to Cython or Python version
+except ImportError: # fall back to pure Python version
+    FastBinaryTree = BinaryTree
+except ValueError: # for pypy
     FastBinaryTree = BinaryTree
 
 try:
-    from qavltree import cAVLTree
+    from .qavltree import cAVLTree
     class FastAVLTree(cAVLTree, TreeMixin):
         """ Faster balanced AVL-Tree written in Cython with C-Code. """
-except ImportError: # fall back to Cython or Python version
+except ImportError: # fall back to pure Python version
+    FastAVLTree = AVLTree
+except ValueError: # for pypy
     FastAVLTree = AVLTree
 
 try:
-    from qrbtree import cRBTree
+    from .qrbtree import cRBTree
     class FastRBTree(cRBTree, TreeMixin):
         """ Faster balanced Red-Black-Tree  written in Cython with C-Code. """
-except ImportError: # fall back to Cython or Python version
+except ImportError: # fall back to pure Python version
+    FastRBTree = RBTree
+except ValueError: # pypy
     FastRBTree = RBTree
 
 __all__ = ['FastBinaryTree', 'FastAVLTree', 'FastRBTree',
