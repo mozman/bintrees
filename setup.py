@@ -28,7 +28,6 @@ setup(
     cmdclass = {'build_ext': build_ext},
     ext_modules = ext_modules,
     packages=['bintrees'],
-    requires=['cython'],
     long_description=read('README.txt'),
     platforms="OS Independent",
     license="GPLv3",

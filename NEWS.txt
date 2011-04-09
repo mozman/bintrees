@@ -1,10 +1,22 @@
+Version 0.3.2
+
+  * added itemslice(startkey, endkey, reverse=False), keyslice(startkey, endkey, reverse=False),
+    valueslice(startkey, endkey, reverse=False) - slicing by keys
+  * tested with pypy 1.4.1, damn fast
+  * TODO: Python 3 support
+
 Version 0.3.1 10.09.2010
+
   * runs with Python 2.7
+
 Version 0.3.0 11.05.2010
+
   * low level functions written as c-module only interface to python is a cython
     module
   * support for the pickle protocol
+
 Version 0.2.1 06.05.2010
+
   * added delslice del T[0:3] -> remove treenodes 0, 1, 2
   * added discard -> remove key without KeyError if not found
   * added heap methods: min, max, nlarges, nsmallest ...
@@ -14,8 +26,12 @@ Version 0.2.1 06.05.2010
   * added index: T.index(key) -> get position of item <key>
   * added item_at: T.item_at(0) -> get item at position (not key!) 0
           T.item_at(0) O(n)! <==> T.min_item() O(log(n))
+
 Version 0.2.0 - 03 Mai 2010
+
   * TreeMixin Class as base for Python-Trees and as Mixin for Cython-Trees
+
 Version 0.1.0 - 27 April 2010
+
   * Alpha status
   * Initial release

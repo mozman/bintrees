@@ -23,8 +23,9 @@ from __main__ import keys, dict_search, searchdict
 """
 
 try:
-    with open('testkeys.txt') as fp:
-        keys = eval(fp.read())
+    fp = open('testkeys.txt')
+    keys = eval(fp.read())
+    fp.close()
 except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
@@ -44,10 +45,10 @@ def dict_search():
         obj = searchdict[key]
 
 def print_result(time, text):
-    print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
+    print("Operation: %s takes %.2f seconds\n" % (text, time))
 
 def main():
-    print ("Nodes: {0}".format(len(keys)))
+    print ("Nodes: %d" % len(keys))
 
     t = Timer("dict_build()", setup_Dict_b)
     print_result(t.timeit(COUNT), 'dict() build only')

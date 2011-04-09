@@ -29,10 +29,12 @@ def random_keys():
     shuffle(keys)
     return keys
 try:
-    with open('testkeys.txt') as fp:
-        keys = eval(fp.read())
+    fp = open('testkeys.txt')
+    keys = eval(fp.read())
+    fp.close()
 except IOError:
     keys = random_keys()
+
 
 py_searchtree = BinaryTree.fromkeys(keys)
 cy_searchtree = FastBinaryTree.fromkeys(keys)
@@ -66,12 +68,13 @@ def qbintree_search():
         obj = qt_searchtree.get_value(key)
 
 def print_result(time, text):
-    print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
+    print("Operation: %s takes %.2f seconds\n" % (text, time))
 
 def main():
-    with open('testkeys.txt', 'w') as fp:
-        fp.write(repr(keys))
-    print ("Nodes: {0}".format(len(keys)))
+    fp = open('testkeys.txt', 'w')
+    fp.write(repr(keys))
+    fp.close()
+    print ("Nodes: %d" % len(keys))
 
     t = Timer("bintree_build()", setup_BinaryTree)
     print_result(t.timeit(COUNT), 'BinaryTree build only')

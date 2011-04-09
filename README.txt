@@ -70,6 +70,7 @@ Methods
 
 walk forward/backward
 ~~~~~~~~~~~~~~~~~~~~~
+
     * prev_item(key) -> get (k, v) pair, where k is predecessor to key, O(log(n))
     * prev_key(key) -> k, get the predecessor of key, O(log(n))
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
@@ -77,14 +78,19 @@ walk forward/backward
 
 traverse tree
 ~~~~~~~~~~~~~
+
     * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
     * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
     * itervalues([reverse]) -> an iterator over the values of T, O(n)
+    * itemslice(startkey, endkey, [reverse]) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
+    * keyslice(startkey, endkey, [reverse]) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
+    * valueslice(startkey, endkey, [reverse]) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
     * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
     * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
 
 Heap methods
 ~~~~~~~~~~~~
+
     * max_item() -> get largest (key, value) pair of T, O(log(n))
     * max_key() -> get largest key of T, O(log(n))
     * min_item() -> get smallest (key, value) pair of T, O(log(n))
@@ -96,6 +102,7 @@ Heap methods
 
 Index methods (access by index is slow)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     * index(k) -> index of key k, O(n)
     * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
     * T[s:e:i] -> slicing from start s to end e, step i, O(n)
@@ -103,6 +110,7 @@ Index methods (access by index is slow)
 
 Set methods (using frozenset)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     * intersection(t1, t2, ...) -> Tree with keys *common* to all trees
     * union(t1, t2, ...) -> Tree with keys from *either* trees
     * difference(t1, t2, ...) -> Tree with keys in T but not any of t1, t2, ...
@@ -113,6 +121,7 @@ Set methods (using frozenset)
 
 Classmethods
 ~~~~~~~~~~~~
+
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
 
 Performance
@@ -122,37 +131,40 @@ Profiling with timeit(): 5000 unique random int keys, time in seconds
 
 BinaryTrees
 -----------
-========================  =============  =========  ==============
-unbalanced BinaryTree     cPython 2.6.5  ipy 2.6.0  FastBinaryTree
-========================  =============  =========  ==============
-100x build time               7,14          2,98        0,40
-100x build & delete time     12,87          5,04        1,00
-search 100x all keys          2,96          1,32        0,67
-========================  =============  =========  ==============
+
+========================  =============  ==============  ==============  ==============
+                          CPython 2.7.1  FastBinaryTree  ipy 2.7.0       pypy 1.4.1
+========================  =============  ==============  ==============  ==============
+build time 100x            6,59           0,39            2,62            0,46
+build & delete time 100x  11,82           0,98            4,66            0,70
+search 100x all keys       2,99           0,66            1,23            0,24
+========================  =============  ==============  ==============  ==============
 
 AVLTrees
---------
-========================  =============  =========  =============
-AVLTree                   cPython 2.6.5  ipy 2.6.0  FastAVLTree
-========================  =============  =========  =============
-100x build time             19,51          10,77      0,44
-100x build & delete time    32,20          22,04      1,05
-search 100x all keys         2,45           1,31      0,62
-========================  =============  =========  =============
+-------
+
+========================  =============  ==============  ==============  ==============
+                          CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
+========================  =============  ==============  ==============  ==============
+build time 100x	          18,89           0,42           11,45           1,88
+build & delete time 100x  31,66           1,02           23,46           3,86
+search 100x all keys       2,45           0,60            1,00           0,24
+========================  =============  ==============  ==============  ==============
 
 RBTrees
 -------
-========================  =============  =========  =============
-RBTree                    cPython 2.6.5  ipy 2.6.0  FastRBTree
-========================  =============  =========  =============
-100x build time             12,41          5,17       0,50
-100x build & delete time    35,28         13,57       1,23
-search 100x all keys         2,49          1,35       0,61
-========================  =============  =========  =============
+
+========================  =============  ==============  ==============  ==============
+                          CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
+========================  =============  ==============  ==============  ==============
+build time 100x	          11,62           0,49            4,80            0,77
+build & delete time 100x  31,45           1,20           13,04            1,90
+search 100x all keys       2,60           0,60            1,03            0,23
+========================  =============  ==============  ==============  ==============
 
 Memory usage for 100x5000 int keys (Binary/AVL&RB)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    * cPython-Trees (20/22) MByte (using __slots__)
+    * CPython-Trees (20/22) MByte (using __slots__)
     * FastXTrees (20 Bytes/Node on 32 bit systems) x 500.000 = ~9,5 MByte
     * dict 10 MByte
 
