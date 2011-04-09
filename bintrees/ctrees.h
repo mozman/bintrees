@@ -16,26 +16,26 @@ typedef node_t* nodeptr;
 
 /* common binary tree functions */
 void ct_delete_tree(node_t *root);
-int ct_compare(PyObject *compare, PyObject *key1, PyObject *key2);
-PyObject *ct_get_item(node_t *root, PyObject *key, PyObject *cmp);
-node_t *ct_find_node(node_t *root, PyObject *key, PyObject *cmp);
-node_t *ct_succ_node(node_t *root, PyObject *key, PyObject *cmp);
-node_t *ct_prev_node(node_t *root, PyObject *key, PyObject *cmp);
+int ct_compare(PyObject *key1, PyObject *key2);
+PyObject *ct_get_item(node_t *root, PyObject *key);
+node_t *ct_find_node(node_t *root, PyObject *key);
+node_t *ct_succ_node(node_t *root, PyObject *key);
+node_t *ct_prev_node(node_t *root, PyObject *key);
 node_t *ct_max_node(node_t *root);
 node_t *ct_min_node(node_t *root);
-int ct_index_of(node_t *root, PyObject *key, PyObject *cmp);
+int ct_index_of(node_t *root, PyObject *key);
 node_t *ct_node_at(node_t *root, int index);
 
 /* unbalanced binary tree */
-int ct_bintree_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
-int ct_bintree_remove(node_t **root, PyObject *key, PyObject *cmp);
+int ct_bintree_insert(node_t **root, PyObject *key, PyObject *value);
+int ct_bintree_remove(node_t **root, PyObject *key);
 
 /* avl-tree functions */
-int avl_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
-int avl_remove(node_t **root, PyObject *key, PyObject *cmp);
+int avl_insert(node_t **root, PyObject *key, PyObject *value);
+int avl_remove(node_t **root, PyObject *key);
 
 /* rb-tree functions */
-int rb_insert(node_t **root, PyObject *key, PyObject *value, PyObject *cmp);
-int rb_remove(node_t **root, PyObject *key, PyObject *cmp);
+int rb_insert(node_t **root, PyObject *key, PyObject *value);
+int rb_remove(node_t **root, PyObject *key);
 
 #endif

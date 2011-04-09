@@ -68,73 +68,46 @@ ct_swap_data(node_t *node1, node_t *node2)
 }
 
 int
-ct_fast_compare(PyObject *key1, PyObject *key2)
+ct_compare(PyObject *key1, PyObject *key2)
 {
 	int res;
 
 	res = PyObject_RichCompareBool(key1, key2, Py_LT);
 	if (res > 0)
 		return -1;
+	else if (res < 0) {
+		PyErr_SetString(PyExc_TypeError, "ivalid type for key");
+		return 0;
+		}
 	res = PyObject_RichCompareBool(key1, key2, Py_GT);
 	if (res > 0)
 		return +1;
 	return 0;
 }
 
-extern int
-ct_compare(PyObject *compare, PyObject *key1, PyObject *key2)
-{
-	if (compare == Py_None)
-		/* this is a real performance boost! */
-		return ct_fast_compare(key1, key2);
-	/* Invoke a Python compare function returning the result as an int. */
-	PyObject *res;
-	PyObject *args;
-	int i;
-	args = PyTuple_Pack(2, key1, key2);
-	if (args == NULL)
-		return -1;
-	/*
-	Py_INCREF(key1);
-	Py_INCREF(key2);
-	PyTuple_SET_ITEM(args, 0, key1);
-	PyTuple_SET_ITEM(args, 1, key2);
-	*/
-	res = PyObject_Call(compare, args, NULL);
-	Py_DECREF(args);
-	if (res == NULL)
-		return -1; /* got no result object, compare is not callable? */
-	if (!PyNumber_Check(res)) { /* PY3K changes */
-		Py_DECREF(res);
-		PyErr_SetString(PyExc_TypeError, "comparison function must return int");
-		return -1;
-	}
-	i = PyNumber_Long(res); /* PY3K changes */
-	Py_DECREF(res);
-	return i;
-}
 
 extern node_t *
-ct_find_node(node_t *root, PyObject *key, PyObject *cmp)
+ct_find_node(node_t *root, PyObject *key)
 {
 	int res;
 	while (root != NULL) {
-		res = ct_compare(cmp, key, KEY(root));
+		res = ct_compare(key, KEY(root));
 		if (res == 0) /* key found */
 			return root;
-		else
+		else {
 			root = LINK(root, (res > 0));
+		}
 	}
 	return NULL; /* key not found */
 }
 
 extern PyObject *
-ct_get_item(node_t *root, PyObject *key, PyObject *cmp)
+ct_get_item(node_t *root, PyObject *key)
 {
 	node_t *node;
 	PyObject *tuple;
 
-	node = ct_find_node(root, key, cmp);
+	node = ct_find_node(root, key);
 	if (node != NULL) {
 		tuple = PyTuple_New(2);
 		PyTuple_SET_ITEM(tuple, 0, KEY(node));
@@ -167,7 +140,7 @@ ct_min_node(node_t *root)
 }
 
 extern int
-ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
+ct_bintree_remove(node_t **rootaddr, PyObject *key)
 /* attention: rootaddr is the address of the root pointer */
 {
 	node_t *node, *parent, *replacement;
@@ -181,7 +154,7 @@ ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 	direction = 0;
 
 	while (1) {
-		cmp_res = ct_compare(cmp, key, KEY(node));
+		cmp_res = ct_compare(key, KEY(node));
 		if (cmp_res == 0) /* key found, remove node */
 		{
 			if ((LEFT_NODE(node) != NULL) && (RIGHT_NODE(node) != NULL)) {
@@ -223,7 +196,7 @@ ct_bintree_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 }
 
 extern int
-ct_bintree_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
+ct_bintree_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 /* attention: rootaddr is the address of the root pointer */
 {
 	node_t *parent, *node;
@@ -246,7 +219,7 @@ ct_bintree_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *c
 				LINK(parent, direction) = node;
 				return 1;
 			}
-			cval = ct_compare(cmp, key, KEY(node));
+			cval = ct_compare(key, KEY(node));
 			if (cval == 0) {
 				/* key exists, replace value object */
 				Py_XDECREF(VALUE(node)); /* release old value object */
@@ -295,7 +268,7 @@ rb_double(node_t *root, int dir)
 #define rb_new_node(key, value) ct_new_node(key, value, 1)
 
 extern int
-rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
+rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 {
 	node_t *root = *rootaddr;
 
@@ -356,7 +329,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 				break;
 
 			int cmp_res;
-			cmp_res = ct_compare(cmp, KEY(q), key);
+			cmp_res = ct_compare(KEY(q), key);
 			if (cmp_res == 0) {       /* key exists?              */
 				Py_XDECREF(VALUE(q)); /* release old value object */
 				VALUE(q) = value;     /* set new value object     */
@@ -385,7 +358,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 }
 
 extern int
-rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
+rb_remove(node_t **rootaddr, PyObject *key)
 {
 	node_t *root = *rootaddr;
 	if (root == NULL)
@@ -412,7 +385,7 @@ rb_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 		g = p, p = q;
 		q = q->link[dir];
 
-		int cmp_res = ct_compare(cmp, KEY(q), key);
+		int cmp_res = ct_compare(KEY(q), key);
 		dir = cmp_res < 0;
 
 		/*
@@ -505,7 +478,7 @@ avl_double(node_t *root, int dir)
 }
 
 extern int
-avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
+avl_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 {
 	node_t *root = *rootaddr;
 
@@ -524,7 +497,7 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 		/* Search for an empty link, save the path */
 		for (;;) {
 			/* Push direction and node onto stack */
-			cmp_res = ct_compare(cmp, KEY(it), key);
+			cmp_res = ct_compare(KEY(it), key);
 			if (cmp_res == 0) {
 				Py_XDECREF(VALUE(it)); // release old value object
 				VALUE(it) = value; // set new value object
@@ -547,7 +520,7 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 
 		/* Walk back up the search path */
 		while (--top >= 0 && !done) {
-			cmp_res = ct_compare(cmp, KEY(up[top]), key);
+			cmp_res = ct_compare(KEY(up[top]), key);
 			// int dir = (cmp_res < 0);
 			int lh, rh, max;
 
@@ -585,7 +558,7 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value, PyObject *cmp)
 }
 
 extern int
-avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
+avl_remove(node_t **rootaddr, PyObject *key)
 {
 	node_t *root = *rootaddr;
 	int cmp_res;
@@ -599,7 +572,7 @@ avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 			/* Terminate if not found */
 			if (it == NULL)
 				return 0;
-			cmp_res = ct_compare(cmp, KEY(it), key);
+			cmp_res = ct_compare(KEY(it), key);
 			if (cmp_res == 0)
 				break;
 
@@ -677,19 +650,19 @@ avl_remove(node_t **rootaddr, PyObject *key, PyObject *cmp)
 }
 
 extern node_t *
-ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
+ct_succ_node(node_t *root, PyObject *key)
 {
 	node_t *succ = NULL;
 	node_t *node = root;
 	int cval;
 
 	while (node != NULL) {
-		cval = ct_compare(cmp, key, KEY(node));
+		cval = ct_compare(key, KEY(node));
 		if (cval == 0)
 			break;
 		else if (cval < 0) {
 			if ((succ == NULL) ||
-				(ct_compare(cmp, KEY(node), KEY(succ)) < 0))
+				(ct_compare(KEY(node), KEY(succ)) < 0))
 				succ = node;
 			node = LEFT_NODE(node);
 		} else
@@ -705,27 +678,27 @@ ct_succ_node(node_t *root, PyObject *key, PyObject *cmp)
 			node = LEFT_NODE(node);
 		if (succ == NULL)
 			succ = node;
-		else if (ct_compare(cmp, KEY(node), KEY(succ)) < 0)
+		else if (ct_compare(KEY(node), KEY(succ)) < 0)
 			succ = node;
 	}
 	return succ;
 }
 
 extern node_t *
-ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
+ct_prev_node(node_t *root, PyObject *key)
 {
 	node_t *prev = NULL;
 	node_t *node = root;
 	int cval;
 
 	while (node != NULL) {
-		cval = ct_compare(cmp, key, KEY(node));
+		cval = ct_compare(key, KEY(node));
 		if (cval == 0)
 			break;
 		else if (cval < 0)
 			node = LEFT_NODE(node);
 		else {
-			if ((prev == NULL) || (ct_compare(cmp, KEY(node), KEY(prev)) > 0))
+			if ((prev == NULL) || (ct_compare(KEY(node), KEY(prev)) > 0))
 				prev = node;
 			node = RIGHT_NODE(node);
 		}
@@ -740,14 +713,14 @@ ct_prev_node(node_t *root, PyObject *key, PyObject *cmp)
 			node = RIGHT_NODE(node);
 		if (prev == NULL)
 			prev = node;
-		else if (ct_compare(cmp, KEY(node), KEY(prev)) > 0)
+		else if (ct_compare(KEY(node), KEY(prev)) > 0)
 			prev = node;
 	}
 	return prev;
 }
 
 extern int
-ct_index_of(node_t *root, PyObject *key, PyObject *cmp)
+ct_index_of(node_t *root, PyObject *key)
 /*
 get index of item <key>, returns -1 if key not found.
 */
@@ -764,7 +737,7 @@ get index of item <key>, returns -1 if key not found.
 			node = LEFT_NODE(node);
 		}
 		else {
-			if (ct_compare(cmp, KEY(node), key) == 0) {
+			if (ct_compare(KEY(node), key) == 0) {
 				stack_delete(stack);
 				return index;
 			}

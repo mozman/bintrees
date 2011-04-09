@@ -14,14 +14,12 @@ cdef class cWalker:
         self.root = NULL
         self.node = NULL
         self.stack = stack_init(MAXSTACK)
-        self.compare = None
 
     def __dealloc__(self):
         stack_delete(self.stack)
 
-    cdef void set_tree(self, node_t *root, object compare):
+    cdef void set_tree(self, node_t *root):
         self.root = root
-        self.compare = compare
         self.reset()
 
     cpdef reset(self):
@@ -48,7 +46,7 @@ cdef class cWalker:
         cdef int cval
         self.node = self.root
         while self.node != NULL:
-            cval = ct_compare(self.compare, key, <object> self.node.key)
+            cval = ct_compare(key, <object> self.node.key)
             if cval == 0:
                 return True
             elif cval < 0:
@@ -100,7 +98,7 @@ cdef class cWalker:
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        self.node = ct_succ_node(self.root, key, self.compare)
+        self.node = ct_succ_node(self.root, key)
         if self.node == NULL: # given key is biggest in tree
             raise KeyError(str(key))
         return (<object> self.node.key, <object> self.node.value)
@@ -109,7 +107,7 @@ cdef class cWalker:
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        self.node = ct_prev_node(self.root, key, self.compare)
+        self.node = ct_prev_node(self.root, key)
         if self.node == NULL: # given key is smallest in tree
             raise KeyError(str(key))
         return (<object> self.node.key, <object> self.node.value)
