@@ -11,22 +11,12 @@ from cwalker import cWalker
 from cwalker cimport *
 from ctrees cimport *
 
-def oldcmp(a, b):
-    if a < b:
-        return -1
-    elif a > b:
-        return +1
-    else:
-        return 0
-
 cdef class cRBTree:
     cdef node_t *_root
     cdef int _count
-    cdef object _compare
 
-    def __cinit__(self, items=None, compare=None):
+    def __cinit__(self, items=None):
         self._root = NULL
-        self._compare = compare # if compare is None use PyObject_compare()
         self._count = 0
         if items:
             self.update(items)
@@ -35,19 +25,14 @@ cdef class cRBTree:
         ct_delete_tree(self._root)
 
     @property
-    def compare(self):
-        return self._compare if self._compare is not None else oldcmp
-
-    @property
     def count(self):
         return self._count
 
     def __getstate__(self):
         data = dict(self.iteritems())
-        return {'data': data, 'cmp': self._compare}
+        return {'data': data}
 
     def __setstate__(self, state):
-        self._compare = state['cmp']
         self.update(state['data'])
 
     def clear(self):
@@ -56,7 +41,7 @@ cdef class cRBTree:
         self._root = NULL
 
     def get_value(self, key):
-        result = <object> ct_get_item(self._root, key, self._compare)
+        result = <object> ct_get_item(self._root, key)
         if result is None:
             raise KeyError(key)
         else:
@@ -65,11 +50,11 @@ cdef class cRBTree:
     def get_walker(self):
         cdef cWalker walker
         walker = cWalker()
-        walker.set_tree(self._root, self._compare)
+        walker.set_tree(self._root)
         return walker
 
     def insert(self, key, value):
-        res = rb_insert(&self._root, key, value, self._compare)
+        res = rb_insert(&self._root, key, value)
         if res < 0:
             raise MemoryError('Can not allocate memory for node structure.')
         else:
@@ -77,7 +62,7 @@ cdef class cRBTree:
 
     def remove(self, key):
         cdef int result
-        result =  rb_remove(&self._root, key, self._compare)
+        result =  rb_remove(&self._root, key)
         if result == 0:
             raise KeyError(str(key))
         else:
@@ -102,7 +87,7 @@ cdef class cRBTree:
     def index(self, key):
         """ T.index(k) -> index, raises KeyError if k not in T """
         cdef int result
-        result = ct_index_of(self._root, key, self._compare)
+        result = ct_index_of(self._root, key)
         if result >= 0:
             return result
         else:

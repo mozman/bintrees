@@ -9,7 +9,6 @@ import unittest
 import pickle
 from io import StringIO
 
-
 from random import randint, shuffle
 
 set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
@@ -295,8 +294,9 @@ class CheckTree(object):
 
     def test_039_remove_random_numbers(self):
         try:
-            with open('xtestkey.txt') as fp: # if you need known keys
-                keys = eval(fp.read())
+            fp = open('xtestkey.txt')
+            keys = eval(fp.read())
+            fp.close()
         except IOError:
             keys = randomkeys(1000)
         shuffle(keys)
@@ -776,9 +776,6 @@ class CheckTree(object):
         # 12, 34, 45, 16, 35, 57
         tree = self.TREE(self.default_values1)
         self.assertRaises(KeyError, tree.upper_bound, 12)
-
-def cmpx(a,b):
-    return -cmp(a, b)
 
 if __name__=='__main__':
     unittest.main()
