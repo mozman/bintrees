@@ -33,13 +33,11 @@ class Walker(object):
         return self._node is not None
 
     def goto(self, key):
-        compare = self._tree.compare
         self._node = self._tree.root
         while self._node is not None:
-            cval = compare(key, self._node.key)
-            if cval == 0:
+            if key == self._node.key:
                 return True
-            elif cval < 0:
+            elif key < self._node.key:
                 self.go_left()
             else:
                 self.go_right()
@@ -94,20 +92,18 @@ class Walker(object):
         """
         self._node = self._tree.root
         succ = None
-        compare = self._tree.compare
         while self._node is not None:
-            cval = compare(key, self._node.key)
-            if cval == 0:
+            if key == self._node.key:
                 break
-            elif cval < 0:
-                if (succ is None) or (compare(self._node.key, succ[0]) < 0):
+            elif key < self._node.key:
+                if (succ is None) or (self._node.key < succ[0]):
                     succ = self.item
                 self._node = self._node.left
             else:
                 self._node = self._node.right
 
         if self._node is None: # stay at dead end
-            raise KeyError(unicode(key))
+            raise KeyError(str(key))
         # found node of key
         if self._node.right is not None:
             # find smallest node of right subtree
@@ -116,10 +112,10 @@ class Walker(object):
                 self._node = self._node.left
             if succ is None:
                 succ = self.item
-            elif compare(self._node.key, succ[0]) < 0:
+            elif self._node.key < succ[0]:
                 succ = self.item
         elif succ is None: # given key is biggest in tree
-            raise KeyError(unicode(key))
+            raise KeyError(str(key))
         return succ
 
     def prev_item(self, key):
@@ -128,20 +124,18 @@ class Walker(object):
         """
         self._node = self._tree.root
         prev = None
-        compare = self._tree.compare
         while self._node is not None:
-            cval = compare(key, self._node.key)
-            if cval == 0:
+            if key == self._node.key:
                 break
-            elif cval < 0:
+            elif key < self._node.key:
                 self._node = self._node.left
             else:
-                if (prev is None) or (compare(self._node.key, prev[0]) > 0):
+                if (prev is None) or (self._node.key > prev[0]):
                     prev = self.item
                 self._node = self._node.right
 
         if self._node is None: # stay at dead end (None)
-            raise KeyError(unicode(key))
+            raise KeyError(str(key))
         # found node of key
         if self._node.left is not None:
             # find biggest node of left subtree
@@ -150,8 +144,8 @@ class Walker(object):
                 self._node = self._node.right
             if prev is None:
                 prev = self.item
-            elif compare(self._node.key, prev[0]) > 0:
+            elif self._node.key > prev[0]:
                 prev = self.item
         elif prev is None: # given key is smallest in tree
-            raise KeyError(unicode(key))
+            raise KeyError(str(key))
         return prev

@@ -32,10 +32,6 @@
 
 from __future__ import absolute_import
 
-from .compat import PY3
-if PY3:
-    from .compat import cmp
-
 from .treemixin import TreeMixin
 
 __all__ = ['RBTree']
@@ -104,9 +100,9 @@ class RBTree(TreeMixin):
     binary search tree which inserts and removes intelligently, to ensure the
     tree is reasonably balanced.
 
-    RBTree([compare]) -> new empty tree.
-    RBTree(mapping, [compare]) -> new tree initialized from a mapping
-    RBTree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
+    RBTree() -> new empty tree.
+    RBTree(mapping) -> new tree initialized from a mapping
+    RBTree(seq) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
     Methods
     -------
@@ -188,10 +184,9 @@ class RBTree(TreeMixin):
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
-    def __init__(self, items=None, compare=None):
+    def __init__(self, items=None):
         """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
         self._root = None
-        self._compare = compare if compare is not None else cmp
         self._count = 0
         if items is not None:
             self.update(items)
@@ -217,11 +212,6 @@ class RBTree(TreeMixin):
         """ root node of T """
         return self._root
 
-    @property
-    def compare(self):
-        """ compare function of T """
-        return self._compare
-
     def _new_node(self, key, value):
         """ Create a new treenode """
         self._count += 1
@@ -229,7 +219,6 @@ class RBTree(TreeMixin):
 
     def insert(self, key, value):
         """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
-        compare = self._compare
         if self._root is None: # Empty tree case
             self._root = self._new_node(key, value)
             self._root.red = False # make root black
@@ -264,13 +253,12 @@ class RBTree(TreeMixin):
                     grand_grand_parent[direction2] = jsw_double(grand_parent, 1-last)
 
             # Stop if found
-            cmp_res = compare(key, node.key)
-            if cmp_res == 0:
+            if key == node.key:
                 node.value = value #set new value for key
                 break
 
             last = direction
-            direction = 0 if cmp_res < 0 else 1
+            direction = 0 if key < node.key else 1
             # Update helpers
             if grand_parent is not None:
                 grand_grand_parent = grand_parent
@@ -285,7 +273,6 @@ class RBTree(TreeMixin):
         """ T.remove(key) <==> del T[key], remove item <key> from tree """
         if self._root is None:
             raise KeyError(str(key))
-        compare = self._compare
         head = Node() # False tree root
         node = head
         node.right = self._root
@@ -302,11 +289,11 @@ class RBTree(TreeMixin):
             grand_parent = parent
             parent = node
             node = node[direction]
-            cmp_res = compare(key, node.key)
-            direction = 1 if cmp_res > 0 else 0
+
+            direction = 1 if key > node.key else 0
 
             # Save found node
-            if cmp_res == 0:
+            if key == node.key:
                 found = node
 
             # Push the red node down

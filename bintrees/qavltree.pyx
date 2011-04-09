@@ -11,6 +11,14 @@ from cwalker import cWalker
 from cwalker cimport *
 from ctrees cimport *
 
+def oldcmp(a, b):
+    if a < b:
+        return -1
+    elif a > b:
+        return +1
+    else:
+        return 0
+
 cdef class cAVLTree:
     cdef node_t *_root
     cdef int _count
@@ -28,7 +36,7 @@ cdef class cAVLTree:
 
     @property
     def compare(self):
-        return self._compare if self._compare is not None else cmp
+        return self._compare if self._compare is not None else oldcmp
 
     @property
     def count(self):

@@ -44,6 +44,7 @@ class TreeIterator(object):
 
     def next(self):
         return self._step(1)
+    __next__ = next
 
     def prev(self):
         return self._step(-1)
@@ -68,4 +69,4 @@ class TreeIterator(object):
         if node.goto(key):
             self._item = node.item
         else:
-            raise KeyError(unicode(key))
+            raise KeyError(str(key))

@@ -6,10 +6,6 @@
 
 from __future__ import absolute_import
 
-from .compat import PY3
-if PY3:
-    from .compat import cmp
-
 from .treemixin import TreeMixin
 
 __all__ = ['BinaryTree']
@@ -50,9 +46,9 @@ class BinaryTree(TreeMixin):
     A binary tree is a tree data structure in which each node has at most two
     children.
 
-    BinaryTree([compare]) -> new empty tree.
-    BinaryTree(mapping, [compare]) -> new tree initialized from a mapping
-    BinaryTree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
+    BinaryTree() -> new empty tree.
+    BinaryTree(mapping,) -> new tree initialized from a mapping
+    BinaryTree(seq) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
     Methods
     -------
@@ -134,10 +130,9 @@ class BinaryTree(TreeMixin):
 
     * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
     """
-    def __init__(self, items=None, compare=None):
+    def __init__(self, items=None):
         """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
         self._root = None
-        self._compare = compare if compare is not None else cmp
         self._count = 0
         if items is not None:
             self.update(items)
@@ -163,11 +158,6 @@ class BinaryTree(TreeMixin):
         """ count of items """
         return self._count
 
-    @property
-    def compare(self):
-        """ compare function of T """
-        return self._compare
-
     def _new_node(self, key, value):
         """ Create a new tree node. """
         self._count += 1
@@ -178,7 +168,6 @@ class BinaryTree(TreeMixin):
         if self._root is None:
             self._root = self._new_node(key, value)
         else:
-            compare = self._compare
             parent = None
             direction = 0
             node = self._root
@@ -186,13 +175,12 @@ class BinaryTree(TreeMixin):
                 if node is None:
                     parent[direction] = self._new_node(key, value)
                     break
-                cval = compare(key, node.key)
-                if cval == 0: # key exists
+                if key == node.key:
                     node.value = value # replace value
                     break
                 else:
                     parent = node
-                    direction = 0 if cval < 0 else 1
+                    direction = 0 if key <= node.key else 1
                     node = node[direction]
 
     def remove(self, key):
@@ -201,12 +189,10 @@ class BinaryTree(TreeMixin):
         if node is None:
             raise KeyError(str(key))
         else:
-            compare = self._compare
             parent = None
             direction = 0
             while True:
-                cmp_res = compare(key, node.key)
-                if cmp_res == 0:
+                if key == node.key:
                     # remove node
                     if (node.left is not None) and (node.right is not None):
                         # find replacment node: smallest key in right-subtree
@@ -232,7 +218,7 @@ class BinaryTree(TreeMixin):
                     self._count -= 1
                     break
                 else:
-                    direction = 0 if cmp_res < 0 else 1
+                    direction = 0 if key < node.key else 1
                     parent = node
                     node = node[direction]
                     if node is None:

@@ -67,12 +67,26 @@ ct_swap_data(node_t *node1, node_t *node2)
 	VALUE(node2) = tmp;
 }
 
+int
+ct_fast_compare(PyObject *key1, PyObject *key2)
+{
+	int res;
+
+	res = PyObject_RichCompareBool(key1, key2, Py_LT);
+	if (res > 0)
+		return -1;
+	res = PyObject_RichCompareBool(key1, key2, Py_GT);
+	if (res > 0)
+		return +1;
+	return 0;
+}
+
 extern int
 ct_compare(PyObject *compare, PyObject *key1, PyObject *key2)
 {
 	if (compare == Py_None)
 		/* this is a real performance boost! */
-		return PyObject_Compare(key1, key2);
+		return ct_fast_compare(key1, key2);
 	/* Invoke a Python compare function returning the result as an int. */
 	PyObject *res;
 	PyObject *args;
@@ -90,12 +104,12 @@ ct_compare(PyObject *compare, PyObject *key1, PyObject *key2)
 	Py_DECREF(args);
 	if (res == NULL)
 		return -1; /* got no result object, compare is not callable? */
-	if (!PyInt_Check(res)) {
+	if (!PyNumber_Check(res)) { /* PY3K changes */
 		Py_DECREF(res);
 		PyErr_SetString(PyExc_TypeError, "comparison function must return int");
 		return -1;
 	}
-	i = PyInt_AsLong(res);
+	i = PyNumber_Long(res); /* PY3K changes */
 	Py_DECREF(res);
 	return i;
 }

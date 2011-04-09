@@ -32,7 +32,6 @@ class TestTree(unittest.TestCase):
     def test_properties(self):
         tree = Tree(self.values)
         self.assertEqual(tree.count, 6)
-        self.assertEqual(tree.compare, cmp)
 
     def test_clear_tree(self):
         tree = Tree(self.values)
@@ -55,7 +54,7 @@ class TestTree(unittest.TestCase):
         self.assertEqual(tree.count, 0)
 
     def test_remove_random_numbers(self):
-        keys = list(set([randint(0, 10000) for _ in xrange(500)]))
+        keys = list(set([randint(0, 10000) for _ in range(500)]))
         shuffle(keys)
         tree = Tree(zip(keys, keys))
         self.assertEqual(tree.count, len(keys))

@@ -6,7 +6,6 @@
 
 import sys
 import unittest
-from itertools import izip
 
 from bintrees import BinaryTree
 from bintrees import TreeIterator
@@ -22,13 +21,13 @@ class TestTreeIterator(unittest.TestCase):
     def test_iterkeys_ascending(self):
         tree = BinaryTree.fromkeys(keys)
         treeiter = TreeIterator(tree)
-        for key, chk in izip(treeiter, sorted(keys)):
+        for key, chk in zip(treeiter, sorted(keys)):
             self.assertEqual(key, chk)
 
     def test_iterkeys_descending(self):
         tree = BinaryTree.fromkeys(keys)
         treeiter = TreeIterator(tree, reverse=True)
-        for key, chk in izip(treeiter, sorted(keys, reverse=True)):
+        for key, chk in zip(treeiter, sorted(keys, reverse=True)):
             self.assertEqual(key, chk)
 
     def test_iterkeys_next_prev(self):
