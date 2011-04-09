@@ -5,7 +5,6 @@ Abstract
 ========
 
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
-No Cython implementation for Python 3.
 
 This Classes are much slower than the built-in dict class, but they have always
 sorted keys, and all results of iterators and list returning functions are also sorted.
@@ -29,28 +28,24 @@ Trees written with C-Functions and Cython 0.12.1 as wrapper
     - *FastAVLTree* -- balanced AVL-Tree
     - *FastRBTree* -- balanced Red-Black-Tree
 
-All trees provides the same API, the pickle protocol is supported, but not lambda
-functions as user defined compare functions.
+All trees provides the same API, the pickle protocol is supported.
 
 FastXTrees has C-structs as tree-node structure and C-implementation for low level
 operations: insert, remove, get_value, max_item, min_item, index, item_at.
-The biggest performance boost was to use the PyObject_Compare() function from the
-C-API as default compare function. If you have to use a user-defined compare
-function you will lost this performance advantage.
 
 Constructor
 ~~~~~~~~~~~
 
-    * Tree([compare]) -> new empty tree, compare(a, b) -> -1, 0, +1; like builtin.cmp
-    * Tree(mapping, [compare]) -> new tree initialized from a mapping (requires only an iteritems() method)
-    * Tree(seq, [compare]) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
+    * Tree() -> new empty tree;
+    * Tree(mapping) -> new tree initialized from a mapping (requires only an items() method)
+    * Tree(seq) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
 Methods
 ~~~~~~~
 
     * __contains__(k) -> True if T has a key k, else False, O(log(n))
-    * __delitem__(y) <==> del T[y], O(log(n))
-    * __getitem__(y) <==> T[y], O(log(n))
+    * __delitem__(y) <==> del T[y], del[s:e], O(log(n))
+    * __getitem__(y) <==> T[y], T[s:e], O(log(n))
     * __iter__() <==> iter(T)
     * __len__() <==> len(T), O(1)
     * __max__() <==> max(T), get max item (k,v) of T, O(log(n))
@@ -65,15 +60,26 @@ Methods
     * copy() -> a shallow copy of T, O(n*log(n))
     * discard(k) -> None, remove k from T, if k is present, O(log(n))
     * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
-    * has_key(k) -> True if T has a key k, else False, O(log(n))
     * is_empty() -> True if len(T) == 0, O(1)
-    * items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
-    * keys([reverse]) -> list of T's keys, O(n)
+    * items([reverse]) -> generator for (k, v) items of T, O(n)
+    * keys([reverse]) -> generator for keys of T, O(n)
+    * values([reverse]) -> generator for values of  T, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
-    * values([reverse]) -> list of T's values, O(n)
+
+Key slicing methods
+~~~~~~~~~~~~~~~~~~~
+
+    * itemslice(s, e) -> generator for (k, v) items of T for key: s <= key < e, O(n)
+    * keyslice(s, e) -> generator for keys of T, key: s <= key < e, O(n)
+    * valueslice(s, e) -> generator for values of T, key: s <= key < e, O(n)
+    * T[s:e] -> key generator, for key if s <= key < e, O(n), uses keyslice(s, e)
+    * del T[s:e] -> remove items by key slicing, for key if s <= key < e, O(n)
+
+    If 's' is None or T[:e], generator starts with min_key(), if 'e' is None
+    or T[s:] generator ends with max_key(), T[:] for all keys, same as T.keys().
 
 walk forward/backward
 ~~~~~~~~~~~~~~~~~~~~~
@@ -86,12 +92,6 @@ walk forward/backward
 traverse tree
 ~~~~~~~~~~~~~
 
-    * iteritems([reverse]) -> an iterator over the (k, v) items of T, O(n)
-    * iterkeys([reverse]) -> an iterator over the keys of T, O(n)
-    * itervalues([reverse]) -> an iterator over the values of T, O(n)
-    * itemslice(startkey, endkey) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
-    * keyslice(startkey, endkey) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
-    * valueslice(startkey, endkey) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
     * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
     * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
 
@@ -106,14 +106,6 @@ Heap methods
     * pop_max() -> (k, v), remove item with maximum key, O(log(n))
     * nlargest(i[,pop]) -> get list of i largest items (k, v), O(i*log(n))
     * nsmallest(i[,pop]) -> get list of i smallest items (k, v), O(i*log(n))
-
-Index methods (access by index is slow)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    * index(k) -> index of key k, O(n)
-    * item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
-    * T[s:e:i] -> slicing from start s to end e, step i, O(n)
-    * del T[s:e:i] -> remove items by slicing, O(n)
 
 Set methods (using frozenset)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,9 +128,6 @@ Performance
 
 Profiling with timeit(): 5000 unique random int keys, time in seconds
 
-BinaryTrees
------------
-
 ========================  =============  ==============  ==============  ==============
 unbalanced Trees          CPython 2.7.1  FastBinaryTree  ipy 2.7.0       pypy 1.4.1
 ========================  =============  ==============  ==============  ==============
@@ -146,9 +135,6 @@ build time 100x            6,59           0,39            2,62            0,46
 build & delete time 100x  11,82           0,98            4,66            0,70
 search 100x all keys       2,99           0,66            1,23            0,24
 ========================  =============  ==============  ==============  ==============
-
-AVLTrees
---------
 
 ========================  =============  ==============  ==============  ==============
 AVLTrees                  CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
@@ -158,9 +144,6 @@ build & delete time 100x  31,66           1,02           23,46           3,86
 search 100x all keys       2,45           0,60            1,00           0,24
 ========================  =============  ==============  ==============  ==============
 
-RBTrees
--------
-
 ========================  =============  ==============  ==============  ==============
 RBTrees                   CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
 ========================  =============  ==============  ==============  ==============
@@ -169,23 +152,19 @@ build & delete time 100x  31,45           1,20           13,04            1,90
 search 100x all keys       2,60           0,60            1,03            0,23
 ========================  =============  ==============  ==============  ==============
 
-Memory usage for 100x5000 int keys (Binary/AVL&RB)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+News
+====
 
-    * CPython-Trees (20/22) MByte (using __slots__)
-    * FastXTrees (20 Bytes/Node on 32 bit systems) x 500.000 = ~9,5 MByte
-    * dict 10 MByte
+Version 0.4.0
 
-builtin.dict
-------------
-
-========================  =============  =========
-builtin.dict              cPython 2.6.5  ipy 2.6.0
-========================  =============  =========
-100x build time             0,03           0,08
-100x build & delete time    0,06           0,10
-search 100x all keys        0,04           0,04
-========================  =============  =========
+  * API change!!!
+  * full Python 3 support, also for Cython implementations
+  * removing user defined compare() function - keys have to be comparable!
+  * removed T.has_key(), use 'key in T'
+  * keys(), items(), values() generating 'views'
+  * removed iterkeys(), itervalues(), iteritems() methods
+  * replaced index slicing by key slicing
+  * removed index() and item_at()
 
 Installation
 ============

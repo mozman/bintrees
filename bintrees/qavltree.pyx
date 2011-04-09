@@ -29,7 +29,7 @@ cdef class cAVLTree:
         return self._count
 
     def __getstate__(self):
-        data = dict(self.iteritems())
+        data = dict(self.items())
         return {'data': data}
 
     def __setstate__(self, state):

@@ -1,11 +1,13 @@
 Version 0.4.0 planned - someday
 
   * API change!!!
-  * full Python 3 support, also Cython
+  * full Python 3 support, also for Cython implementations
   * removing user defined compare() function - keys have to be comparable!
-  * replacing index slicing by key slicing
+  * removed T.has_key(), use 'key in T'
   * keys(), items(), values() generating 'views'
-  * removing iter...() methods
+  * removed iterkeys(), itervalues(), iteritems() methods
+  * replaced index slicing by key slicing
+  * removed index() and item_at()
 
 Version 0.3.2 09.04.2011
 
