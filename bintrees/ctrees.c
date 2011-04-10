@@ -76,15 +76,16 @@ ct_compare(PyObject *key1, PyObject *key2)
 	if (res > 0)
 		return -1;
 	else if (res < 0) {
-		PyErr_SetString(PyExc_TypeError, "ivalid type for key");
+		PyErr_SetString(PyExc_TypeError, "invalid type for key");
 		return 0;
 		}
-	res = PyObject_RichCompareBool(key1, key2, Py_GT);
-	if (res > 0)
-		return +1;
-	return 0;
+	/* second compare:
+	+1 if key1 > key2
+	 0 if not -> equal
+	-1 means error, if error, it should happend at the first compare
+	*/
+	return PyObject_RichCompareBool(key1, key2, Py_GT);
 }
-
 
 extern node_t *
 ct_find_node(node_t *root, PyObject *key)
