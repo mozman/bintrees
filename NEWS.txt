@@ -1,4 +1,8 @@
-Version 0.4.0 planned - someday
+Version 1.0.0 planned
+
+  * bug fixes
+
+Version 0.4.0 xx.04.2011
 
   * API change!!!
   * full Python 3 support, also for Cython implementations
@@ -8,6 +12,7 @@ Version 0.4.0 planned - someday
   * removed iterkeys(), itervalues(), iteritems() methods
   * replaced index slicing by key slicing
   * removed index() and item_at()
+  * repr() produces a correct representation
 
 Version 0.3.2 09.04.2011
 

@@ -48,12 +48,13 @@ def crb_item_at():
 
 
 def print_result(time, text):
-    print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
+    print("Operation: %s takes %.2f seconds\n" % (text, time, text))
 
 def main():
-    with open('testkeys.txt', 'w') as fp:
-        fp.write(repr(keys))
-    print ("Nodes: {0}".format(len(keys)))
+    fp = open('testkeys.txt', 'w')
+    fp.write(repr(keys))
+    fp.close()
+    print ("Nodes: %d" % len(keys))
 
     shuffle(keys)
 

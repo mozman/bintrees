@@ -165,6 +165,7 @@ Version 0.4.0
   * removed iterkeys(), itervalues(), iteritems() methods
   * replaced index slicing by key slicing
   * removed index() and item_at()
+  * repr() produces a correct representation
 
 Installation
 ============

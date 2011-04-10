@@ -29,11 +29,10 @@ cdef class cBinaryTree:
         return self._count
 
     def __getstate__(self):
-        data = dict(self.items())
-        return {'data': data}
+        return dict(self.items())
 
     def __setstate__(self, state):
-        self.update(state['data'])
+        self.update(state)
 
     def clear(self):
         ct_delete_tree(self._root)
@@ -82,29 +81,3 @@ cdef class cBinaryTree:
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
         return (<object>node.key, <object>node.value)
-
-    def index(self, key):
-        """ T.index(k) -> index, raises KeyError if k not in T """
-        cdef int result
-        result = ct_index_of(self._root, key)
-        if result >= 0:
-            return result
-        else:
-            raise KeyError(str(key))
-
-    def item_at(self, index):
-        """ T.item_at(index) -> item (k,v) """
-        cdef node_t *result
-        cdef int n
-        n = <int> index
-        if n < 0:
-            n = self._count + n
-        if (n < 0) or (n >= self._count):
-            raise IndexError('item_at()')
-        result = ct_node_at(self._root, n)
-        if result == NULL:
-            # index is in valid range so NULL should not be returned,
-            # implementation error in ct_node_at(...) function!
-            raise SystemError('got NULL from ct_node_at(...)')
-        else:
-            return (<object>result.key, <object>result.value)
