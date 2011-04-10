@@ -6,7 +6,7 @@ Version 0.4.0 xx.04.2011
 
   * API change!!!
   * full Python 3 support, also for Cython implementations
-  * removing user defined compare() function - keys have to be comparable!
+  * removed user defined compare() function - keys have to be comparable!
   * removed T.has_key(), use 'key in T'
   * keys(), items(), values() generating 'views'
   * removed iterkeys(), itervalues(), iteritems() methods

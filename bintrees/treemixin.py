@@ -66,18 +66,19 @@ class TreeMixin(object):
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
 
-    Key slicing methods
+    slicing by keys
 
-    * itemslice(s, e) -> generator for (k, v) items of T for key: s <= key < e, O(n)
-    * keyslice(s, e) -> generator for keys of T, key: s <= key < e, O(n)
-    * valueslice(s, e) -> generator for values of T, key: s <= key < e, O(n)
-    * T[s:e] -> key generator, for key if s <= key < e, O(n), uses keyslice(s, e)
-    * del T[s:e] -> remove items by key slicing, for key if s <= key < e, O(n)
+    * itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
+    * keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
+    * valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
+    * T[s:e] -> value generator, for s <= key < e, O(n), uses valueslice(s, e)
+    * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
-    If 's' is None or T[:e], generator starts with min_key(), if 'e' is None
-    or T[s:] generator ends with max_key(), T[:] for all keys, same as T.keys().
+    if 's' is None or T[:e], generator starts with value of min_key()
+    if 'e' is None or T[s:] generator ends with value of max_key()
+    T[:] for all values, same as T.values().
 
-    walk forward/backward, O(log(n))
+    prev/succ operations
 
     * prev_item(key) -> get (k, v) pair, where k is predecessor to key, O(log(n))
     * prev_key(key) -> k, get the predecessor of key, O(log(n))
@@ -254,7 +255,7 @@ class TreeMixin(object):
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
         if isinstance(key, slice):
-            return self.keyslice(key.start, key.stop)
+            return self.valueslice(key.start, key.stop)
         else:
             return self.get_value(key)
 
