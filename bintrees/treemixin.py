@@ -141,11 +141,13 @@ class TreeMixin(object):
             if right is not None:
                 result.extend(right)
             return result
+
         node = self.get_walker()
         if node.is_valid:
-            return "{{{0}}}".format(", ".join(_tostr()))
+            fmt = self.__class__.__name__ + "({%s})"
+            return fmt % ", ".join(_tostr())
         else:
-            return "{}"
+            return self.__class__.__name__ + "()"
 
     def copy(self):
         """ T.copy() -> get a shallow copy of T. """
@@ -329,13 +331,12 @@ class TreeMixin(object):
         raise KeyError(str(key))
 
     def __getstate__(self):
-        data = dict(self.items())
-        return { 'data': data }
+        return dict(self.items())
 
     def __setstate__(self, state):
         self._root = None
         self._count = 0
-        self.update(state['data'])
+        self.update(state)
 
     def setdefault(self, key, default=None):
         """ T.setdefault(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T """
@@ -380,8 +381,7 @@ class TreeMixin(object):
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
         if len(args) > 1:
-            raise TypeError("pop expected at most 2 arguments, got {0}".format(
-                              1+len(args)))
+            raise TypeError("pop expected at most 2 arguments, got %d" % (1+len(args)))
         walker = self.get_walker()
         if walker.goto(key) is False:
             if len(args) == 0:
@@ -405,10 +405,11 @@ class TreeMixin(object):
         return result
 
     def foreach(self, func, order=0):
-        """Visit all tree nodes and process key, value.
+        """ Visit all tree nodes and process key, value.
 
-        func -- function(key, value)
-        order -- inorder = 0, preorder = -1, postorder = +1
+        parm func: function(key, value)
+        param int order: inorder = 0, preorder = -1, postorder = +1
+
         """
         def _traverse():
             if order == -1:

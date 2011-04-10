@@ -65,12 +65,13 @@ class CheckTree(object):
 
     def test_008a_repr(self):
         tree = self.TREE(self.default_values2)
+        clsname = tree.__class__.__name__
         reprstr = repr(tree)
-        self.assertEqual(reprstr, '{1: 16, 2: 12, 3: 57, 4: 34, 8: 45, 9: 35}')
+        self.assertEqual(reprstr, '%s({1: 16, 2: 12, 3: 57, 4: 34, 8: 45, 9: 35})' % clsname)
 
     def test_008b_repr_empty_tree(self):
         tree = self.TREE()
-        self.assertEqual(repr(tree), '{}')
+        self.assertEqual(repr(tree), tree.__class__.__name__+'()')
 
     def test_009_clear(self):
         tree = self.TREE(self.default_values2)

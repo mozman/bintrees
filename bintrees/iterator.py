@@ -25,7 +25,7 @@ class TreeIterator(object):
         elif rtype == 'item':
             self._retfunc = lambda item: item
         else:
-            raise ValueError("Unknown return type '{0}'".format(rtype))
+            raise ValueError("Unknown return type '%s'" % rtype)
 
     @property
     def key(self):
