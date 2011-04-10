@@ -33,6 +33,7 @@ def randomkeys(num, maxnum=100000):
 class CheckTree(object):
     default_values1 = list(zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57]))
     default_values2 = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
+    slicetest_data = [(1, 1), (2, 2), (3, 3), (4, 4), (8, 8), (9, 9), (10, 10), (11, 11)]
 
     def test_001_init(self):
         tree = self.TREE()
@@ -152,20 +153,28 @@ class CheckTree(object):
         result = reversed(list(tree.keyslice(15, 36)))
         self.assertEqual(list(result), [35, 34, 16])
 
-    def test_018d_keyslice_from_start(self):
-        tree = self.TREE.fromkeys([1, 2, 3, 4, 8, 9, 10, 11])
+    def test_018d_slice_from_start(self):
+        # values: 1, 2, 3, 4, 8, 9, 10, 11
+        tree = self.TREE(self.slicetest_data)
         result = list(tree[:4])
         self.assertEqual(list(result), [1, 2, 3])
 
-    def test_018e_keyslice_til_end(self):
-        tree = self.TREE.fromkeys([1, 2, 3, 4, 8, 9, 10, 11])
+    def test_018e_slice_til_end(self):
+        # values: 1, 2, 3, 4, 8, 9, 10, 11
+        tree = self.TREE(self.slicetest_data)
         result = list(tree[8:])
         self.assertEqual(list(result), [8, 9, 10, 11])
 
-    def test_018f_keyslice_from_start_til_end(self):
-        tree = self.TREE.fromkeys([1, 2, 3, 4, 8, 9, 10, 11])
+    def test_018f_slice_from_start_til_end(self):
+        # values: 1, 2, 3, 4, 8, 9, 10, 11
+        tree = self.TREE(self.slicetest_data)
         result = list(tree[:])
         self.assertEqual(list(result), [1, 2, 3, 4, 8, 9, 10, 11])
+
+    def test_018g_slice_produces_values(self):
+        tree = self.TREE([(1,100), (2, 200), (3, 300)])
+        result = list(tree[:])
+        self.assertEqual(list(result), [100, 200, 300])
 
     def test_019_values(self):
         tree = self.TREE(self.default_values1)
@@ -549,21 +558,6 @@ class CheckTree(object):
         result = reversed(sorted(set3))
         for key, chk in zip(reversed(tree), result):
             self.assertEqual(chk, key)
-
-    def test_076_getslice(self):
-        tree = self.TREE(self.default_values2)
-        expected = [1, 2, 3, 4, 8, 9]
-        result = list(tree[2:4])
-        self.assertEqual(result, [2, 3])
-
-        result = list(tree[:4])
-        self.assertEqual(result, [1, 2, 3])
-
-        result = list(tree[4:])
-        self.assertEqual(result, [4, 8, 9])
-
-        result = list(tree[:])
-        self.assertEqual(result, [1, 2, 3, 4, 8, 9])
 
     def test_077_delslice(self):
         T = self.TREE.fromkeys([1, 2, 3, 4, 8, 9])
