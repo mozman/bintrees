@@ -8,11 +8,18 @@ class TreeIterator(object):
     __slots__ = ['_tree', '_direction', '_item', '_retfunc', ]
     def __init__(self, tree, rtype='key', reverse=False):
         """
-        Params:
+        required tree methods:
 
-        tree -- a binary tree, required methods: min_item, max_item, prev_item, succ_item
-        rtype -- 'key', 'value', 'item'
-        reverse -- False: ascending order; True: descending order
+        - get_walker
+        - min_item
+        - max_item
+        - prev_item
+        - succ_item
+
+        param tree: binary tree
+        param str rtype: 'key', 'value', 'item'
+        param bool reverse: `False` for ascending order; `True` for descending order
+
         """
         self._tree = tree
         self._item = None
