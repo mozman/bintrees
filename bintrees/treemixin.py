@@ -8,6 +8,7 @@ from __future__ import absolute_import
 
 from .iterator import TreeIterator
 from .walker import Walker
+from .treeslice import TreeSlice
 
 class TreeMixin(object):
     """
@@ -255,7 +256,7 @@ class TreeMixin(object):
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
         if isinstance(key, slice):
-            return self.valueslice(key.start, key.stop)
+            return TreeSlice(self, key.start, key.stop)
         else:
             return self.get_value(key)
 
