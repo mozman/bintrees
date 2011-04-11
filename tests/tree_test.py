@@ -171,10 +171,15 @@ class CheckTree(object):
         result = list(tree[:])
         self.assertEqual(list(result), [1, 2, 3, 4, 8, 9, 10, 11])
 
-    def test_018g_slice_produces_values(self):
+    def __test_018g_slice_produces_values(self):
         tree = self.TREE([(1,100), (2, 200), (3, 300)])
         result = list(tree[:])
         self.assertEqual(list(result), [100, 200, 300])
+
+    def test_018g_slice_produces_keys(self):
+        tree = self.TREE([(1,100), (2, 200), (3, 300)])
+        result = list(tree[:])
+        self.assertEqual(list(result), [1, 2, 3])
 
     def test_019_values(self):
         tree = self.TREE(self.default_values1)
