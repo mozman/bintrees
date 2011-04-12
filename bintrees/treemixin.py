@@ -263,29 +263,53 @@ class TreeMixin(object):
         """ T.getitems(s, e) -> item iterator: s <= key < e.
 
         if s is None: start with min element -> T[:e]
-        if e is None: end with max element. -> T[s:]
+        if e is None: end with max element -> T[s:]
         T[:] -> all elements
+
         """
-        def has_upper_bound(key):
-            return key >= endkey
+        if self.is_empty():
+            return
 
-        def has_lower_bound(key):
-            return key < startkey
+        def go_left_with_bound():
+            # don't visit subtrees without keys in search range
+            return node.key > startkey and node.has_left() and go_down
+        def go_left_without_bound():
+            return node.has_left() and go_down
+        can_go_left = go_left_without_bound if startkey is None else go_left_with_bound
 
-        def no_bounds(key):
-            return False
+        def go_right_with_bound():
+            # don't visit subtrees without keys in search range
+            return node.key < endkey and node.has_right()
+        def go_right_without_bound():
+            return node.has_right()
+        can_go_right = go_right_without_bound if endkey is None else go_right_with_bound
 
-        lower_than_lower_bound = no_bounds if startkey is None else has_lower_bound
-        greater_equal_upper_bound = no_bounds if endkey is None else has_upper_bound
+        if (startkey, endkey) == (None, None):
+            key_in_range = lambda: True
+        elif startkey is None:
+            key_in_range = lambda: node.key < endkey
+        elif endkey is None:
+            key_in_range = lambda: node.key >= startkey
+        else:
+            key_in_range = lambda: startkey <= node.key < endkey
 
-        for item in self.items():
-            key = item[0]
-            if lower_than_lower_bound(key):
-                pass
-            elif greater_equal_upper_bound(key):
-                return
+        node = self.get_walker()
+        go_down = True
+        while True:
+            if can_go_left():
+                node.push()
+                node.go_left()
             else:
-                yield item
+                if key_in_range():
+                    yield node.item
+                if can_go_right():
+                    node.go_right()
+                    go_down = True
+                else:
+                    if node.stack_is_empty():
+                        return
+                    node.pop()
+                    go_down = False
 
     def valueslice(self, startkey, endkey):
         """ T.valueslice(startkey, endkey) -> value iterator:
@@ -573,6 +597,7 @@ class TreeMixin(object):
         """ x.isdisjoint(S) ->  True if x has a null intersection with tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.isdisjoint(frozenset(tree.keys()))
+
 
 def _make_sets(trees):
     sets = []
