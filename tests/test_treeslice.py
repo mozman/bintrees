@@ -93,5 +93,9 @@ class TestTreeSlice(unittest.TestCase):
         subslice = self.tree[2:][:1]
         self.assertEqual([], list(subslice))
 
+    def test_repr(self):
+        result = repr(self.tree[2:4])
+        self.assertEqual("RBTree({2: 'b', 3: 'c'})", result)
+
 if __name__=='__main__':
     unittest.main()

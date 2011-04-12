@@ -72,7 +72,7 @@ class CheckTree(object):
 
     def test_008b_repr_empty_tree(self):
         tree = self.TREE()
-        self.assertEqual(repr(tree), tree.__class__.__name__+'()')
+        self.assertEqual(repr(tree), tree.__class__.__name__+'({})')
 
     def test_009_clear(self):
         tree = self.TREE(self.default_values2)
