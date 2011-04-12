@@ -122,34 +122,8 @@ class TreeMixin(object):
 
     def __repr__(self):
         """ x.__repr__(...) <==> repr(x) """
-        def _tostr():
-            result = []
-            left = None
-            right = None
-            if node.has_left():
-                node.push()
-                node.go_left()
-                left = _tostr()
-                node.pop()
-            if node.has_right():
-                node.push()
-                node.go_right()
-                right = _tostr()
-                node.pop()
-            nodestr = repr(node.key)+': '+repr(node.value)
-            if left is not None:
-                result.extend(left)
-            result.append(nodestr)
-            if right is not None:
-                result.extend(right)
-            return result
-
-        node = self.get_walker()
-        if node.is_valid:
-            fmt = self.__class__.__name__ + "({%s})"
-            return fmt % ", ".join(_tostr())
-        else:
-            return self.__class__.__name__ + "()"
+        tpl = "%s({" % self.__class__.__name__ + '%s' + '})'
+        return tpl % ", ".join( ("%r: %r" %item for item in self.items()) )
 
     def copy(self):
         """ T.copy() -> get a shallow copy of T. """

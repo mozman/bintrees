@@ -13,6 +13,10 @@ class TreeSlice(object):
         self._start = start
         self._stop = stop
 
+    def __repr__(self):
+        tpl = "%s({" % self._tree.__class__.__name__ + '%s' + '})'
+        return tpl % ", ".join( ("%r: %r" % item for item in self._tree.itemslice(self._start, self._stop)) )
+
     def __contains__(self, key):
         if self._inrange(key):
             return key in  self._tree
