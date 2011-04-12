@@ -270,19 +270,19 @@ class TreeMixin(object):
         if self.is_empty():
             return
 
-        def go_left_with_bound():
+        if startkey is None:
+            # no lower bound
+            can_go_left = lambda: node.has_left() and visit_left
+        else:
             # don't visit subtrees without keys in search range
-            return node.key > startkey and node.has_left() and go_down
-        def go_left_without_bound():
-            return node.has_left() and go_down
-        can_go_left = go_left_without_bound if startkey is None else go_left_with_bound
+            can_go_left = lambda: node.key > startkey and node.has_left() and visit_left
 
-        def go_right_with_bound():
+        if endkey is None:
+            # no upper bound
+            can_go_right = lambda: node.has_right()
+        else:
             # don't visit subtrees without keys in search range
-            return node.key < endkey and node.has_right()
-        def go_right_without_bound():
-            return node.has_right()
-        can_go_right = go_right_without_bound if endkey is None else go_right_with_bound
+            can_go_right = lambda: node.key < endkey and node.has_right()
 
         if (startkey, endkey) == (None, None):
             key_in_range = lambda: True
@@ -294,7 +294,7 @@ class TreeMixin(object):
             key_in_range = lambda: startkey <= node.key < endkey
 
         node = self.get_walker()
-        go_down = True
+        visit_left = True
         while True:
             if can_go_left():
                 node.push()
@@ -304,12 +304,13 @@ class TreeMixin(object):
                     yield node.item
                 if can_go_right():
                     node.go_right()
-                    go_down = True
+                    visit_left = True
                 else:
                     if node.stack_is_empty():
                         return
                     node.pop()
-                    go_down = False
+                    # left side is already done
+                    visit_left = False
 
     def valueslice(self, startkey, endkey):
         """ T.valueslice(startkey, endkey) -> value iterator:
