@@ -6,8 +6,8 @@ Abstract
 
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
 
-This Classes are much slower than the built-in dict class, but they have always
-sorted keys, and all results of iterators and list returning functions are also sorted.
+This Classes are much slower than the built-in dict class, but all
+iterators/generators yielding data in sorted key order.
 
 Source of Algorithms
 --------------------
@@ -31,7 +31,7 @@ Trees written with C-Functions and Cython 0.12.1 as wrapper
 All trees provides the same API, the pickle protocol is supported.
 
 FastXTrees has C-structs as tree-node structure and C-implementation for low level
-operations: insert, remove, get_value, max_item, min_item, index, item_at.
+operations: insert, remove, get_value, max_item, min_item.
 
 Constructor
 ~~~~~~~~~~~
@@ -75,12 +75,31 @@ slicing by keys
     * itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
     * keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
     * valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
-    * T[s:e] -> value generator, for s <= key < e, O(n), uses valueslice(s, e)
+    * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
     * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
-    if 's' is None or T[:e], generator starts with value of min_key()
-    if 'e' is None or T[s:] generator ends with value of max_key()
-    T[:] for all values, same as T.values().
+    if 's' is None or T[:e] TreeSlice/iterator starts with value of min_key()
+    if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key()
+    T[:] is a TreeSlice which represents the whole tree.
+
+    TreeSlice is a tree wrapper with range check, and contains no references
+    to objects, deleting objects in the associated tree also deletes the object
+    in the TreeSlice.
+
+    * TreeSlice[k] -> get value for key k, raises KeyError if k not exists in range s:e
+    * TreeSlice[s1:e1] -> TreeSlice object, with keys in range s1 <= key < e1
+
+      * new lower bound is max(s, s1)
+      * new upper bound is min(e, e1)
+
+    TreeSlice methods:
+
+    * items() -> generator for (k, v) items of T, O(n)
+    * keys() -> generator for keys of T, O(n)
+    * values() -> generator for values of  T, O(n)
+    * __iter__ <==> keys()
+    * __repr__ <==> repr(T)
+    * __contains__(key)-> True if TreeSlice has a key k, else False, O(log(n))
 
 prev/succ operations
 ~~~~~~~~~~~~~~~~~~~~

@@ -72,12 +72,31 @@ class TreeMixin(object):
     * itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
     * keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
     * valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
-    * T[s:e] -> value generator, for s <= key < e, O(n), uses valueslice(s, e)
+    * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
     * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
-    if 's' is None or T[:e], generator starts with value of min_key()
-    if 'e' is None or T[s:] generator ends with value of max_key()
-    T[:] for all values, same as T.values().
+    if 's' is None or T[:e] TreeSlice/iterator starts with value of min_key()
+    if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key()
+    T[:] is a TreeSlice which represents the whole tree.
+
+    TreeSlice is a tree wrapper with range check, and contains no references
+    to objects, deleting objects in the associated tree also deletes the object
+    in the TreeSlice.
+
+    * TreeSlice[k] -> get value for key k, raises KeyError if k not exists in range s:e
+    * TreeSlice[s1:e1] -> TreeSlice object, with keys in range s1 <= key < e1
+
+      * new lower bound is max(s, s1)
+      * new upper bound is min(e, e1)
+
+    TreeSlice methods:
+
+    * items() -> generator for (k, v) items of T, O(n)
+    * keys() -> generator for keys of T, O(n)
+    * values() -> generator for values of  T, O(n)
+    * __iter__ <==> keys()
+    * __repr__ <==> repr(T)
+    * __contains__(key)-> True if TreeSlice has a key k, else False, O(log(n))
 
     prev/succ operations
 
