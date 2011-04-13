@@ -141,8 +141,8 @@ class TreeMixin(object):
 
     def __repr__(self):
         """ x.__repr__(...) <==> repr(x) """
-        tpl = "%s({" % self.__class__.__name__ + '%s' + '})'
-        return tpl % ", ".join( ("%r: %r" %item for item in self.items()) )
+        tpl = "%s({%s})" % (self.__class__.__name__ , '%s')
+        return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
 
     def copy(self):
         """ T.copy() -> get a shallow copy of T. """
@@ -205,12 +205,6 @@ class TreeMixin(object):
         return ( item[0] for item in self.items(reverse) )
     __iter__ = keys
 
-    def treeiter(self, rtype='key', reverse=False):
-        """ T.treeiter([rtype, reverse]) -> TreeIterator,
-        rtype in ('key', 'value', 'item').
-        """
-        return TreeIterator(self, rtype, reverse)
-
     def __reversed__(self):
         return self.keys(reverse=True)
 
@@ -246,12 +240,39 @@ class TreeMixin(object):
                     node.pop()
                     go_down = False
 
+    def treeiter(self, rtype='key', reverse=False):
+        """ T.treeiter([rtype, reverse]) -> TreeIterator,
+        rtype in ('key', 'value', 'item').
+        """
+        return TreeIterator(self, rtype, reverse)
+
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
         if isinstance(key, slice):
             return TreeSlice(self, key.start, key.stop)
         else:
             return self.get_value(key)
+
+    def __setitem__(self, key, value):
+        """ x.__setitem__(i, y) <==> x[i]=y """
+        if isinstance(key, slice):
+            raise ValueError('setslice is not supported')
+        self.insert(key, value)
+
+    def __delitem__(self, key):
+        """ x.__delitem__(y) <==> del x[y] """
+        if isinstance(key, slice):
+            self.delitems(self.keyslice(key.start, key.stop))
+        else:
+            self.remove(key)
+
+    def delitems(self, keys):
+        """ T.delitems(keys) -> remove all items by keys
+        """
+        # convert generator to a set, because the content of the
+        # tree will be modified!
+        for key in frozenset(keys):
+            self.remove(key)
 
     def keyslice(self, startkey, endkey):
         """ T.keyslice(startkey, endkey) -> key iterator:
@@ -260,11 +281,11 @@ class TreeMixin(object):
         return ( item[0] for item in self.itemslice(startkey, endkey) )
 
     def itemslice(self, startkey, endkey):
-        """ T.getitems(s, e) -> item iterator: s <= key < e.
+        """ T.itemslice(s, e) -> item iterator: s <= key < e.
 
         if s is None: start with min element -> T[:e]
         if e is None: end with max element -> T[s:]
-        T[:] -> all elements
+        T[:] -> all items
 
         """
         if self.is_empty():
@@ -318,27 +339,6 @@ class TreeMixin(object):
         """
         return ( item[1] for item in self.itemslice(startkey, endkey) )
 
-    def __setitem__(self, key, value):
-        """ x.__setitem__(i, y) <==> x[i]=y """
-        if isinstance(key, slice):
-            raise ValueError('setslice is not supported')
-        self.insert(key, value)
-
-    def __delitem__(self, key):
-        """ x.__delitem__(y) <==> del x[y] """
-        if isinstance(key, slice):
-            self.delitems(self.keyslice(key.start, key.stop))
-        else:
-            self.remove(key)
-
-    def delitems(self, keys):
-        """ T.delitems(keys) -> remove all items by keys
-        """
-        # convert generator to list, because the content of the
-        # tree will be modified!
-        for key in list(keys):
-            self.remove(key)
-
     def get_value(self, key):
         node = self.root
         while node is not None:
@@ -354,6 +354,8 @@ class TreeMixin(object):
         return dict(self.items())
 
     def __setstate__(self, state):
+        # note for myself: this is called like __init__, so don't use clear()
+        # to remove existing data!
         self._root = None
         self._count = 0
         self.update(state)
