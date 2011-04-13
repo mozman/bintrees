@@ -1,0 +1,13 @@
+syntax: glob
+build/*.*
+dist/*.*
+*.so
+*.o
+*.pyd
+*.err
+*.orig
+*.bak
+*.pyc
+*.*~
+*.wpr
+MANIFEST

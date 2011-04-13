@@ -1,0 +1,4 @@
+include NEWS.txt README.txt LICENSE.txt
+include tests/testkey.txt
+recursive-include tests *.py
+recursive-include bintrees *.h *.c *.pyx *.pxd
