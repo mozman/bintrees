@@ -3,7 +3,8 @@
 # Author:  mozman
 # Purpose: DEPRICATED FastBinaryTree
 # Created: 28.04.2010
-#
+# Copyright (C) 2010, 2011 by Manfred Moitzi
+# License: GPLv3
 # no longer maintained
 
 __all__ = ['cBinaryTree']

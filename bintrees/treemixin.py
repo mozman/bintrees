@@ -153,7 +153,11 @@ class TreeMixin(object):
 
     def __contains__(self, key):
         """ k in T -> True if T has a key k, else False """
-        return self.get_walker().goto(key)
+        try:
+            self.get_value(key)
+            return True
+        except KeyError:
+            return False
 
     def __len__(self):
         """ x.__len__() <==> len(x) """
@@ -362,11 +366,11 @@ class TreeMixin(object):
 
     def setdefault(self, key, default=None):
         """ T.setdefault(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T """
-        walker = self.get_walker()
-        if not walker.goto(key):
+        try:
+            return self.get_value(key)
+        except KeyError:
             self.insert(key, default)
             return default
-        return walker.value
 
     def update(self, *args):
         """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
@@ -392,10 +396,9 @@ class TreeMixin(object):
 
     def get(self, key, default=None):
         """ T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None. """
-        walker = self.get_walker()
-        if walker.goto(key):
-            return walker.value
-        else:
+        try:
+            return self.get_value(key)
+        except KeyError:
             return default
 
     def pop(self, key, *args):
@@ -404,15 +407,15 @@ class TreeMixin(object):
         """
         if len(args) > 1:
             raise TypeError("pop expected at most 2 arguments, got %d" % (1+len(args)))
-        walker = self.get_walker()
-        if walker.goto(key) is False:
+        try:
+            value = self.get_value(key)
+            self.remove(key)
+            return value
+        except KeyError:
             if len(args) == 0:
-                raise KeyError(str(key))
+                raise
             else:
                 return args[0]
-        value = walker.value
-        self.remove(key)
-        return value
 
     def popitem(self):
         """ T.popitem() -> (k, v), remove and return some (key, value) pair as a
@@ -422,7 +425,7 @@ class TreeMixin(object):
             raise KeyError("popitem(): tree is empty")
         walker = self.get_walker()
         walker.goto_leaf()
-        result = (walker.key, walker.value)
+        result = walker.item
         self.remove(walker.key)
         return result
 
@@ -456,15 +459,15 @@ class TreeMixin(object):
 
     def min_item(self):
         """ Get item with min key of tree, raises ValueError if tree is empty. """
-        walker = self.get_walker()
         if self.count == 0:
             raise ValueError("Tree is empty")
-        while walker.has_left():
-            walker.go_left()
-        return (walker.key, walker.value)
+        node = self._root
+        while node.left is not None:
+            node = node.left
+        return (node.key, node.value)
 
     def pop_min(self):
-        """ T.pop_min() -> (k, v), remove item with minimum key, raise KeyError
+        """ T.pop_min() -> (k, v), remove item with minimum key, raise ValueError
         if T is empty.
         """
         item = self.min_item()
@@ -510,16 +513,15 @@ class TreeMixin(object):
 
     def max_item(self):
         """ Get item with max key of tree, raises ValueError if tree is empty. """
-
         if self.count == 0:
             raise ValueError("Tree is empty")
-        walker = self.get_walker()
-        while walker.has_right():
-            walker.go_right()
-        return walker.item
+        node = self._root
+        while node.right is not None:
+            node = node.right
+        return (node.key, node.value)
 
     def pop_max(self):
-        """ T.pop_max() -> (k, v), remove item with maximum key, raise KeyError
+        """ T.pop_max() -> (k, v), remove item with maximum key, raise ValueError
         if T is empty.
         """
         item = self.max_item()
@@ -536,28 +538,26 @@ class TreeMixin(object):
         If pop is True, remove items from T.
         """
         if pop:
-            return [self.pop_min() for _ in xrange(min(len(self), n))]
+            return [self.pop_min() for _ in range(min(len(self), n))]
         else:
-            gen = self.keys()
-            keys = (next(gen) for _ in range(min(len(self), n)))
-            return [(key, self.get(key)) for key in keys]
+            items = self.items()
+            return  [ next(items) for _ in range(min(len(self), n)) ]
 
     def nlargest(self, n, pop=False):
         """ T.nlargest(n) -> get list of n largest items (k, v).
         If pop is True remove items from T.
         """
         if pop:
-            return [self.pop_max() for _ in xrange(min(len(self), n))]
+            return [self.pop_max() for _ in range(min(len(self), n))]
         else:
-            gen = self.keys(reverse=True)
-            keys = (next(gen) for _ in range(min(len(self), n)))
-            return [(key, self.get(key)) for key in keys]
+            items = self.items(reverse=True)
+            return [ next(items) for _ in range(min(len(self), n)) ]
 
     def intersection(self, *trees):
         """ x.intersection(t1, t2, ...) -> Tree, with keys *common* to all trees
         """
         thiskeys = frozenset(self.keys())
-        sets = _make_sets(trees)
+        sets = _build_sets(trees)
         rkeys = thiskeys.intersection(*sets)
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
 
@@ -565,8 +565,7 @@ class TreeMixin(object):
         """ x.union(t1, t2, ...) -> Tree with keys from *either* trees
         """
         thiskeys = frozenset(self.keys())
-        sets = _make_sets(trees)
-        rkeys = thiskeys.union(*sets)
+        rkeys = thiskeys.union(*_build_sets(trees))
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
 
     def difference(self, *trees):
@@ -574,8 +573,7 @@ class TreeMixin(object):
         t2, ...
         """
         thiskeys = frozenset(self.keys())
-        sets = _make_sets(trees)
-        rkeys = thiskeys.difference(*sets)
+        rkeys = thiskeys.difference(*_build_sets(trees))
         return self.__class__( ((key, self.get(key)) for key in rkeys) )
 
     def symmetric_difference(self, tree):
@@ -601,9 +599,6 @@ class TreeMixin(object):
         thiskeys = frozenset(self.keys())
         return thiskeys.isdisjoint(frozenset(tree.keys()))
 
+def _build_sets(trees):
+    return [ frozenset(tree.keys()) for tree in trees ]
 
-def _make_sets(trees):
-    sets = []
-    for tree in trees:
-        sets.append(frozenset(tree.keys()))
-    return sets

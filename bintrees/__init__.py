@@ -3,6 +3,8 @@
 # Author:  mozman
 # Purpose: binary trees package
 # Created: 03.05.2010
+# Copyright (C) 2010, 2011 by Manfred Moitzi
+# License: GPLv3
 
 from __future__ import absolute_import
 
@@ -118,6 +120,15 @@ Classmethods
 * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
 """
 
+__all__ = [
+    'FastBinaryTree',
+    'FastAVLTree',
+    'FastRBTree',
+    'BinaryTree',
+    'AVLTree',
+    'RBTree'
+]
+
 from .treemixin import TreeMixin
 from .iterator import TreeIterator
 from .bintree import BinaryTree
@@ -148,8 +159,5 @@ try:
         """ Faster balanced Red-Black-Tree  written in Cython with C-Code. """
 except ImportError: # fall back to pure Python version
     FastRBTree = RBTree
-except ValueError: # pypy
+except ValueError: # for pypy
     FastRBTree = RBTree
-
-__all__ = ['FastBinaryTree', 'FastAVLTree', 'FastRBTree',
-           'BinaryTree', 'AVLTree', 'RBTree']
