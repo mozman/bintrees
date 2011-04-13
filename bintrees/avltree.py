@@ -4,6 +4,8 @@
 # Purpose: avl tree module (Julienne Walker's unbounded none recursive algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_avl.aspx
 # Created: 01.05.2010
+# Copyright (C) 2010, 2011 by Manfred Moitzi
+# License: GPLv3
 
 # Conclusion of Julienne Walker
 

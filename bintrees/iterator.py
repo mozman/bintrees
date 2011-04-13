@@ -3,6 +3,8 @@
 # Author:  Mozman
 # Purpose: iterator provides a TreeIterator for binary trees
 # Created: 04.05.2010
+# Copyright (C) 2010, 2011 by Manfred Moitzi
+# License: GPLv3
 
 class TreeIterator(object):
     __slots__ = ['_tree', '_direction', '_item', '_retfunc', ]
