@@ -3,7 +3,7 @@
 # Author:  mozman -- <mozman@gmx.at>
 # Purpose: TreeSlice
 # Created: 11.04.2011
-# Copyright (C) 2011, Manfred Moitzi
+# Copyright (C) 2010, 2011 by Manfred Moitzi
 # License: GPLv3
 
 class TreeSlice(object):

@@ -3,6 +3,8 @@
 # Author:  mozman
 # Purpose: cython unbalanced binary tree module
 # Created: 28.04.2010
+# Copyright (C) 2010, 2011 by Manfred Moitzi
+# License: GPLv3
 
 __all__ = ['cBinaryTree']
 
