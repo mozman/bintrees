@@ -20,8 +20,9 @@ from __main__ import keys, crb_pop_min, crb_pop_max
 """
 
 try:
-    with open('testkeys.txt') as fp:
-        keys = eval(fp.read())
+    fp=open('testkeys.txt')
+    keys = eval(fp.read())
+    fp.close()
     bskeys = zip(keys, keys)
 except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
@@ -48,12 +49,13 @@ def crb_pop_max():
         tree.pop_max()
 
 def print_result(time, text):
-    print("Operation: {1} takes {0:.2f} seconds\n".format(time, text))
+    print("Operation: %s takes %.2f seconds\n" % (text, time))
 
 def main():
-    with open('testkeys.txt', 'w') as fp:
-        fp.write(repr(keys))
-    print ("Nodes: {0}".format(len(keys)))
+    fp = open('testkeys.txt', 'w')
+    fp.write(repr(keys))
+    fp.close()
+    print("Nodes: %d" % len(keys))
 
     shuffle(keys)
 
