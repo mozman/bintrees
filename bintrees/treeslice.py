@@ -15,7 +15,7 @@ class TreeSlice(object):
 
     def __repr__(self):
         tpl = "%s({%s})" % (self._tree.__class__.__name__, '%s')
-        return tpl % ", ".join( ("%r: %r" % item for item in self._tree.itemslice(self._start, self._stop)) )
+        return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
 
     def __contains__(self, key):
         if self._inrange(key):
