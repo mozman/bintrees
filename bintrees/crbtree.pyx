@@ -4,7 +4,7 @@
 # Purpose: DEPRICATED FastRBTree
 # Created: 28.04.2010
 # Copyright (C) 2010, 2011 by Manfred Moitzi
-# License: GPLv3
+# License: LGPLv3
 # no longer maintained
 
 __all__ = ['cRBTree']

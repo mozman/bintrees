@@ -4,7 +4,7 @@
 # Purpose: test iteritemsinrange
 # Created: 12.04.2011
 # Copyright (C) 2011, Manfred Moitzi
-# License: GPLv3
+# License: LGPLv3
 
 import sys
 import unittest

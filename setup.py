@@ -7,13 +7,19 @@
 import os
 from distutils.core import setup
 from distutils.extension import Extension
-from Cython.Distutils import build_ext
 
-ext_modules = [Extension("bintrees.cwalker", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cwalker.pyx"]),
-               Extension("bintrees.qbintree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qbintree.pyx"]),
-               Extension("bintrees.qrbtree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qrbtree.pyx"]),
-               Extension("bintrees.qavltree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qavltree.pyx"]),
-               ]
+try:
+    from Cython.Distutils import build_ext
+    ext_modules = [Extension("bintrees.cwalker", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cwalker.pyx"]),
+                   Extension("bintrees.qbintree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qbintree.pyx"]),
+                   Extension("bintrees.qrbtree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qrbtree.pyx"]),
+                   Extension("bintrees.qavltree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qavltree.pyx"]),
+                   ]
+    commands = {'build_ext': build_ext}
+except:
+    ext_modules =[]
+    commands = {}
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
@@ -25,17 +31,16 @@ setup(
     url='http://bitbucket.org/mozman/bintrees',
     download_url='http://bitbucket.org/mozman/bintrees/downloads',
     author_email='mozman@gmx.at',
-    cmdclass = {'build_ext': build_ext},
+    cmdclass = commands,
     ext_modules = ext_modules,
     packages=['bintrees'],
     long_description=read('README.txt'),
     platforms="OS Independent",
-    license="GPLv3",
+    license="LGPLv3",
     classifiers=[
-    "Development Status :: 5 - Production/Stable",
-    "License :: OSI Approved :: GNU General Public License (GPL)",
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 2.6",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.2",
