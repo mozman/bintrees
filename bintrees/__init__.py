@@ -79,13 +79,36 @@ walk forward/backward, O(log(n))
 * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
 * succ_key(key) -> k, get the successor of key, O(log(n))
 
-traverse tree
+slicing by keys
 
-* itemslice(startkey, endkey, [reverse]) -> an iterator over the (k, v) items of T for key: startkey <= key < endkey, O(n)
-* keyslice(startkey, endkey, [reverse]) -> an iterator over the keys of T for key: startkey <= key < endkey, O(n)
-* valueslice(startkey, endkey, [reverse]) -> an iterator over the values of T for key: startkey <= key < endkey, O(n)
-* treeiter([rtype, reverse]) -> TreeIterator
-* foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
+* itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
+* keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
+* valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
+* T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
+* del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
+
+if 's' is None or T[:e] TreeSlice/iterator starts with value of min_key()
+if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key()
+T[:] is a TreeSlice which represents the whole tree.
+
+TreeSlice is a tree wrapper with range check, and contains no references
+to objects, deleting objects in the associated tree also deletes the object
+in the TreeSlice.
+
+* TreeSlice[k] -> get value for key k, raises KeyError if k not exists in range s:e
+* TreeSlice[s1:e1] -> TreeSlice object, with keys in range s1 <= key < e1
+
+  * new lower bound is max(s, s1)
+  * new upper bound is min(e, e1)
+
+TreeSlice methods:
+
+* items() -> generator for (k, v) items of T, O(n)
+* keys() -> generator for keys of T, O(n)
+* values() -> generator for values of  T, O(n)
+* __iter__ <==> keys()
+* __repr__ <==> repr(T)
+* __contains__(key)-> True if TreeSlice has a key k, else False, O(log(n))
 
 Heap methods
 
@@ -97,13 +120,6 @@ Heap methods
 * pop_max() -> (k, v), remove item with maximum key, O(log(n))
 * nlargest(i[,pop]) -> get list of i largest items (k, v), O(i*log(n))
 * nsmallest(i[,pop]) -> get list of i smallest items (k, v), O(i*log(n))
-
-Index methods (access by index slow)
-
-* index(k) -> index of key k, O(n)
-* item_at(i)-> get (k,v) pair as a 2-tuple at index i, i<0 count from end, O(n)
-* T[s:e:i] -> slicing from start s to end e, step i, O(n)
-* del T[s:e:i] -> remove items by slicing, O(n)
 
 Set methods (using frozenset)
 
@@ -130,7 +146,6 @@ __all__ = [
 ]
 
 from .treemixin import TreeMixin
-from .iterator import TreeIterator
 from .bintree import BinaryTree
 from .avltree import AVLTree
 from .rbtree import RBTree

@@ -6,7 +6,6 @@
 
 from __future__ import absolute_import
 
-from .iterator import TreeIterator
 from .walker import Walker
 from .treeslice import TreeSlice
 
@@ -66,6 +65,7 @@ class TreeMixin(object):
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
+    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
     slicing by keys
 
@@ -104,11 +104,6 @@ class TreeMixin(object):
     * prev_key(key) -> k, get the predecessor of key, O(log(n))
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
     * succ_key(key) -> k, get the successor of key, O(log(n))
-
-    traverse tree
-
-    * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
-    * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
 
     Heap methods
 
@@ -243,12 +238,6 @@ class TreeMixin(object):
                         return # all done
                     node.pop()
                     go_down = False
-
-    def treeiter(self, rtype='key', reverse=False):
-        """ T.treeiter([rtype, reverse]) -> TreeIterator,
-        rtype in ('key', 'value', 'item').
-        """
-        return TreeIterator(self, rtype, reverse)
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """

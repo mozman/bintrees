@@ -68,6 +68,7 @@ Methods
     * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
     * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
+    * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
 
 slicing by keys
 ~~~~~~~~~~~~~~~
@@ -109,12 +110,6 @@ prev/succ operations
     * prev_key(key) -> k, get the predecessor of key, O(log(n))
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
     * succ_key(key) -> k, get the successor of key, O(log(n))
-
-traverse tree
-~~~~~~~~~~~~~
-
-    * treeiter([rtype, reverse]) -> extended TreeIterator (has prev, succ, goto, ... methods)
-    * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
 
 Heap methods
 ~~~~~~~~~~~~
@@ -175,6 +170,12 @@ search 100x all keys       2,60           0,60            1,03            0,23
 
 News
 ====
+
+Version 1.0.0
+
+  * bug fixes
+  * status: 5 - Production/Stable
+  * removed useless TreeIterator() class and T.treeiter() method.
 
 Version 0.4.0
 
