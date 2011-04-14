@@ -186,6 +186,8 @@ Version 0.4.0
   * replaced index slicing by key slicing
   * removed index() and item_at()
   * repr() produces a correct representation
+  * installs on systems without cython (tested with pypy)
+  * new license: GNU Library or Lesser General Public License (LGPL)
 
 Installation
 ============

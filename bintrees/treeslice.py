@@ -4,7 +4,7 @@
 # Purpose: TreeSlice
 # Created: 11.04.2011
 # Copyright (C) 2010, 2011 by Manfred Moitzi
-# License: GPLv3
+# License: LGPLv3
 
 class TreeSlice(object):
     __slots__ = ['_tree', '_start', '_stop']
