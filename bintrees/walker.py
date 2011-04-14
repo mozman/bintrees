@@ -52,7 +52,7 @@ class Walker(object):
         self._node = self._stack.pop()
 
     def stack_is_empty(self):
-        return (self._stack is None) or (len(self._stack) == 0)
+        return len(self._stack) == 0
 
     def goto_leaf(self):
         """ get a leaf node """
@@ -92,30 +92,30 @@ class Walker(object):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        self._node = self._tree.root
+        node = self._tree.root
         succ = None
-        while self._node is not None:
-            if key == self._node.key:
+        while node is not None:
+            if key == node.key:
                 break
-            elif key < self._node.key:
-                if (succ is None) or (self._node.key < succ[0]):
-                    succ = self.item
-                self._node = self._node.left
+            elif key < node.key:
+                if (succ is None) or (node.key < succ[0]):
+                    succ = (node.key, node.value)
+                node = node.left
             else:
-                self._node = self._node.right
+                node = node.right
 
-        if self._node is None: # stay at dead end
+        if node is None: # stay at dead end
             raise KeyError(str(key))
         # found node of key
-        if self._node.right is not None:
+        if node.right is not None:
             # find smallest node of right subtree
-            self._node = self._node.right
-            while self._node.left is not None:
-                self._node = self._node.left
+            node = node.right
+            while node.left is not None:
+                node = node.left
             if succ is None:
-                succ = self.item
-            elif self._node.key < succ[0]:
-                succ = self.item
+                succ = (node.key, node.value)
+            elif node.key < succ[0]:
+                succ = (node.key, node.value)
         elif succ is None: # given key is biggest in tree
             raise KeyError(str(key))
         return succ
@@ -124,30 +124,30 @@ class Walker(object):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        self._node = self._tree.root
+        node = self._tree.root
         prev = None
         while self._node is not None:
-            if key == self._node.key:
+            if key == node.key:
                 break
-            elif key < self._node.key:
-                self._node = self._node.left
+            elif key < node.key:
+                node = node.left
             else:
-                if (prev is None) or (self._node.key > prev[0]):
-                    prev = self.item
-                self._node = self._node.right
+                if (prev is None) or (node.key > prev[0]):
+                    prev = (node.key, node.value)
+                node = node.right
 
-        if self._node is None: # stay at dead end (None)
+        if node is None: # stay at dead end (None)
             raise KeyError(str(key))
         # found node of key
-        if self._node.left is not None:
+        if node.left is not None:
             # find biggest node of left subtree
-            self._node = self._node.left
-            while self._node.right is not None:
-                self._node = self._node.right
+            node = node.left
+            while node.right is not None:
+                node = node.right
             if prev is None:
-                prev = self.item
-            elif self._node.key > prev[0]:
-                prev = self.item
+                prev = (node.key, node.value)
+            elif node.key > prev[0]:
+                prev = (node.key, node.value)
         elif prev is None: # given key is smallest in tree
             raise KeyError(str(key))
         return prev
