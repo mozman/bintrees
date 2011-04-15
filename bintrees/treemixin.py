@@ -219,25 +219,35 @@ class TreeMixin(object):
         reverse defaults to False
         """
         if self.is_empty():
-            return
-        node = self.get_walker()
-        direction = 1 if reverse else 0
-        other = 1 - direction
-        go_down = True
-        while True:
-            if node.has_child(direction) and go_down:
-                node.push()
-                node.down(direction)
-            else:
-                yield node.item
-                if node.has_child(other):
-                    node.down(other)
-                    go_down = True
+            return []
+
+        def defaultiteritems():
+            direction = 1 if reverse else 0
+            other = 1 - direction
+            go_down = True
+            while True:
+                if node.has_child(direction) and go_down:
+                    node.push()
+                    node.down(direction)
                 else:
-                    if node.stack_is_empty():
-                        return # all done
-                    node.pop()
-                    go_down = False
+                    yield node.item
+                    if node.has_child(other):
+                        node.down(other)
+                        go_down = True
+                    else:
+                        if node.stack_is_empty():
+                            return # all done
+                        node.pop()
+                        go_down = False
+
+        node = self.get_walker()
+        try: # specialized iterators
+            if reverse:
+                return node.iteritemsbackward()
+            else:
+                return node.iteritemsforward()
+        except AttributeError:
+            return defaultiteritems()
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
