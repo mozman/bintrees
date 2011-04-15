@@ -151,3 +151,47 @@ class Walker(object):
         elif prev is None: # given key is smallest in tree
             raise KeyError(str(key))
         return prev
+
+    def iteritemsforward(self):
+        """ optimized forward iterator (reduced method calls) """
+        if self._tree.is_empty():
+            return
+        node = self._tree.root
+        stack = []
+        go_left = True
+        while True:
+            if node.left is not None and go_left:
+                stack.append(node)
+                node = node.left
+            else:
+                yield (node.key, node.value)
+                if node.right is not None:
+                    node = node.right
+                    go_left = True
+                else:
+                    if len(stack) == 0:
+                        return # all done
+                    node = stack.pop()
+                    go_left = False
+
+    def iteritemsbackward(self):
+        """ optimized backward iterator (reduced method calls) """
+        if self._tree.is_empty():
+            return
+        node = self._tree.root
+        stack = []
+        go_right = True
+        while True:
+            if node.right is not None and go_right:
+                stack.append(node)
+                node = node.right
+            else:
+                yield (node.key, node.value)
+                if node.left is not None:
+                    node = node.left
+                    go_right = True
+                else:
+                    if len(stack) == 0:
+                        return # all done
+                    node = stack.pop()
+                    go_right = False

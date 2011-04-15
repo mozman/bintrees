@@ -14,10 +14,10 @@ KEYS = 5000
 KEYRANGE = 1000000
 
 setup_BinaryTree = """
-from __main__ import bintree_build_delete, bintree_build, bintree_search
+from __main__ import bintree_build_delete, bintree_build, bintree_search, iterbintree
 """
 setup_FastBinaryTree = """
-from __main__ import cbintree_build_delete, cbintree_build, cbintree_search
+from __main__ import cbintree_build_delete, cbintree_build, cbintree_search, itercbintree
 """
 
 def random_keys():
@@ -63,9 +63,11 @@ def cbintree_search():
     for key in keys:
         obj = cy_searchtree[key]
 
-def qbintree_search():
-    for key in keys:
-        obj = qt_searchtree.get_value(key)
+def iterbintree():
+    items = list(py_searchtree.items())
+
+def itercbintree():
+    items = list(cy_searchtree.items())
 
 def print_result(time, text):
     print("Operation: %s takes %.2f seconds\n" % (text, time))
@@ -95,6 +97,12 @@ def main():
 
     t = Timer("cbintree_search()", setup_FastBinaryTree)
     print_result(t.timeit(COUNT), 'FastBinaryTree search')
+
+    t = Timer("iterbintree()", setup_BinaryTree)
+    print_result(t.timeit(COUNT), 'BinaryTree iter all items')
+
+    t = Timer("itercbintree()", setup_FastBinaryTree)
+    print_result(t.timeit(COUNT), 'FastBinaryTree iter all items')
 
 if __name__=='__main__':
     main()
