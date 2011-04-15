@@ -221,7 +221,7 @@ class TreeMixin(object):
         if self.is_empty():
             return []
 
-        def defaultiteritems():
+        def default_iterator(node):
             direction = 1 if reverse else 0
             other = 1 - direction
             go_down = True
@@ -240,14 +240,14 @@ class TreeMixin(object):
                         node.pop()
                         go_down = False
 
-        node = self.get_walker()
+        treewalker = self.get_walker()
         try: # specialized iterators
             if reverse:
-                return node.iteritemsbackward()
+                return treewalker.iteritemsbackward()
             else:
-                return node.iteritemsforward()
+                return treewalker.iteritemsforward()
         except AttributeError:
-            return defaultiteritems()
+            return default_iterator(treewalker)
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
