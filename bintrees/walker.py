@@ -157,7 +157,7 @@ class Walker(object):
         if self._tree.is_empty():
             return
         node = self._tree.root
-        stack = []
+        stack = self._stack
         go_left = True
         while True:
             if node.left is not None and go_left:
@@ -179,7 +179,7 @@ class Walker(object):
         if self._tree.is_empty():
             return
         node = self._tree.root
-        stack = []
+        stack = self._stack
         go_right = True
         while True:
             if node.right is not None and go_right:
