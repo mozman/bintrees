@@ -7,7 +7,10 @@
 import sys
 import unittest
 import pickle
-from io import StringIO
+try:
+    from io import StringIO
+except:
+    from StringIO import StringIO
 
 from random import randint, shuffle
 
