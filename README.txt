@@ -176,6 +176,7 @@ Version 1.0.0
   * bug fixes
   * status: 5 - Production/Stable
   * removed useless TreeIterator() class and T.treeiter() method.
+  * patch from Max Motovilov for Visual Studio 2008 usage to build the C-extensions
 
 Version 0.4.0
 
