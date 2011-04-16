@@ -300,6 +300,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 
 		/* Search down the tree for a place to insert */
 		for (;;) {
+			int cmp_res;
 			if (q == NULL) {
 				/* Insert a new node at the first null link */
 				q = rb_new_node(key, value);
@@ -329,7 +330,6 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 			if (new_node)
 				break;
 
-			int cmp_res;
 			cmp_res = ct_compare(KEY(q), key);
 			if (cmp_res == 0) {       /* key exists?              */
 				Py_XDECREF(VALUE(q)); /* release old value object */
@@ -362,13 +362,14 @@ extern int
 rb_remove(node_t **rootaddr, PyObject *key)
 {
 	node_t *root = *rootaddr;
-	if (root == NULL)
-		return 0;
 
 	node_t head = { { NULL } }; /* False tree root */
 	node_t *q, *p, *g; /* Helpers */
 	node_t *f = NULL; /* Found item */
 	int dir = 1;
+
+	if (root == NULL)
+		return 0;
 
 	/* Set up our helpers */
 	q = &head;
@@ -381,12 +382,14 @@ rb_remove(node_t **rootaddr, PyObject *key)
 	 */
 	while (q->link[dir] != NULL) {
 		int last = dir;
+		int cmp_res;
 
 		/* Move the helpers down */
 		g = p, p = q;
 		q = q->link[dir];
 
-		int cmp_res = ct_compare(KEY(q), key);
+		cmp_res =  ct_compare(KEY(q), key);
+
 		dir = cmp_res < 0;
 
 		/*
@@ -521,9 +524,10 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 
 		/* Walk back up the search path */
 		while (--top >= 0 && !done) {
-			cmp_res = ct_compare(KEY(up[top]), key);
 			// int dir = (cmp_res < 0);
 			int lh, rh, max;
+
+			cmp_res = ct_compare(KEY(up[top]), key);
 
 			lh = height(up[top]->link[upd[top]]);
 			rh = height(up[top]->link[!upd[top]]);
@@ -771,10 +775,10 @@ return NULL if index out of range
 	node_t *node = root;
 	int counter = 0;
 	int go_down = 1;
+	node_stack_t *stack;
 
 	if (index < 0) return NULL;
 
-	node_stack_t *stack;
 	stack = stack_init(32);
 
 	for(;;) {
