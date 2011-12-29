@@ -21,8 +21,8 @@ Trees written in Python (only standard library)
     - *AVLTree* -- balanced AVL-Tree
     - *RBTree* -- balanced Red-Black-Tree
 
-Trees written with C-Functions and Cython 0.12.1 as wrapper
------------------------------------------------------------
+Trees written with C-Functions and Cython as wrapper
+----------------------------------------------------
 
     - *FastBinaryTree* -- unbalanced binary tree
     - *FastAVLTree* -- balanced AVL-Tree
