@@ -15,5 +15,3 @@ packages:
 
 upload:
 	python setup.py sdist --formats=zip,gztar upload
-	python setup.py bdist --formats=msi upload
-	python3 setup.py bdist --formats=msi upload
