@@ -3,12 +3,11 @@
 # Author:  mozman
 # Purpose: test cAVLTree
 # Created: 28.04.2010
-import sys
+
 import unittest
+from random import randint, shuffle
 
 from bintrees.qavltree import cAVLTree
-
-from random import randint, shuffle
 
 class Tree(cAVLTree):
     def update(self, items):

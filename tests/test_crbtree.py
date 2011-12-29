@@ -3,12 +3,11 @@
 # Author:  mozman
 # Purpose: test binary trees
 # Created: 28.04.2010
-import sys
+
 import unittest
+from random import randint, shuffle
 
 from bintrees.qrbtree import cRBTree
-
-from random import randint, shuffle
 
 class Tree(cRBTree):
     def update(self, items):

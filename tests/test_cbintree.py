@@ -3,9 +3,8 @@
 # Author:  mozman
 # Purpose: test cython binary trees
 # Created: 28.04.2010
-import sys
-import unittest
 
+import unittest
 from random import randint, shuffle
 
 from bintrees.qbintree import cBinaryTree

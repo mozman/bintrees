@@ -1,4 +1,4 @@
-Version 1.0.0 planned
+Version 1.0.0 29.12.2011
 
   * bug fixes
   * status: 5 - Production/Stable
