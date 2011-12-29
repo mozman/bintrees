@@ -8,3 +8,12 @@ py3:
 py2:
 	python  $(CMD) $(FLAGS) 
 
+packages:
+	python setup.py sdist --formats=zip,gztar
+	python setup.py bdist --formats=msi
+	python3 setup.py bdist --formats=msi
+
+upload:
+	python setup.py sdist --formats=zip,gztar upload
+	python setup.py bdist --formats=msi upload
+	python3 setup.py bdist --formats=msi upload

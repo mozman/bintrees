@@ -16,7 +16,7 @@ try:
                    Extension("bintrees.qavltree", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/qavltree.pyx"]),
                    ]
     commands = {'build_ext': build_ext}
-except:
+except ImportError:
     ext_modules =[]
     commands = {}
 
@@ -25,7 +25,7 @@ def read(fname):
 
 setup(
     name = 'bintrees',
-    version='0.4.1',
+    version='1.0.0',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',
@@ -38,13 +38,16 @@ setup(
     platforms="OS Independent",
     license="LGPLv3",
     classifiers=[
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.2",
     "Programming Language :: Cython",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: IronPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
     ]

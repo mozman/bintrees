@@ -145,27 +145,27 @@ Performance
 Profiling with timeit(): 5000 unique random int keys, time in seconds
 
 ========================  =============  ==============  ==============  ==============
-unbalanced Trees          CPython 2.7.1  FastBinaryTree  ipy 2.7.0       pypy 1.4.1
+unbalanced Trees          CPython 2.7.2  FastBinaryTree  ipy 2.7.0       pypy 1.7.0
 ========================  =============  ==============  ==============  ==============
-build time 100x            6,59           0,39            2,62            0,46
-build & delete time 100x  11,82           0,98            4,66            0,70
-search 100x all keys       2,99           0,66            1,23            0,24
-========================  =============  ==============  ==============  ==============
-
-========================  =============  ==============  ==============  ==============
-AVLTrees                  CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
-========================  =============  ==============  ==============  ==============
-build time 100x	          18,89           0,42           11,45           1,88
-build & delete time 100x  31,66           1,02           23,46           3,86
-search 100x all keys       2,45           0,60            1,00           0,24
+build time 100x            7,55           0,60            2,51            0,29
+build & delete time 100x  13,34           1,48            4,45            0,47
+search 100x all keys       2,86           0,96            0,27            0,06
 ========================  =============  ==============  ==============  ==============
 
 ========================  =============  ==============  ==============  ==============
-RBTrees                   CPython 2.7.1  FastAVLTree     ipy 2.7.0       pypy 1.4.1
+AVLTrees                  CPython 2.7.2  FastAVLTree     ipy 2.7.0       pypy 1.7.0
 ========================  =============  ==============  ==============  ==============
-build time 100x	          11,62           0,49            4,80            0,77
-build & delete time 100x  31,45           1,20           13,04            1,90
-search 100x all keys       2,60           0,60            1,03            0,23
+build time 100x	          22,66           0,65           10,45            1,29
+build & delete time 100x  36,71           1,47           20,89            3,02
+search 100x all keys       2,34           0,85            0,89            0,14
+========================  =============  ==============  ==============  ==============
+
+========================  =============  ==============  ==============  ==============
+RBTrees                   CPython 2.7.2  FastRBTree      ipy 2.7.0       pypy 1.7.0
+========================  =============  ==============  ==============  ==============
+build time 100x	          14,78           0,65            4,43            0,49
+build & delete time 100x  39,34           1,63           12,43            1,32
+search 100x all keys       2,32           0,86            0,86            0,13
 ========================  =============  ==============  ==============  ==============
 
 News
@@ -207,7 +207,7 @@ http://bitbucket.org/mozman/bintrees/downloads
 Documentation
 =============
 
-http://bitbucket.org/mozman/bintrees/wiki/Home
+this README.txt
 
 bintrees can be found on bitbucket.org at:
 
