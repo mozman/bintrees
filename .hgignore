@@ -1,6 +1,7 @@
 syntax: glob
-build/*.*
-dist/*.*
+build/*
+dist/*
+.tox/*
 *.so
 *.o
 *.pyd
