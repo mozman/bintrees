@@ -1,3 +1,7 @@
+Version 1.0.1 December.2012
+
+  * bug fixes
+
 Version 1.0.0 29.12.2011
 
   * bug fixes

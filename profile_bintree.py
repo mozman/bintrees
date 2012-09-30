@@ -21,20 +21,13 @@ from __main__ import cbintree_build_delete, cbintree_build, cbintree_search, ite
 """
 
 def random_keys():
-    from random import shuffle, randint
-    keys = set()
-    while len(keys) < KEYS:
-        keys.add(randint(0, KEYRANGE))
-    keys = list(keys)
-    shuffle(keys)
-    return keys
+    import random
+    return random.sample(range(KEYRANGE), KEYS)
 try:
-    fp = open('testkeys.txt')
-    keys = eval(fp.read())
-    fp.close()
+    with open('testkeys.txt') as fp:
+        keys = eval(fp.read())
 except IOError:
     keys = random_keys()
-
 
 py_searchtree = BinaryTree.fromkeys(keys)
 cy_searchtree = FastBinaryTree.fromkeys(keys)
