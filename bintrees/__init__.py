@@ -8,7 +8,7 @@
 
 from __future__ import absolute_import
 
-"""
+__doc__ = """
 Binary Tree Package
 ===================
 
