@@ -126,7 +126,7 @@ class Walker(object):
         """
         node = self._tree.root
         prev = None
-        while self._node is not None:
+        while node is not None:
             if key == node.key:
                 break
             elif key < node.key:
