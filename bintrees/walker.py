@@ -6,6 +6,9 @@
 # Copyright (C) 2010, 2011 by Manfred Moitzi
 # License: LGPLv3
 
+from operater import attrgetter, lt, gt
+
+
 class Walker(object):
     __slots__ = ['_node', '_stack', '_tree']
 
@@ -88,71 +91,56 @@ class Walker(object):
     def has_right(self):
         return self._node.right is not None
 
-    def succ_item(self, key):
-        """ Get successor (k,v) pair of key, raises KeyError if key is max key
-        or key does not exist.
-        """
+    def _next_item(self, key, left, right, less_than):
         node = self._tree.root
         succ = None
         while node is not None:
             if key == node.key:
                 break
-            elif key < node.key:
-                if (succ is None) or (node.key < succ[0]):
-                    succ = (node.key, node.value)
-                node = node.left
+            elif less_than(key, node.key):
+                if (succ is None) or less_than(node.key, succ.key):
+                    succ = node
+                node = left(node)
             else:
-                node = node.right
+                node = right(node)
 
-        if node is None: # stay at dead end
+        if node is None:  # stay at dead end
             raise KeyError(str(key))
         # found node of key
-        if node.right is not None:
+        if right(node) is not None:
             # find smallest node of right subtree
-            node = node.right
-            while node.left is not None:
-                node = node.left
+            node = right(node)
+            while left(node) is not None:
+                node = left(node)
             if succ is None:
-                succ = (node.key, node.value)
-            elif node.key < succ[0]:
-                succ = (node.key, node.value)
-        elif succ is None: # given key is biggest in tree
+                succ = node
+            elif less_than(node.key, succ.key):
+                succ = node
+        elif succ is None:  # given key is biggest in tree
             raise KeyError(str(key))
-        return succ
+        return (succ.key, succ.value)
+
+    def succ_item(self, key):
+        """ Get successor (k,v) pair of key, raises KeyError if key is max key
+        or key does not exist.
+        """
+        return self.succ_item(key,
+            left=attrgetter("left"),
+            right=attrgetter("right"),
+            less_than=lt,
+        )
 
     def prev_item(self, key):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        node = self._tree.root
-        prev = None
-        while node is not None:
-            if key == node.key:
-                break
-            elif key < node.key:
-                node = node.left
-            else:
-                if (prev is None) or (node.key > prev[0]):
-                    prev = (node.key, node.value)
-                node = node.right
+        return self.succ_item(key,
+            left=attrgetter("right"),
+            right=attrgetter("left"),
+            less_than=gt,
+        )
 
-        if node is None: # stay at dead end (None)
-            raise KeyError(str(key))
-        # found node of key
-        if node.left is not None:
-            # find biggest node of left subtree
-            node = node.left
-            while node.right is not None:
-                node = node.right
-            if prev is None:
-                prev = (node.key, node.value)
-            elif node.key > prev[0]:
-                prev = (node.key, node.value)
-        elif prev is None: # given key is smallest in tree
-            raise KeyError(str(key))
-        return prev
-
-    def iteritemsforward(self):
+    def _iteritems(self, left=attrgetter("left"), right=attrgetter("right")):
         """ optimized forward iterator (reduced method calls) """
         if self._tree.is_empty():
             return
@@ -160,38 +148,30 @@ class Walker(object):
         stack = self._stack
         go_left = True
         while True:
-            if node.left is not None and go_left:
+            if left(node) is not None and go_left:
                 stack.append(node)
-                node = node.left
+                node = left(node)
             else:
                 yield (node.key, node.value)
-                if node.right is not None:
-                    node = node.right
+                if right(node) is not None:
+                    node = right(node)
                     go_left = True
                 else:
                     if len(stack) == 0:
-                        return # all done
+                        return  # all done
                     node = stack.pop()
                     go_left = False
 
+    def iteritemsfoward(self):
+        for item in self._iteritems(
+            left=attrgetter("left"),
+            right=attrgetter("right"),
+        ):
+            yield item
+
     def iteritemsbackward(self):
-        """ optimized backward iterator (reduced method calls) """
-        if self._tree.is_empty():
-            return
-        node = self._tree.root
-        stack = self._stack
-        go_right = True
-        while True:
-            if node.right is not None and go_right:
-                stack.append(node)
-                node = node.right
-            else:
-                yield (node.key, node.value)
-                if node.left is not None:
-                    node = node.left
-                    go_right = True
-                else:
-                    if len(stack) == 0:
-                        return # all done
-                    node = stack.pop()
-                    go_right = False
+        for item in self._iteritems(
+            left=attrgetter("right"),
+            right=attrgetter("left"),
+        ):
+            yield item
