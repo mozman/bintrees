@@ -6,7 +6,7 @@
 # Copyright (C) 2010, 2011 by Manfred Moitzi
 # License: LGPLv3
 
-from operater import attrgetter, lt, gt
+from operator import attrgetter, lt, gt
 
 
 class Walker(object):
@@ -124,7 +124,7 @@ class Walker(object):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        return self.succ_item(key,
+        return self._next_item(key,
             left=attrgetter("left"),
             right=attrgetter("right"),
             less_than=lt,
@@ -134,7 +134,7 @@ class Walker(object):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        return self.succ_item(key,
+        return self._next_item(key,
             left=attrgetter("right"),
             right=attrgetter("left"),
             less_than=gt,
