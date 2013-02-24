@@ -1,17 +1,40 @@
-# build c extensions with distutils
 FLAGS = --inplace --force
 CMD = setup.py build_ext
+RUNTESTS = -m unittest discover
 
-py3:
-	python3 $(CMD) $(FLAGS)
+PYTHON27 = C:/python27/python.exe
+PYTHON32 = C:/python32/python.exe
+PYTHON33 = C:/python33/python.exe
+PYPY = C:/pypy-2.0-beta1/pypy.exe
 
-py2:
-	python  $(CMD) $(FLAGS) 
+build27:
+	$(PYTHON27)  $(CMD) $(FLAGS)
+
+build32:
+	$(PYTHON32) $(CMD) $(FLAGS)
+
+build33:
+	$(PYTHON33) $(CMD) $(FLAGS)
+
+test27:
+	$(PYTHON27) $(RUNTESTS)
+
+test32:
+	$(PYTHON32) $(RUNTESTS)
+
+test33:
+	$(PYTHON33) $(RUNTESTS)
+	
+testpypy:
+	$(PYPY) $(RUNTESTS)
+
+testall: build27 test27 build32 test32 build33 test33 testpypy
 
 packages:
-	python setup.py sdist --formats=zip,gztar
-	python setup.py bdist --formats=msi
-	python3 setup.py bdist --formats=msi
+	$(PYTHON27) setup.py sdist --formats=zip,gztar
+	$(PYTHON27) setup.py bdist --formats=msi
+	$(PYTHON32) setup.py bdist --formats=msi
+	$(PYTHON33) setup.py bdist --formats=msi
 
 upload:
-	python setup.py sdist --formats=zip,gztar upload
+	$(PYTHON27) setup.py sdist --formats=zip,gztar upload

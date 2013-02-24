@@ -3,14 +3,14 @@
 # Author:  mozman
 # Purpose: test binary trees
 # Created: 28.04.2010
+# License: MIT-License
 
 import sys
+PYPY = hasattr(sys, 'pypy_version_info')
+
 import unittest
 import pickle
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
+from io import StringIO
 
 from random import randint, shuffle
 
@@ -18,6 +18,7 @@ from bintrees import BinaryTree, AVLTree, RBTree
 from bintrees import FastBinaryTree, FastAVLTree, FastRBTree
 
 set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
+
 
 def check_integrity(keys, remove_key, tree):
     for search_key in keys:
@@ -28,6 +29,7 @@ def check_integrity(keys, remove_key, tree):
             if search_key not in tree:
                 return False
     return True
+
 
 def randomkeys(num, maxnum=100000):
     keys = set([randint(0, maxnum) for _ in range(num)])
@@ -637,6 +639,7 @@ class CheckTree(object):
         self.assertTrue(15 not in i)
         self.assertTrue(29 not in i)
 
+    @unittest.skipIf(PYPY, "getrefcount() not supported by pypy.")
     def test_084_refcount_get(self):
         tree = self.TREE(self.default_values1) # key == value
         tree[700] = 701
@@ -647,6 +650,7 @@ class CheckTree(object):
 
         self.assertEqual(sys.getrefcount(chk), count)
 
+    @unittest.skipIf(PYPY, "getrefcount() not supported by pypy.")
     def test_085_refcount_set(self):
         tree = self.TREE(self.default_values1) # key == value
         chk = 800
@@ -654,6 +658,7 @@ class CheckTree(object):
         tree[801] = chk
         self.assertEqual(sys.getrefcount(chk), count+1)
 
+    @unittest.skipIf(PYPY, "getrefcount() not supported by pypy.")
     def test_086_refcount_del(self):
         tree = self.TREE(self.default_values1) # key == value
         chk = 900
@@ -663,6 +668,7 @@ class CheckTree(object):
         del tree[901]
         self.assertEqual(sys.getrefcount(chk), count)
 
+    @unittest.skipIf(PYPY, "getrefcount() not supported by pypy.")
     def test_087_refcount_replace(self):
         tree = self.TREE(self.default_values1) # key == value
         chk = 910
