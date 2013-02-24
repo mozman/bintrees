@@ -686,6 +686,61 @@ class CheckTree(object):
         self.assertEqual(list(tree.keys()), list(tree2.keys()))
         self.assertEqual(list(tree.values()), list(tree2.values()))
 
+    # [12, 34, 45, 16, 35, 57]
+    def test_089_floor_item(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        self.assertEqual(tree.floor_item(12), (12, 12))
+        self.assertEqual(tree.floor_item(13), (12, 12))
+        self.assertEqual(tree.floor_item(60), (57, 57))
+
+    def test_090a_floor_item_key_error(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        with self.assertRaises(KeyError):
+            tree.floor_item(11)
+
+    def test_090b_floor_item_empty_tree(self):
+        tree = self.TREE_CLASS()
+        with self.assertRaises(KeyError):
+            tree.floor_item(11)
+
+    def test_091_floor_key(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        self.assertEqual(tree.floor_key(12), 12)
+        self.assertEqual(tree.floor_key(13), 12)
+        self.assertEqual(tree.floor_key(60), 57)
+
+    def test_092_floor_key_key_error(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        with self.assertRaises(KeyError):
+            tree.floor_key(11)
+
+    def test_093_ceiling_item(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        self.assertEqual(tree.ceiling_item(57), (57, 57))
+        self.assertEqual(tree.ceiling_item(56), (57, 57))
+        self.assertEqual(tree.ceiling_item(0), (12, 12))
+
+    def test_094a_ceiling_item_key_error(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        with self.assertRaises(KeyError):
+            tree.ceiling_item(60)
+
+    def test_094a_ceiling_item_empty_tree(self):
+        tree = self.TREE_CLASS()
+        with self.assertRaises(KeyError):
+            tree.ceiling_item(60)
+
+    def test_095_ceiling_key(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        self.assertEqual(tree.ceiling_key(57), 57)
+        self.assertEqual(tree.ceiling_key(56), 57)
+        self.assertEqual(tree.ceiling_key(0), 12)
+
+    def test_096_ceiling_key_key_error(self):
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        with self.assertRaises(KeyError):
+            tree.ceiling_key(60)
+
 
 class TestBinaryTree(CheckTree, unittest.TestCase):
     TREE_CLASS = BinaryTree

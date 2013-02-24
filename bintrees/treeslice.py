@@ -6,8 +6,10 @@
 # Copyright (c) 2010-2013 by Manfred Moitzi
 # License: MIT License
 
+
 class TreeSlice(object):
     __slots__ = ['_tree', '_start', '_stop']
+
     def __init__(self, tree, start, stop):
         self._tree = tree
         self._start = start
@@ -19,7 +21,7 @@ class TreeSlice(object):
 
     def __contains__(self, key):
         if self._inrange(key):
-            return key in  self._tree
+            return key in self._tree
         else:
             return False
 
@@ -46,6 +48,7 @@ class TreeSlice(object):
                 return start
             else:
                 return max(start, self._start)
+
         def newstop():
             if stop is None:
                 return self._stop

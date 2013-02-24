@@ -66,8 +66,10 @@ class Node(object):
         self.key = None
         self.value = None
 
+
 def height(node):
     return node.balance if node is not None else -1
+
 
 def jsw_single(root, direction):
     other_side = 1 - direction
@@ -80,6 +82,7 @@ def jsw_single(root, direction):
     root.balance = max(rlh, rrh) + 1
     save.balance = max(slh, root.balance) + 1
     return save
+
 
 def jsw_double(root, direction):
     other_side = 1 - direction
@@ -150,14 +153,14 @@ class AVLTree(TreeMixin):
         if self._root is None:
             self._root = self._new_node(key, value)
         else:
-            node_stack = [] # node stack
-            dir_stack = array('I') # direction stack
+            node_stack = []  # node stack
+            dir_stack = array('I')  # direction stack
             done = False
             top = 0
             node = self._root
             # search for an empty link, save path
             while True:
-                if key == node.key: # update existing item
+                if key == node.key:  # update existing item
                     node.value = value
                     return
                 direction = 1 if key > node.key else 0
@@ -180,9 +183,9 @@ class AVLTree(TreeMixin):
                 right_height = height(topnode[other_side])
 
                 # Terminate or rebalance as necessary */
-                if (left_height-right_height == 0):
+                if left_height - right_height == 0:
                     done = True
-                if (left_height-right_height >= 2):
+                if left_height - right_height >= 2:
                     a = topnode[direction][direction]
                     b = topnode[direction][other_side]
 
@@ -193,7 +196,7 @@ class AVLTree(TreeMixin):
 
                     # Fix parent
                     if top != 0:
-                        node_stack[top-1][dir_stack[top-1]] = node_stack[top]
+                        node_stack[top - 1][dir_stack[top - 1]] = node_stack[top]
                     else:
                         self._root = node_stack[0]
                     done = True
@@ -211,8 +214,8 @@ class AVLTree(TreeMixin):
         if self._root is None:
             raise KeyError(str(key))
         else:
-            node_stack = [None] * MAXSTACK # node stack
-            dir_stack = array('I', [0] * MAXSTACK) # direction stack
+            node_stack = [None] * MAXSTACK  # node stack
+            dir_stack = array('I', [0] * MAXSTACK)  # direction stack
             top = 0
             node = self._root
 
@@ -238,7 +241,7 @@ class AVLTree(TreeMixin):
 
                 # Fix parent
                 if top != 0:
-                    node_stack[top-1][dir_stack[top-1]] = node[direction]
+                    node_stack[top - 1][dir_stack[top - 1]] = node[direction]
                 else:
                     self._root = node[direction]
                 node.free()
@@ -252,7 +255,7 @@ class AVLTree(TreeMixin):
                 node_stack[top] = node
                 top += 1
 
-                while (heir.left is not None):
+                while heir.left is not None:
                     dir_stack[top] = 0
                     node_stack[top] = heir
                     top += 1
@@ -263,8 +266,8 @@ class AVLTree(TreeMixin):
                 node.value = heir.value
 
                 # Unlink successor and fix parent
-                xdir = 1 if node_stack[top-1].key == node.key else 0
-                node_stack[top-1][xdir] = heir.right
+                xdir = 1 if node_stack[top - 1].key == node.key else 0
+                node_stack[top - 1][xdir] = heir.right
                 heir.free()
                 self._count -= 1
 
@@ -293,7 +296,7 @@ class AVLTree(TreeMixin):
                         node_stack[top] = jsw_double(topnode, direction)
                     # Fix parent
                     if top != 0:
-                        node_stack[top-1][dir_stack[top-1]] = node_stack[top]
+                        node_stack[top - 1][dir_stack[top - 1]] = node_stack[top]
                     else:
                         self._root = node_stack[0]
                 top -= 1

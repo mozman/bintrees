@@ -124,7 +124,8 @@ class Walker(object):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
-        return self._next_item(key,
+        return self._next_item(
+            key,
             left=attrgetter("left"),
             right=attrgetter("right"),
             less_than=lt,
@@ -134,7 +135,8 @@ class Walker(object):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
-        return self._next_item(key,
+        return self._next_item(
+            key,
             left=attrgetter("right"),
             right=attrgetter("left"),
             less_than=gt,
@@ -162,16 +164,57 @@ class Walker(object):
                     node = stack.pop()
                     go_left = False
 
-    def iteritemsfoward(self):
+    def iter_items_forward(self):
         for item in self._iteritems(
             left=attrgetter("left"),
             right=attrgetter("right"),
         ):
             yield item
 
-    def iteritemsbackward(self):
+    def iter_items_backward(self):
         for item in self._iteritems(
             left=attrgetter("right"),
             right=attrgetter("left"),
         ):
             yield item
+
+    def floor_item(self, key):
+        """ Get the element (k,v) pair associated with the greatest key less
+        than or equal to the given key, raises KeyError if there is no such key.
+        """
+        node = self._tree.root
+        prev = None
+        while node is not None:
+            if key == node.key:
+                return node.key, node.value
+            elif key < node.key:
+                node = node.left
+            else:
+                if (prev is None) or (node.key > prev.key):
+                    prev = node
+                node = node.right
+        # node must be None here
+        if prev:
+            return prev.key, prev.value
+        raise KeyError(str(key))
+
+    def ceiling_item(self, key):
+        """ Get the element (k,v) pair associated with the smallest key greater
+        than or equal to the given key, raises KeyError if there is no such key.
+        """
+        node = self._tree.root
+        succ = None
+        while node is not None:
+            if key == node.key:
+                return node.key, node.value
+            elif key > node.key:
+                node = node.right
+            else:
+                if (succ is None) or (node.key < succ.key):
+                    succ = node
+                node = node.left
+            # node must be None here
+        if succ:
+            return succ.key, succ.value
+        raise KeyError(str(key))
+

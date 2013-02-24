@@ -22,6 +22,8 @@ cdef extern from "ctrees.h":
     node_t *ct_min_node(node_t *root)
     node_t *ct_succ_node(node_t *root, object key)
     node_t *ct_prev_node(node_t *root, object key)
+    node_t *ct_floor_node(node_t *root, object key)
+    node_t *ct_ceiling_node(node_t *root, object key)
     int ct_index_of(node_t *root, object key)
     node_t *ct_node_at(node_t *root, int index)
 

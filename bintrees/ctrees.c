@@ -732,6 +732,50 @@ ct_prev_node(node_t *root, PyObject *key)
 	return prev;
 }
 
+extern node_t *
+ct_floor_node(node_t *root, PyObject *key)
+{
+	node_t *prev = NULL;
+	node_t *node = root;
+	int cval;
+
+	while (node != NULL) {
+		cval = ct_compare(key, KEY(node));
+		if (cval == 0)
+			return node;
+		else if (cval < 0)
+			node = LEFT_NODE(node);
+		else {
+			if ((prev == NULL) || (ct_compare(KEY(node), KEY(prev)) > 0))
+				prev = node;
+			node = RIGHT_NODE(node);
+		}
+	}
+	return prev;
+}
+
+extern node_t *
+ct_ceiling_node(node_t *root, PyObject *key)
+{
+	node_t *succ = NULL;
+	node_t *node = root;
+	int cval;
+
+	while (node != NULL) {
+		cval = ct_compare(key, KEY(node));
+		if (cval == 0)
+			return node;
+		else if (cval < 0) {
+			if ((succ == NULL) ||
+				(ct_compare(KEY(node), KEY(succ)) < 0))
+				succ = node;
+			node = LEFT_NODE(node);
+		} else
+			node = RIGHT_NODE(node);
+	}
+	return succ;
+}
+
 extern int
 ct_index_of(node_t *root, PyObject *key)
 /*

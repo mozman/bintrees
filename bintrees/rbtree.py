@@ -38,9 +38,11 @@ from .treemixin import TreeMixin
 
 __all__ = ['RBTree']
 
+
 class Node(object):
     """ Internal object, represents a treenode """
     __slots__ = ['key', 'value', 'red', 'left', 'right']
+
     def __init__(self, key=None, value=None):
         self.key = key
         self.value = value
@@ -65,13 +67,15 @@ class Node(object):
         else:
             self.right = value
 
+
 def is_red(node):
     if (node is not None) and node.red:
         return True
     else:
         return False
 
-def jsw_single (root, direction):
+
+def jsw_single(root, direction):
     other_side = 1 - direction
     save = root[other_side]
     root[other_side] = save[direction]
@@ -80,10 +84,12 @@ def jsw_single (root, direction):
     save.red = False
     return save
 
-def jsw_double (root, direction):
+
+def jsw_double(root, direction):
     other_side = 1 - direction
     root[other_side] = jsw_single(root[other_side], other_side)
     return jsw_single(root, direction)
+
 
 class RBTree(TreeMixin):
     """
@@ -144,15 +150,15 @@ class RBTree(TreeMixin):
 
     def insert(self, key, value):
         """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
-        if self._root is None: # Empty tree case
+        if self._root is None:  # Empty tree case
             self._root = self._new_node(key, value)
-            self._root.red = False # make root black
+            self._root.red = False  # make root black
             return
 
-        head = Node() # False tree root
+        head = Node()  # False tree root
         grand_parent = None
         grand_grand_parent = head
-        parent = None # parent
+        parent = None  # parent
         direction = 0
         last = 0
 
@@ -161,10 +167,10 @@ class RBTree(TreeMixin):
         node = grand_grand_parent.right
         # Search down the tree
         while True:
-            if node is None: # Insert new node at the bottom
+            if node is None:  # Insert new node at the bottom
                 node = self._new_node(key, value)
                 parent[direction] = node
-            elif is_red(node.left) and is_red(node.right):# Color flip
+            elif is_red(node.left) and is_red(node.right):  # Color flip
                 node.red = True
                 node.left.red = False
                 node.right.red = False
@@ -173,13 +179,13 @@ class RBTree(TreeMixin):
             if is_red(node) and is_red(parent):
                 direction2 = 1 if grand_grand_parent.right is grand_parent else 0
                 if node is parent[last]:
-                    grand_grand_parent[direction2] = jsw_single(grand_parent, 1-last)
+                    grand_grand_parent[direction2] = jsw_single(grand_parent, 1 - last)
                 else:
-                    grand_grand_parent[direction2] = jsw_double(grand_parent, 1-last)
+                    grand_grand_parent[direction2] = jsw_double(grand_parent, 1 - last)
 
             # Stop if found
             if key == node.key:
-                node.value = value #set new value for key
+                node.value = value  # set new value for key
                 break
 
             last = direction
@@ -191,19 +197,19 @@ class RBTree(TreeMixin):
             parent = node
             node = node[direction]
 
-        self._root = head.right # Update root
-        self._root.red = False # make root black
+        self._root = head.right  # Update root
+        self._root.red = False  # make root black
 
     def remove(self, key):
         """ T.remove(key) <==> del T[key], remove item <key> from tree """
         if self._root is None:
             raise KeyError(str(key))
-        head = Node() # False tree root
+        head = Node()  # False tree root
         node = head
         node.right = self._root
         parent = None
         grand_parent = None
-        found = None # Found item
+        found = None  # Found item
         direction = 1
 
         # Search and push a red down
@@ -223,13 +229,13 @@ class RBTree(TreeMixin):
 
             # Push the red node down
             if not is_red(node) and not is_red(node[direction]):
-                if is_red(node[1-direction]):
+                if is_red(node[1 - direction]):
                     parent[last] = jsw_single(node, direction)
                     parent = parent[last]
-                elif not is_red(node[1-direction]):
-                    sibling = parent[1-last]
+                elif not is_red(node[1 - direction]):
+                    sibling = parent[1 - last]
                     if sibling is not None:
-                        if (not is_red(sibling[1-last])) and (not is_red(sibling[last])):
+                        if (not is_red(sibling[1 - last])) and (not is_red(sibling[last])):
                             # Color flip
                             parent.red = False
                             sibling.red = True
