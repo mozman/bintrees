@@ -113,3 +113,21 @@ cdef class cWalker:
         if self.node == NULL: # given key is smallest in tree
             raise KeyError(str(key))
         return (<object> self.node.key, <object> self.node.value)
+
+    def floor_item(self, key):
+        """ Get the element (k,v) pair associated with the greatest key less
+        than or equal to the given key, raises KeyError if there is no such key.
+        """
+        self.node = ct_floor_node(self.root, key)
+        if self.node == NULL:  # given key is smaller than min-key in tree
+            raise KeyError(str(key))
+        return (<object> self.node.key, <object> self.node.value)
+
+    def ceiling_item(self, key):
+        """ Get the element (k,v) pair associated with the smallest key greater
+        than or equal to the given key, raises KeyError if there is no such key.
+        """
+        self.node = ct_ceiling_node(self.root, key)
+        if self.node == NULL:  # given key is greater than max-key in tree
+            raise KeyError(str(key))
+        return (<object> self.node.key, <object> self.node.value)

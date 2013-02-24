@@ -150,6 +150,39 @@ class WalkerCheck:
         item = walker.succ_item(20)
         self.assertEqual(item[0], 30)
 
+    def test_floor_item(self):
+        tree = self.get_tree(testitems)
+        walker = tree.get_walker()
+        with self.assertRaises(KeyError):
+            walker.floor_item(0)
+        self.assertEqual(walker.floor_item(2)[0], 1)
+        self.assertEqual(walker.floor_item(3)[0], 3)
+        self.assertEqual(walker.floor_item(8)[0], 8)
+        self.assertEqual(walker.floor_item(9)[0], 8)
+        self.assertEqual(walker.floor_item(11)[0], 10)
+        self.assertEqual(walker.floor_item(13)[0], 12)
+        self.assertEqual(walker.floor_item(14)[0], 12)
+        self.assertEqual(walker.floor_item(16)[0], 15)
+        self.assertEqual(walker.floor_item(21)[0], 20)
+        self.assertEqual(walker.floor_item(31)[0], 30)
+
+    def test_ceiling_item(self):
+        tree = self.get_tree(testitems)
+        walker = tree.get_walker()
+        with self.assertRaises(KeyError):
+            walker.ceiling_item(50)
+        self.assertEqual(walker.ceiling_item(30)[0], 30)
+        self.assertEqual(walker.ceiling_item(29)[0], 30)
+        self.assertEqual(walker.ceiling_item(19)[0], 20)
+        self.assertEqual(walker.ceiling_item(13)[0], 15)
+        self.assertEqual(walker.ceiling_item(11)[0], 12)
+        self.assertEqual(walker.ceiling_item(10)[0], 10)
+        self.assertEqual(walker.ceiling_item(9)[0], 10)
+        self.assertEqual(walker.ceiling_item(8)[0], 8)
+        self.assertEqual(walker.ceiling_item(2)[0], 3)
+        self.assertEqual(walker.ceiling_item(1)[0], 1)
+        self.assertEqual(walker.ceiling_item(0)[0], 1)
+
 
 class TestPythonWalker(WalkerCheck, unittest.TestCase):
     def get_tree(self, items):
@@ -160,5 +193,5 @@ class TestWalker(WalkerCheck, unittest.TestCase):
     def get_tree(self, items):
         return FastBinaryTree(items)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

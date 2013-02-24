@@ -1,4 +1,4 @@
-Version 1.0.1 February.2013
+Version 1.0.1 February 2013
 
   * bug fixes
   * refactorings by graingert
@@ -7,6 +7,7 @@ Version 1.0.1 February.2013
   * tested with CPython2.7, CPython3.2, CPython3.3, pypy-1.9, pypy-2.0-beta1
   * unified line endings to LF
   * PEP8 refactorings
+  * added floor_item/key, ceiling_item/key methods, thanks to Dai Mikurube
 
 Version 1.0.0 29.12.2011
 

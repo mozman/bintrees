@@ -106,6 +106,10 @@ class TreeMixin(object):
     * prev_key(key) -> k, get the predecessor of key, O(log(n))
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
     * succ_key(key) -> k, get the successor of key, O(log(n))
+    * floor_item(key) -> get (k, v) pair, where k is the greatest key less than or equal to key, O(log(n))
+    * floor_key(key) -> k, get the greatest key less than or equal to key, O(log(n))
+    * ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key, O(log(n))
+    * ceiling_key(key) -> k, get the smallest key greater than or equal to key, O(log(n))
 
     Heap methods
 
@@ -138,7 +142,7 @@ class TreeMixin(object):
 
     def __repr__(self):
         """ x.__repr__(...) <==> repr(x) """
-        tpl = "%s({%s})" % (self.__class__.__name__ , '%s')
+        tpl = "%s({%s})" % (self.__class__.__name__, '%s')
         return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
 
     def copy(self):
@@ -238,16 +242,16 @@ class TreeMixin(object):
                         go_down = True
                     else:
                         if node.stack_is_empty():
-                            return # all done
+                            return  # all done
                         node.pop()
                         go_down = False
 
         treewalker = self.get_walker()
-        try: # specialized iterators
+        try:  # specialized iterators
             if reverse:
-                return treewalker.iteritemsbackward()
+                return treewalker.iter_items_backward()
             else:
-                return treewalker.iteritemsforward()
+                return treewalker.iter_items_forward()
         except AttributeError:
             return default_iterator(treewalker)
 
@@ -407,7 +411,7 @@ class TreeMixin(object):
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
         if len(args) > 1:
-            raise TypeError("pop expected at most 2 arguments, got %d" % (1+len(args)))
+            raise TypeError("pop expected at most 2 arguments, got %d" % (1 + len(args)))
         try:
             value = self.get_value(key)
             self.remove(key)
@@ -512,6 +516,38 @@ class TreeMixin(object):
         key, value = self.succ_item(key)
         return key
 
+    def floor_item(self, key):
+        """ Get the element (k,v) pair associated with the greatest key less
+        than or equal to the given key, raises KeyError if there is no such key.
+        """
+        if self.count == 0:
+            raise KeyError("Tree is empty")
+        walker = self.get_walker()
+        return walker.floor_item(key)
+
+    def floor_key(self, key):
+        """ Get the greatest key less than or equal to the given key, raises
+        KeyError if there is no such key.
+        """
+        key, value = self.floor_item(key)
+        return key
+
+    def ceiling_item(self, key):
+        """ Get the element (k,v) pair associated with the smallest key greater
+        than or equal to the given key, raises KeyError if there is no such key.
+        """
+        if self.count == 0:
+            raise KeyError("Tree is empty")
+        walker = self.get_walker()
+        return walker.ceiling_item(key)
+
+    def ceiling_key(self, key):
+        """ Get the smallest key greater than or equal to the given key, raises
+        KeyError if there is no such key.
+        """
+        key, value = self.ceiling_item(key)
+        return key
+
     def max_item(self):
         """ Get item with max key of tree, raises ValueError if tree is empty. """
         if self.count == 0:
@@ -599,6 +635,7 @@ class TreeMixin(object):
         """ x.isdisjoint(S) ->  True if x has a null intersection with tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.isdisjoint(frozenset(tree.keys()))
+
 
 def _build_sets(trees):
     return [ frozenset(tree.keys()) for tree in trees ]

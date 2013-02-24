@@ -12,9 +12,11 @@ from .treemixin import TreeMixin
 
 __all__ = ['BinaryTree']
 
+
 class Node(object):
     """ Internal object, represents a treenode """
     __slots__ = ['key', 'value', 'left', 'right']
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -38,6 +40,7 @@ class Node(object):
         self.right = None
         self.value = None
         self.key = None
+
 
 class BinaryTree(TreeMixin):
     """
@@ -101,7 +104,7 @@ class BinaryTree(TreeMixin):
                     parent[direction] = self._new_node(key, value)
                     break
                 if key == node.key:
-                    node.value = value # replace value
+                    node.value = value  # replace value
                     break
                 else:
                     parent = node
@@ -132,10 +135,10 @@ class BinaryTree(TreeMixin):
                         #swap places
                         node.key = replacement.key
                         node.value = replacement.value
-                        node = replacement # delete replacement!
+                        node = replacement  # delete replacement!
                     else:
                         down_dir = 1 if node.left is None else 0
-                        if parent is None: # root
+                        if parent is None:  # root
                             self._root = node[down_dir]
                         else:
                             parent[direction] = node[down_dir]

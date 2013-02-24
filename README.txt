@@ -110,6 +110,10 @@ prev/succ operations
     * prev_key(key) -> k, get the predecessor of key, O(log(n))
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
     * succ_key(key) -> k, get the successor of key, O(log(n))
+    * floor_item(key) -> get (k, v) pair, where k is the greatest key less than or equal to key, O(log(n))
+    * floor_key(key) -> k, get the greatest key less than or equal to key, O(log(n))
+    * ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key, O(log(n))
+    * ceiling_key(key) -> k, get the smallest key greater than or equal to key, O(log(n))
 
 Heap methods
 ~~~~~~~~~~~~
@@ -170,6 +174,17 @@ search 100x all keys       2,32           0,86            0,86            0,13
 
 News
 ====
+
+Version 1.0.1 February 2013
+
+  * bug fixes
+  * refactorings by graingert
+  * skip useless tests for pypy
+  * new license: MIT License
+  * tested with CPython2.7, CPython3.2, CPython3.3, pypy-1.9, pypy-2.0-beta1
+  * unified line endings to LF
+  * PEP8 refactorings
+  * added floor_item/key, ceiling_item/key methods, thanks to Dai Mikurube
 
 Version 1.0.0
 

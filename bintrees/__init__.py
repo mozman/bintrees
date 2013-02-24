@@ -152,27 +152,30 @@ from .rbtree import RBTree
 
 try:
     from .qbintree import cBinaryTree
+
     class FastBinaryTree(cBinaryTree, TreeMixin):
         """ Faster unbalanced binary tree  written in Cython with C-Code. """
-except ImportError: # fall back to pure Python version
+except ImportError:  # fall back to pure Python version
     FastBinaryTree = BinaryTree
-except ValueError: # for pypy
+except ValueError:  # for pypy
     FastBinaryTree = BinaryTree
 
 try:
     from .qavltree import cAVLTree
+
     class FastAVLTree(cAVLTree, TreeMixin):
         """ Faster balanced AVL-Tree written in Cython with C-Code. """
-except ImportError: # fall back to pure Python version
+except ImportError:  # fall back to pure Python version
     FastAVLTree = AVLTree
-except ValueError: # for pypy
+except ValueError:  # for pypy
     FastAVLTree = AVLTree
 
 try:
     from .qrbtree import cRBTree
+
     class FastRBTree(cRBTree, TreeMixin):
         """ Faster balanced Red-Black-Tree  written in Cython with C-Code. """
-except ImportError: # fall back to pure Python version
+except ImportError:  # fall back to pure Python version
     FastRBTree = RBTree
-except ValueError: # for pypy
+except ValueError:  # for pypy
     FastRBTree = RBTree
