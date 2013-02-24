@@ -3,25 +3,33 @@
 # Author:  mozman
 # Purpose: test cAVLTree
 # Created: 28.04.2010
+# License: MIT-License
+
+import sys
+PYPY = hasattr(sys, 'pypy_version_info')
 
 import unittest
 from random import randint, shuffle
 
-from bintrees.qavltree import cAVLTree
+if not PYPY:
+    from bintrees.qavltree import cAVLTree
 
-class Tree(cAVLTree):
-    def update(self, items):
-        """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
-        try:
-            generator = items.iteritems()
-        except AttributeError:
-            generator = iter(items)
-        for key, value in generator:
-            self.insert(key, value)
+    class Tree(cAVLTree):
+        def update(self, items):
+            """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
+            try:
+                generator = items.iteritems()
+            except AttributeError:
+                generator = iter(items)
+            for key, value in generator:
+                self.insert(key, value)
 
+
+@unittest.skipIf(PYPY, "Cython implementation not supported for pypy.")
 class TestTree(unittest.TestCase):
     values = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
     keys = [2, 4, 8, 1, 9, 3]
+
     def test_create_tree(self):
         tree = Tree()
         self.assertEqual(tree.count, 0)
