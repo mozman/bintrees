@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: test the tree walker class
 # Created: 08.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 import unittest
 from bintrees import BinaryTree, FastBinaryTree
 
 testkeys = [10, 5, 15, 3, 7, 12, 20, 1, 4, 6, 8, 30]
 testitems = list(zip(testkeys, testkeys))
+
 
 class WalkerCheck:
     def get_tree(self, items):
@@ -48,10 +50,10 @@ class WalkerCheck:
         walker = tree.get_walker()
         self.assertTrue(walker.goto(12))
         self.assertEqual(walker.key, 12)
-        self.assertEqual(walker.value,12)
+        self.assertEqual(walker.value, 12)
         walker.reset()
         self.assertEqual(walker.key, 10)
-        self.assertEqual(walker.value,10)
+        self.assertEqual(walker.value, 10)
 
     def test_is_valid(self):
         tree = self.get_tree(testitems)
@@ -100,10 +102,10 @@ class WalkerCheck:
         tree = self.get_tree(testitems)
         walker = tree.get_walker()
         walker.push()
-        walker.down(0) # left
+        walker.down(0)  # left
         self.assertEqual(walker.key, 5)
         walker.pop()
-        walker.down(1) # right
+        walker.down(1)  # right
         self.assertEqual(walker.key, 15)
 
     def test_has_left_right(self):
@@ -148,9 +150,11 @@ class WalkerCheck:
         item = walker.succ_item(20)
         self.assertEqual(item[0], 30)
 
+
 class TestPythonWalker(WalkerCheck, unittest.TestCase):
     def get_tree(self, items):
         return BinaryTree(items)
+
 
 class TestWalker(WalkerCheck, unittest.TestCase):
     def get_tree(self, items):

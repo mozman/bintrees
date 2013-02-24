@@ -3,6 +3,9 @@
 # Author:  mozman
 # Purpose: profile AVLTree, FastAVLTree
 # Created: 01.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
+
 import sys
 from timeit import Timer
 from random import shuffle
@@ -30,32 +33,40 @@ except IOError:
 py_searchtree = AVLTree.fromkeys(keys)
 cy_searchtree = FastAVLTree.fromkeys(keys)
 
+
 def avl_build_delete():
     tree = AVLTree.fromkeys(keys)
     for key in keys:
         del tree[key]
+
 
 def cavl_build_delete():
     tree = FastAVLTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
+
 def avl_build():
     tree = AVLTree.fromkeys(keys)
 
+
 def cavl_build():
     tree = FastAVLTree.fromkeys(keys)
+
 
 def avl_search():
     for key in keys:
         obj = py_searchtree[key]
 
+
 def cavl_search():
     for key in keys:
         obj = cy_searchtree[key]
 
+
 def print_result(time, text):
     print("Operation: %s takes %.2f seconds\n" % (text, time))
+
 
 def main():
     fp = open('testkeys.txt', 'w')
@@ -83,5 +94,5 @@ def main():
     t = Timer("cavl_search()", setup_FastAVLTree)
     print_result(t.timeit(COUNT), 'FastAVLTree search')
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

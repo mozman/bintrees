@@ -3,8 +3,8 @@
 # Author:  mozman -- <mozman@gmx.at>
 # Purpose: TreeSlice
 # Created: 11.04.2011
-# Copyright (C) 2010, 2011 by Manfred Moitzi
-# License: LGPLv3
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 class TreeSlice(object):
     __slots__ = ['_tree', '_start', '_stop']

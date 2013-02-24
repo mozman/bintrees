@@ -1,8 +1,9 @@
 /*
  * stack.h
  *
- *  Created on: 08.05.2010
- *      Author: mozman
+ *  Author: mozman
+ *  Copyright (c) 2010-2013 by Manfred Moitzi
+ *  License: MIT-License
  */
 
 #ifndef STACK_H_

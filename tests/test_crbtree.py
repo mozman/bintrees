@@ -3,7 +3,9 @@
 # Author:  mozman
 # Purpose: test binary trees
 # Created: 28.04.2010
-# License: MIT-License
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
+
 
 import sys
 PYPY = hasattr(sys, 'pypy_version_info')
@@ -29,6 +31,7 @@ if not PYPY:
 class TestTree(unittest.TestCase):
     values = [(2, 12), (4, 34), (8, 45), (1, 16), (9, 35), (3, 57)]
     keys = [2, 4, 8, 1, 9, 3]
+
     def test_create_tree(self):
         tree = Tree()
         self.assertEqual(tree.count, 0)
@@ -68,5 +71,5 @@ class TestTree(unittest.TestCase):
             tree.remove(key)
         self.assertEqual(tree.count, 0)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

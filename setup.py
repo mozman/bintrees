@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
+
 # to build c-extension:
 # setup.py build_ext --inplace --force
 
@@ -37,10 +40,10 @@ setup(
     packages=['bintrees'],
     long_description=read('README.txt'),
     platforms="OS Independent",
-    license="LGPLv3",
+    license="MIT License",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-        "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",

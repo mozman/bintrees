@@ -1,3 +1,11 @@
+/*
+ * ctrees.h
+ *
+ *  Author: mozman
+ *  Copyright (c) 2010-2013 by Manfred Moitzi
+ *  License: MIT-License
+ */
+
 #ifndef __CTREES_H
 #define __CTREES_H
 

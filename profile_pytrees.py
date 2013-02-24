@@ -3,6 +3,8 @@
 # Author:  mozman
 # Purpose: profile pure python trees, works also with ipy
 # Created: 01.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 from timeit import Timer
 from bintrees import BinaryTree
@@ -43,6 +45,7 @@ setup_RBTree_s = """
 from __main__ import keys, rb_search, py_searchtree
 """
 
+
 def random_keys():
     from random import shuffle, randint
     keys = set()
@@ -60,44 +63,55 @@ except IOError:
 
 py_searchtree = BinaryTree.fromkeys(keys)
 
+
 def bintree_build_delete():
     tree = BinaryTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
+
 def bintree_build():
     tree = BinaryTree.fromkeys(keys)
+
 
 def bintree_search():
     for key in keys:
         obj = py_searchtree[key]
+
 
 def avl_build_delete():
     tree = AVLTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
+
 def avl_build():
     tree = AVLTree.fromkeys(keys)
+
 
 def avl_search():
     for key in keys:
         obj = py_searchtree[key]
+
 
 def rb_build_delete():
     tree = RBTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
+
 def rb_build():
     tree = RBTree.fromkeys(keys)
+
 
 def rb_search():
     for key in keys:
         obj = py_searchtree[key]
 
+
 def print_result(time, text):
     print("Operation: %s takes %.2f seconds\n" % (text, time))
+
 
 def main():
     fp = open('testkeys.txt', 'w')
@@ -134,5 +148,5 @@ def main():
     t = Timer("rb_search()", setup_RBTree_s)
     print_result(t.timeit(COUNT), 'RBTree search')
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

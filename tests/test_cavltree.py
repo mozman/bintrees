@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: test cAVLTree
 # Created: 28.04.2010
-# License: MIT-License
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 import sys
 PYPY = hasattr(sys, 'pypy_version_info')
@@ -79,5 +79,5 @@ class TestTree(unittest.TestCase):
             tree.remove(key)
         self.assertEqual(tree.count, 0)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

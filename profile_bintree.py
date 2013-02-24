@@ -3,6 +3,8 @@
 # Author:  mozman
 # Purpose: profile BinaryTree, FastBinaryTree
 # Created: 01.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 from timeit import Timer
 from bintrees import BinaryTree
@@ -20,6 +22,7 @@ setup_FastBinaryTree = """
 from __main__ import cbintree_build_delete, cbintree_build, cbintree_search, itercbintree
 """
 
+
 def random_keys():
     import random
     return random.sample(range(KEYRANGE), KEYS)
@@ -32,38 +35,48 @@ except IOError:
 py_searchtree = BinaryTree.fromkeys(keys)
 cy_searchtree = FastBinaryTree.fromkeys(keys)
 
+
 def bintree_build_delete():
     tree = BinaryTree.fromkeys(keys)
     for key in keys:
         del tree[key]
+
 
 def cbintree_build_delete():
     tree = FastBinaryTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
+
 def bintree_build():
     tree = BinaryTree.fromkeys(keys)
 
+
 def cbintree_build():
     tree = FastBinaryTree.fromkeys(keys)
+
 
 def bintree_search():
     for key in keys:
         obj = py_searchtree[key]
 
+
 def cbintree_search():
     for key in keys:
         obj = cy_searchtree[key]
 
+
 def iterbintree():
     items = list(py_searchtree.items())
+
 
 def itercbintree():
     items = list(cy_searchtree.items())
 
+
 def print_result(time, text):
     print("Operation: %s takes %.2f seconds\n" % (text, time))
+
 
 def main():
     fp = open('testkeys.txt', 'w')
@@ -97,5 +110,5 @@ def main():
     t = Timer("itercbintree()", setup_FastBinaryTree)
     print_result(t.timeit(COUNT), 'FastBinaryTree iter all items')
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
