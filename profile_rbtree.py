@@ -3,6 +3,9 @@
 # Author:  mozman
 # Purpose: profile RBTree, FastRBTree
 # Created: 02.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
+
 import sys
 from timeit import Timer
 from random import shuffle
@@ -31,32 +34,40 @@ except IOError:
 py_searchtree = RBTree.fromkeys(keys)
 cy_searchtree = FastRBTree.fromkeys(keys)
 
+
 def rb_build_delete():
     tree = RBTree.fromkeys(keys)
     for key in keys:
         del tree[key]
+
 
 def crb_build_delete():
     tree = FastRBTree.fromkeys(keys)
     for key in keys:
         del tree[key]
 
+
 def rb_build():
     tree = RBTree.fromkeys(keys)
 
+
 def crb_build():
     tree = FastRBTree.fromkeys(keys)
+
 
 def rb_search():
     for key in keys:
         obj = py_searchtree[key]
 
+
 def crb_search():
     for key in keys:
         obj = cy_searchtree[key]
 
+
 def print_result(time, text):
     print("Operation: %s takes %.2f seconds\n" % (text, time))
+
 
 def main():
     fp = open('testkeys.txt', 'w')
@@ -84,5 +95,5 @@ def main():
     t = Timer("crb_search()", setup_FastRBTree)
     print_result(t.timeit(COUNT), 'FastRBTree search')
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

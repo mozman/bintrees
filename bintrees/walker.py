@@ -3,8 +3,8 @@
 # Author:  mozman
 # Purpose: tree walker
 # Created: 07.05.2010
-# Copyright (C) 2010, 2011 by Manfred Moitzi
-# License: LGPLv3
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 from operator import attrgetter, lt, gt
 

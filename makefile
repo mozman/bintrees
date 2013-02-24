@@ -1,3 +1,6 @@
+# Author:  mozman
+# License: MIT-License
+
 FLAGS = --inplace --force
 CMD = setup.py build_ext
 RUNTESTS = -m unittest discover

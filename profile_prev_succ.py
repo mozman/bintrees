@@ -3,6 +3,9 @@
 # Author:  mozman
 # Purpose: profile RBTree, FastRBTree
 # Created: 02.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
+
 import sys
 from timeit import Timer
 from random import shuffle
@@ -31,12 +34,14 @@ except IOError:
 ptree = PTree.fromkeys(keys)
 ftree = FTree.fromkeys(keys)
 
+
 def rb_prev():
     for key in keys:
         try:
             item = ptree.prev_item(key)
         except KeyError:
             pass
+
 
 def rb_succ():
     for key in keys:
@@ -45,12 +50,14 @@ def rb_succ():
         except KeyError:
             pass
 
+
 def crb_prev():
     for key in keys:
         try:
             item = ftree.prev_item(key)
         except KeyError:
             pass
+
 
 def crb_succ():
     for key in keys:
@@ -59,8 +66,10 @@ def crb_succ():
         except KeyError:
             pass
 
+
 def print_result(time, text):
     print("Operation: %s takes %.2f seconds\n" % (text, time))
+
 
 def main():
     fp = open('testkeys.txt', 'w')
@@ -82,5 +91,6 @@ def main():
     t = Timer("crb_succ()", setup_FastRBTree_ps)
     print_result(t.timeit(COUNT), 'FastXTree succ')
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     main()

@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman -- <mozman@gmx.at>
-# Purpose: test TreeSlice
 # Created: 11.04.2011
-# Copyright (C) 2011, Manfred Moitzi
-# License: LGPLv3
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
-import sys
+
 import unittest
 
 from bintrees import RBTree
 
+
 class TestTreeSlice(unittest.TestCase):
     def setUp(self):
-        self.tree = RBTree({1:'a', 2:'b', 3:'c', 4:'d', 5:'e', 6:'f'})
+        self.tree = RBTree({1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f'})
 
     def test_in_slice_object(self):
         treeslice = self.tree[2:6]
@@ -83,7 +83,7 @@ class TestTreeSlice(unittest.TestCase):
 
     def test_subslicing_nobounds_5(self):
         subslice = self.tree[2:][1:]
-        self.assertEqual([2, 3, 4, 5,6], list(subslice))
+        self.assertEqual([2, 3, 4, 5, 6], list(subslice))
 
     def test_subslicing_nobounds_6(self):
         subslice = self.tree[2:][:5]
@@ -97,5 +97,5 @@ class TestTreeSlice(unittest.TestCase):
         result = repr(self.tree[2:4])
         self.assertEqual("RBTree({2: 'b', 3: 'c'})", result)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()

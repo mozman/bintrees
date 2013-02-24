@@ -1,6 +1,12 @@
-Version 1.0.1 December.2012
+Version 1.0.1 February.2013
 
   * bug fixes
+  * refactorings by graingert
+  * skip useless tests for pypy
+  * new license: MIT License
+  * tested with CPython2.7, CPython3.2, CPython3.3, pypy-1.9, pypy-2.0-beta1
+  * unified line endings to LF
+  * PEP8 refactorings
 
 Version 1.0.0 29.12.2011
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose:
 # Created: 08.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT-License
 
 from ctrees cimport node_t
 

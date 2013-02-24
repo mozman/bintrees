@@ -1,3 +1,11 @@
+/*
+ * stack.c
+ *
+ *  Author: mozman
+ *  Copyright (c) 2010-2013 by Manfred Moitzi
+ *  License: MIT-License
+ */
+
 #include "ctrees.h"
 #include "stack.h"
 

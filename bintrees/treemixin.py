@@ -3,6 +3,8 @@
 # Author:  Mozman
 # Purpose: treemixin provides top level functions for binary trees
 # Created: 03.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
 from __future__ import absolute_import
 

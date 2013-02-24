@@ -3,9 +3,12 @@
 # Author:  mozman
 # Purpose: profile memory usage of FastBinaryTree, FastRBTree and FastAVLTree compared with dict
 # Created: 02.05.2010
+# Copyright (c) 2010-2013 by Manfred Moitzi
+# License: MIT License
 
-from guppy import hpy
-hp=hpy()
+import sys
+from guppy import hpy  # does not run with CPython > 2.6 :(
+hp = hpy()
 
 from bintrees import FastBinaryTree
 from bintrees import FastAVLTree
@@ -25,6 +28,7 @@ try:
 except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
+
 
 def main():
     log = open("memory_usage.txt", 'w')
@@ -54,5 +58,5 @@ def main():
     log.write(str(hp.heap()))
     log.close()
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
