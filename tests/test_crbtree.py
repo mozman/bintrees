@@ -71,5 +71,42 @@ class TestTree(unittest.TestCase):
             tree.remove(key)
         self.assertEqual(tree.count, 0)
 
+    def test_data_corruption(self):
+        tree = Tree()
+        tree.insert(14, 777)
+        tree.insert(15.84, 777)
+        tree.insert(16, 777)
+        tree.insert(16, 777)  # reassign
+        tree.insert(16.3, 777)
+        tree.insert(15.8, 777)
+        tree.insert(16.48, 777)
+        tree.insert(14.95, 777)
+        tree.insert(15.07, 777)
+        tree.insert(16.41, 777)
+        tree.insert(16.43, 777)
+        tree.insert(16.45, 777)
+        tree.insert(16.4, 777)
+        tree.insert(16.42, 777)
+        tree.insert(16.47, 777)
+        tree.insert(16.44, 777)
+        tree.insert(16.46, 777)
+        tree.insert(16.48, 777)
+        tree.insert(16.51, 777)
+        tree.insert(16.5, 777)
+        tree.insert(16.49, 777)
+        tree.insert(16.5, 777)   # reassign
+        tree.insert(16.49, 777)  # reassign
+        tree.insert(16.49, 777)  # reassign
+        tree.insert(16.47, 777)
+        tree.insert(16.5, 777)  # reassign
+        tree.insert(16.48, 777)  # reassign
+        tree.insert(16.46, 777)  # reassign
+        tree.insert(16.44, 777)  # reassign - causes data corruption in version 1.0.1
+        try:
+            tree.get_value(16.43)
+        except KeyError:
+            self.fail("Data corruption in FastRBTree!")
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -343,6 +343,9 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 				Py_XDECREF(VALUE(q)); /* release old value object */
 				VALUE(q) = value;     /* set new value object     */
 				Py_INCREF(value);     /* take new value object    */
+				root = head.link[1];
+            	RED(root) = 0;
+	            (*rootaddr) = root;
 				return 0;
 			}
 			last = dir;

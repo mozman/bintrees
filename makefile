@@ -35,9 +35,9 @@ testall: build27 test27 build32 test32 build33 test33 testpypy
 
 packages:
 	$(PYTHON27) setup.py sdist --formats=zip,gztar
-	$(PYTHON27) setup.py bdist --formats=msi
-	$(PYTHON32) setup.py bdist --formats=msi
-	$(PYTHON33) setup.py bdist --formats=msi
+	$(PYTHON27) setup.py bdist --formats=msi,wininst
+	$(PYTHON32) setup.py bdist --formats=msi,wininst
+	$(PYTHON33) setup.py bdist --formats=msi,wininst
 
 upload:
 	$(PYTHON27) setup.py sdist --formats=zip,gztar upload
