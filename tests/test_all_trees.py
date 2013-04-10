@@ -746,38 +746,11 @@ class CheckTree(object):
         # Error was located in the rb_insert() function in ctrees.c
 
         tree = self.TREE_CLASS()
-        unused_data = 777
-        tree[14] = unused_data
-        tree[15.84] = unused_data
-        tree[16] = unused_data
-        tree[16] = unused_data  # reassign
-        tree[16.3] = unused_data
-        tree[15.8] = unused_data
-        tree[16.48] = unused_data
-        tree[14.95] = unused_data
-        tree[15.07] = unused_data
-        tree[16.41] = unused_data
-        tree[16.43] = unused_data
-        tree[16.45] = unused_data
-        tree[16.4] = unused_data
-        tree[16.42] = unused_data
-        tree[16.47] = unused_data
-        tree[16.44] = unused_data
-        tree[16.46] = unused_data
-        tree[16.48] = unused_data  # reassign
-        tree[16.51] = unused_data
-        tree[16.5] = unused_data
-        tree[16.49] = unused_data
-        tree[16.5] = unused_data  # reassign
-        tree[16.49] = unused_data  # reassign
-        tree[16.49] = unused_data  # reassign
-        tree[16.47] = unused_data  # reassign
-        tree[16.5] = unused_data  # reassign
-        tree[16.48] = unused_data  # reassign
-        tree[16.46] = unused_data  # reassign
-        tree[16.44] = unused_data  # reassign - causes data corruption in version 1.0.1 and prior
-        expected_keys = [14, 14.95, 15.07, 15.8, 15.84, 16, 16.3, 16.4, 16.41, 16.42, 16.43, 16.44, 16.45, 16.46, 16.47,
-                         16.48, 16.49, 16.5, 16.51]
+        insert_keys = [14, 15.84, 16, 16, 16.3, 15.8, 16.48, 14.95, 15.07, 16.41, 16.43, 16.45, 16.4, 16.42, 16.47,
+                       16.44, 16.46, 16.48, 16.51, 16.5, 16.49, 16.5, 16.49, 16.49, 16.47, 16.5, 16.48, 16.46, 16.44]
+        for key in insert_keys:
+            tree[key] = "unused_data"
+        expected_keys = sorted(set(insert_keys))
         self.assertEqual(expected_keys, list(tree.keys()), "Data corruption in %s!" % tree.__class__)
 
 
