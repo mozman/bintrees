@@ -279,6 +279,7 @@ rb_double(node_t *root, int dir)
 extern int
 rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 {
+    int new_node = 0;
 	node_t *root = *rootaddr;
 
 	if (root == NULL) {
@@ -287,6 +288,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 		 new node directly to the root
 		 */
 		root = rb_new_node(key, value);
+		new_node = 1;
 		if (root == NULL)
 			return -1; // got no memory
 	}
@@ -296,7 +298,6 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 		node_t *p, *q; /* Iterator & parent */
 		int dir = 0;
 		int last = 0;
-		int new_node = 0;
 
 		/* Set up our helpers */
 		t = &head;
@@ -312,8 +313,8 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 			if (q == NULL) {
 				/* Insert a new node at the first null link */
 				q = rb_new_node(key, value);
-				p->link[dir] = q;
 				new_node = 1;
+				p->link[dir] = q;
 				if (q == NULL)
 					return -1; // get no memory
 			}
@@ -339,14 +340,11 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 				break;
 
 			cmp_res = ct_compare(KEY(q), key);
-			if (cmp_res == 0) {       /* key exists?              */
+			if (cmp_res == 0) {       /* if key exists            */
 				Py_XDECREF(VALUE(q)); /* release old value object */
 				VALUE(q) = value;     /* set new value object     */
 				Py_INCREF(value);     /* take new value object    */
-				root = head.link[1];
-            	RED(root) = 0;
-	            (*rootaddr) = root;
-				return 0;
+				break;
 			}
 			last = dir;
 			dir = (cmp_res < 0);
@@ -366,7 +364,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 	/* Make the root black for simplified logic */
 	RED(root) = 0;
 	(*rootaddr) = root;
-	return 1;
+	return new_node;
 }
 
 extern int

@@ -5,9 +5,9 @@ FLAGS = --inplace --force
 CMD = setup.py build_ext
 RUNTESTS = -m unittest discover
 
-PYTHON27 = C:/python27/python.exe
-PYTHON32 = C:/python32/python.exe
-PYTHON33 = C:/python33/python.exe
+PYTHON27 = py -2.7
+PYTHON32 = py -3.2
+PYTHON33 = py -3.3
 PYPY = C:/pypy-2.0-beta1/pypy.exe
 
 build27:
@@ -39,5 +39,8 @@ packages:
 	$(PYTHON32) setup.py bdist --formats=msi,wininst
 	$(PYTHON33) setup.py bdist --formats=msi,wininst
 
-upload:
+release:
 	$(PYTHON27) setup.py sdist --formats=zip,gztar upload
+	$(PYTHON27) setup.py bdist --formats=msi,wininst upload
+	$(PYTHON32) setup.py bdist --formats=msi,wininst upload
+	$(PYTHON33) setup.py bdist --formats=msi,wininst upload
