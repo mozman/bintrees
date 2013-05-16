@@ -17,3 +17,6 @@ cdef class cWalker:
     cpdef reset(self)
     cpdef push(self)
     cpdef pop(self)
+    cpdef has_child(self, int direction)
+    cpdef down(self, int direction)
+    cpdef stack_is_empty(self)
