@@ -599,7 +599,7 @@ class CheckTree(object):
         self.assertEqual(i.min_key(), 15)
         self.assertEqual(i.max_key(), 29)
 
-    def test_081_union(self):
+    def test_081_union_keys(self):
         l1 = list(range(30))
         shuffle(l1)
         l2 = list(range(15, 45))
@@ -610,6 +610,17 @@ class CheckTree(object):
         self.assertEqual(len(i), 45)
         self.assertEqual(i.min_key(), 0)
         self.assertEqual(i.max_key(), 44)
+
+    def test_081_union_values(self):
+        l1 = list(range(30))
+        shuffle(l1)
+        l2 = list(range(15, 45))
+        shuffle(l2)
+        tree1 = self.TREE_CLASS(zip(l1, l1))
+        tree2 = self.TREE_CLASS(zip(l2, l2))
+        union_tree = tree1 | tree2
+        self.assertEqual(union_tree[44], 44)
+        self.assertEqual(union_tree[1], 1)
 
     def test_082_difference(self):
         l1 = list(range(30))
@@ -624,7 +635,7 @@ class CheckTree(object):
         self.assertEqual(i.min_key(), 0)
         self.assertEqual(i.max_key(), 14)
 
-    def test_083_symmetric_difference(self):
+    def test_083_symmetric_difference_keys(self):
         l1 = list(range(30))
         shuffle(l1)
         l2 = list(range(15, 45))
@@ -632,12 +643,24 @@ class CheckTree(object):
 
         tree1 = self.TREE_CLASS(zip(l1, l1))
         tree2 = self.TREE_CLASS(zip(l2, l2))
-        i = tree1 ^ tree2
-        self.assertEqual(len(i), 30)
-        self.assertEqual(i.min_key(), 0)
-        self.assertEqual(i.max_key(), 44)
-        self.assertTrue(15 not in i)
-        self.assertTrue(29 not in i)
+        new_tree = tree1 ^ tree2
+        self.assertEqual(len(new_tree), 30)
+        self.assertEqual(new_tree.min_key(), 0)
+        self.assertEqual(new_tree.max_key(), 44)
+        self.assertTrue(15 not in new_tree)
+        self.assertTrue(29 not in new_tree)
+
+    def test_083_symmetric_difference_values(self):
+        l1 = list(range(30))
+        shuffle(l1)
+        l2 = list(range(15, 45))
+        shuffle(l2)
+
+        tree1 = self.TREE_CLASS(zip(l1, l1))
+        tree2 = self.TREE_CLASS(zip(l2, l2))
+        new_tree = tree1 ^ tree2
+        self.assertEqual(new_tree[44], 44)
+        self.assertEqual(new_tree[1], 1)
 
     @unittest.skipIf(PYPY, "getrefcount() not supported by pypy.")
     def test_084_refcount_get(self):
@@ -742,7 +765,7 @@ class CheckTree(object):
             tree.ceiling_key(60)
 
     def test_097_data_corruption(self):
-        # Data corruption in FastRBTree in all versions before 1.02:
+        # Data corruption in FastRBTree in all versions before 1.0.2:
         # Error was located in the rb_insert() function in ctrees.c
 
         tree = self.TREE_CLASS()

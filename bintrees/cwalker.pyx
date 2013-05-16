@@ -65,7 +65,7 @@ cdef class cWalker:
             raise IndexError('pop(): stack is empty')
         self.node = stack_pop(self.stack)
 
-    def stack_is_empty(self):
+    cpdef stack_is_empty(self):
         return <bint> stack_is_empty(self.stack)
 
     def goto_leaf(self):
@@ -78,10 +78,10 @@ cdef class cWalker:
             else:
                 return
 
-    def has_child(self, int direction):
+    cpdef has_child(self, int direction):
         return self.node.link[direction] != NULL
 
-    def down(self, int direction):
+    cpdef down(self, int direction):
         self.node = self.node.link[direction]
 
     def go_left(self):
@@ -131,3 +131,27 @@ cdef class cWalker:
         if self.node == NULL:  # given key is greater than max-key in tree
             raise KeyError(str(key))
         return (<object> self.node.key, <object> self.node.value)
+
+    def iter_items(self, reverse=False):
+        """Iterates over the (key, value) items of the associated tree,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
+        """
+        cdef int direction = 1 if reverse else 0
+        cdef int other = 1 - direction
+        cdef bint go_down = True
+        self.node = self.root
+        while True:
+            if self.has_child(direction) and go_down:
+                self.push()
+                self.down(direction)
+            else:
+                yield self.item
+                if self.has_child(other):
+                    self.down(other)
+                    go_down = True
+                else:
+                    if self.stack_is_empty():
+                        return  # all done
+                    self.pop()
+                    go_down = False

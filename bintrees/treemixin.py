@@ -227,33 +227,8 @@ class TreeMixin(object):
         if self.is_empty():
             return []
 
-        def default_iterator(node):
-            direction = 1 if reverse else 0
-            other = 1 - direction
-            go_down = True
-            while True:
-                if node.has_child(direction) and go_down:
-                    node.push()
-                    node.down(direction)
-                else:
-                    yield node.item
-                    if node.has_child(other):
-                        node.down(other)
-                        go_down = True
-                    else:
-                        if node.stack_is_empty():
-                            return  # all done
-                        node.pop()
-                        go_down = False
-
         treewalker = self.get_walker()
-        try:  # specialized iterators
-            if reverse:
-                return treewalker.iter_items_backward()
-            else:
-                return treewalker.iter_items_forward()
-        except AttributeError:
-            return default_iterator(treewalker)
+        return treewalker.iter_items(reverse)
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
@@ -287,7 +262,7 @@ class TreeMixin(object):
         """ T.keyslice(startkey, endkey) -> key iterator:
         startkey <= key < endkey.
         """
-        return ( item[0] for item in self.itemslice(startkey, endkey) )
+        return (item[0] for item in self.itemslice(startkey, endkey))
 
     def itemslice(self, startkey, endkey):
         """ T.itemslice(s, e) -> item iterator: s <= key < e.
@@ -299,54 +274,20 @@ class TreeMixin(object):
         """
         if self.is_empty():
             return
-
+        tree_walker = self.get_walker()
         if startkey is None:
-            # no lower bound
-            can_go_left = lambda: node.has_left() and visit_left
-        else:
-            # don't visit subtrees without keys in search range
-            can_go_left = lambda: node.key > startkey and node.has_left() and visit_left
-
+            startkey = self.min_key()
         if endkey is None:
-            # no upper bound
-            can_go_right = lambda: node.has_right()
+            key_in_range = lambda x: x >= startkey
         else:
-            # don't visit subtrees without keys in search range
-            can_go_right = lambda: node.key < endkey and node.has_right()
-
-        if (startkey, endkey) == (None, None):
-            key_in_range = lambda: True
-        elif startkey is None:
-            key_in_range = lambda: node.key < endkey
-        elif endkey is None:
-            key_in_range = lambda: node.key >= startkey
-        else:
-            key_in_range = lambda: startkey <= node.key < endkey
-
-        node = self.get_walker()
-        visit_left = True
-        while True:
-            if can_go_left():
-                node.push()
-                node.go_left()
-            else:
-                if key_in_range():
-                    yield node.item
-                if can_go_right():
-                    node.go_right()
-                    visit_left = True
-                else:
-                    if node.stack_is_empty():
-                        return
-                    node.pop()
-                    # left side is already done
-                    visit_left = False
+            key_in_range = lambda x: startkey <= x < endkey
+        return ((key, item) for key, item in tree_walker.iter_items() if key_in_range(key))
 
     def valueslice(self, startkey, endkey):
         """ T.valueslice(startkey, endkey) -> value iterator:
         startkey <= key < endkey.
         """
-        return ( item[1] for item in self.itemslice(startkey, endkey) )
+        return (item[1] for item in self.itemslice(startkey, endkey))
 
     def get_value(self, key):
         node = self.root
@@ -469,7 +410,7 @@ class TreeMixin(object):
         node = self._root
         while node.left is not None:
             node = node.left
-        return (node.key, node.value)
+        return node.key, node.value
 
     def pop_min(self):
         """ T.pop_min() -> (k, v), remove item with minimum key, raise ValueError
@@ -603,7 +544,9 @@ class TreeMixin(object):
         """
         thiskeys = frozenset(self.keys())
         rkeys = thiskeys.union(*_build_sets(trees))
-        return self.__class__( ((key, self.get(key)) for key in rkeys) )
+        all_trees = [self]
+        all_trees.extend(trees)
+        return self.__class__( ((key, _multi_tree_get(all_trees, key)) for key in rkeys) )
 
     def difference(self, *trees):
         """ x.difference(t1, t2, ...) -> Tree with keys in T but not any of t1,
@@ -619,7 +562,8 @@ class TreeMixin(object):
         """
         thiskeys = frozenset(self.keys())
         rkeys = thiskeys.symmetric_difference(frozenset(tree.keys()))
-        return self.__class__( ((key, self.get(key)) for key in rkeys) )
+        all_trees = [self, tree]
+        return self.__class__( ((key, _multi_tree_get(all_trees, key)) for key in rkeys) )
 
     def issubset(self, tree):
         """ x.issubset(tree) -> True if every element in x is in tree """
@@ -639,4 +583,12 @@ class TreeMixin(object):
 
 def _build_sets(trees):
     return [ frozenset(tree.keys()) for tree in trees ]
+
+def _multi_tree_get(trees, key):
+    for tree in trees:
+        try:
+            return tree[key]
+        except KeyError:
+            pass
+    raise KeyError(key)
 

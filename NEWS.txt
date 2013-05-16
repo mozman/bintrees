@@ -1,6 +1,13 @@
+Version 1.0.3 May 2013
+
+  * Cython implementation of iter_items() for Fast_X_Trees()
+  * simplified itemslice() by using the iter_items() method, better performance for Fast_X_Trees
+  * tested with CPython2.7, CPython3.3, pypy-2.0
+
 Version 1.0.2 April 2013
 
   * bug fix: FastRBTree data corruption on inserting existing keys
+  * bug fix: union & symmetric_difference - copy all values to result tree
 
 Version 1.0.1 February 2013
 

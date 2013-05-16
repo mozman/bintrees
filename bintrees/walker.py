@@ -142,42 +142,6 @@ class Walker(object):
             less_than=gt,
         )
 
-    def _iteritems(self, left=attrgetter("left"), right=attrgetter("right")):
-        """ optimized forward iterator (reduced method calls) """
-        if self._tree.is_empty():
-            return
-        node = self._tree.root
-        stack = self._stack
-        go_left = True
-        while True:
-            if left(node) is not None and go_left:
-                stack.append(node)
-                node = left(node)
-            else:
-                yield (node.key, node.value)
-                if right(node) is not None:
-                    node = right(node)
-                    go_left = True
-                else:
-                    if len(stack) == 0:
-                        return  # all done
-                    node = stack.pop()
-                    go_left = False
-
-    def iter_items_forward(self):
-        for item in self._iteritems(
-            left=attrgetter("left"),
-            right=attrgetter("right"),
-        ):
-            yield item
-
-    def iter_items_backward(self):
-        for item in self._iteritems(
-            left=attrgetter("right"),
-            right=attrgetter("left"),
-        ):
-            yield item
-
     def floor_item(self, key):
         """ Get the element (k,v) pair associated with the greatest key less
         than or equal to the given key, raises KeyError if there is no such key.
@@ -217,4 +181,45 @@ class Walker(object):
         if succ:
             return succ.key, succ.value
         raise KeyError(str(key))
+
+    def iter_items(self, reverse=False):
+        if reverse:
+            return self.iter_items_backward()
+        else:
+            return self.iter_items_forward()
+
+    def iter_items_forward(self):
+        for item in self._iter_items(left=attrgetter("left"), right=attrgetter("right")):
+            yield item
+
+    def iter_items_backward(self):
+        for item in self._iter_items(left=attrgetter("right"), right=attrgetter("left")):
+            yield item
+
+    def _iter_items(self, left=attrgetter("left"), right=attrgetter("right")):
+        """Iterates over the (key, value) items of the associated tree,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
+
+        optimized forward iterator (reduced method calls)
+        """
+        if self._tree.is_empty():
+            return
+        node = self._tree.root
+        stack = self._stack
+        go_left = True
+        while True:
+            if left(node) is not None and go_left:
+                stack.append(node)
+                node = left(node)
+            else:
+                yield (node.key, node.value)
+                if right(node) is not None:
+                    node = right(node)
+                    go_left = True
+                else:
+                    if len(stack) == 0:
+                        return  # all done
+                    node = stack.pop()
+                    go_left = False
 
