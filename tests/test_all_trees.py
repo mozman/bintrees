@@ -158,7 +158,7 @@ class CheckTree(object):
 
     def test_018c_keyslice_reverse(self):
         tree = self.TREE_CLASS(self.default_values1)
-        result = reversed(list(tree.keyslice(15, 36)))
+        result = list(tree.keyslice(15, 36, reverse=True))
         self.assertEqual(list(result), [35, 34, 16])
 
     def test_018d_slice_from_start(self):
@@ -178,11 +178,6 @@ class CheckTree(object):
         tree = self.TREE_CLASS(self.slicetest_data)
         result = list(tree[:])
         self.assertEqual(list(result), [1, 2, 3, 4, 8, 9, 10, 11])
-
-    def __test_018g_slice_produces_values(self):
-        tree = self.TREE_CLASS([(1, 100), (2, 200), (3, 300)])
-        result = list(tree[:])
-        self.assertEqual(list(result), [100, 200, 300])
 
     def test_018g_slice_produces_keys(self):
         tree = self.TREE_CLASS([(1, 100), (2, 200), (3, 300)])

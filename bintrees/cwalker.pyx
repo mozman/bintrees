@@ -132,11 +132,12 @@ cdef class cWalker:
             raise KeyError(str(key))
         return (<object> self.node.key, <object> self.node.value)
 
-    def iter_items(self, reverse=False):
+    def iter_items(self, startkey=None, endkey=None, reverse=False):
         """Iterates over the (key, value) items of the associated tree,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False
         """
+        cdef bint iter_all = (startkey is None) and (endkey is None)
         cdef int direction = 1 if reverse else 0
         cdef int other = 1 - direction
         cdef bint go_down = True
@@ -146,7 +147,11 @@ cdef class cWalker:
                 self.push()
                 self.down(direction)
             else:
-                yield self.item
+                if iter_all:
+                    yield self.item
+                elif (startkey is None or ct_compare(startkey, <object> self.node.key) < 1) and \
+                     (endkey is None or ct_compare(endkey, <object> self.node.key) > 0):
+                    yield self.item
                 if self.has_child(other):
                     self.down(other)
                     go_down = True
@@ -155,3 +160,4 @@ cdef class cWalker:
                         return  # all done
                     self.pop()
                     go_down = False
+

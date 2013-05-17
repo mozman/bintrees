@@ -177,8 +177,9 @@ News
 
 Version 1.0.3 May 2013
 
+  * extended iter_items(startkey=None, endkey=None, reverse=reverse) -> better performance for slicing
   * Cython implementation of iter_items() for Fast_X_Trees()
-  * simplified itemslice() by using the iter_items() method, better performance for Fast_X_Trees
+  * added key parameter *reverse* to itemslice(), keyslice(), valueslice()
   * tested with CPython2.7, CPython3.3, pypy-2.0
 
 Version 1.0.2 April 2013
