@@ -71,9 +71,9 @@ class TreeMixin(object):
 
     slicing by keys
 
-    * itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
-    * keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
-    * valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
+    * itemslice(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n)
+    * keyslice(s, e, reverse) -> generator for keys of T for s <= key < e, O(n)
+    * valueslice(s, e, reverse) -> generator for values of T for s <= key < e, O(n)
     * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
     * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
@@ -207,7 +207,7 @@ class TreeMixin(object):
         order if reverse is True, iterate in descending order, reverse defaults
         to False
         """
-        return ( item[0] for item in self.items(reverse) )
+        return (item[0] for item in self.items(reverse))
     __iter__ = keys
 
     def __reversed__(self):
@@ -217,7 +217,7 @@ class TreeMixin(object):
         """ T.values([reverse]) -> an iterator over the values of T, in ascending order
         if reverse is True, iterate in descending order, reverse defaults to False
         """
-        return ( item[1] for item in self.items(reverse) )
+        return (item[1] for item in self.items(reverse))
 
     def items(self, reverse=False):
         """ T.items([reverse]) -> an iterator over the (key, value) items of T,
@@ -228,7 +228,7 @@ class TreeMixin(object):
             return []
 
         treewalker = self.get_walker()
-        return treewalker.iter_items(reverse)
+        return treewalker.iter_items(reverse=reverse)
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
@@ -258,36 +258,35 @@ class TreeMixin(object):
         for key in frozenset(keys):
             self.remove(key)
 
-    def keyslice(self, startkey, endkey):
+    def keyslice(self, startkey, endkey, reverse=False):
         """ T.keyslice(startkey, endkey) -> key iterator:
         startkey <= key < endkey.
-        """
-        return (item[0] for item in self.itemslice(startkey, endkey))
 
-    def itemslice(self, startkey, endkey):
+        Yields keys in ascending order if reverse is False else in descending order.
+        """
+        return (k for k, v in self.itemslice(startkey, endkey, reverse=reverse))
+
+    def itemslice(self, startkey, endkey, reverse=False):
         """ T.itemslice(s, e) -> item iterator: s <= key < e.
 
         if s is None: start with min element -> T[:e]
         if e is None: end with max element -> T[s:]
         T[:] -> all items
 
+        Yields items in ascending key order if reverse is False else in descending key order.
         """
         if self.is_empty():
             return
         tree_walker = self.get_walker()
-        if startkey is None:
-            startkey = self.min_key()
-        if endkey is None:
-            key_in_range = lambda x: x >= startkey
-        else:
-            key_in_range = lambda x: startkey <= x < endkey
-        return ((key, item) for key, item in tree_walker.iter_items() if key_in_range(key))
+        return tree_walker.iter_items(startkey, endkey, reverse=reverse)
 
-    def valueslice(self, startkey, endkey):
+    def valueslice(self, startkey, endkey, reverse=False):
         """ T.valueslice(startkey, endkey) -> value iterator:
         startkey <= key < endkey.
+
+        Yields values in ascending key order if reverse is False else in descending key order.
         """
-        return (item[1] for item in self.itemslice(startkey, endkey))
+        return (v for k, v in self.itemslice(startkey, endkey, reverse=reverse))
 
     def get_value(self, key):
         node = self.root

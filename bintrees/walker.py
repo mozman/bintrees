@@ -182,29 +182,42 @@ class Walker(object):
             return succ.key, succ.value
         raise KeyError(str(key))
 
-    def iter_items(self, reverse=False):
+    def iter_items(self,  startkey=None, endkey=None, reverse=False):
         if reverse:
-            return self.iter_items_backward()
+            return self.iter_items_backward(startkey, endkey)
         else:
-            return self.iter_items_forward()
+            return self.iter_items_forward(startkey, endkey)
 
-    def iter_items_forward(self):
-        for item in self._iter_items(left=attrgetter("left"), right=attrgetter("right")):
+    def iter_items_forward(self, startkey=None, endkey=None):
+        for item in self._iter_items(left=attrgetter("left"), right=attrgetter("right"),
+                                     startkey=startkey, endkey=endkey):
             yield item
 
-    def iter_items_backward(self):
-        for item in self._iter_items(left=attrgetter("right"), right=attrgetter("left")):
+    def iter_items_backward(self, startkey=None, endkey=None):
+        for item in self._iter_items(left=attrgetter("right"), right=attrgetter("left"),
+                                     startkey=startkey, endkey=endkey):
             yield item
 
-    def _iter_items(self, left=attrgetter("left"), right=attrgetter("right")):
+    def _iter_items(self, left=attrgetter("left"), right=attrgetter("right"), startkey=None, endkey=None):
         """Iterates over the (key, value) items of the associated tree,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False
 
-        optimized forward iterator (reduced method calls)
+        optimized iterator (reduced method calls)
         """
         if self._tree.is_empty():
             return
+
+        if startkey is None and endkey is None:
+            in_range = lambda x: True
+        else:
+            if startkey is None:
+                startkey = self._tree.min_key()
+            if endkey is None:
+                in_range = lambda x: x >= startkey
+            else:
+                in_range = lambda x: startkey <= x < endkey
+
         node = self._tree.root
         stack = self._stack
         go_left = True
@@ -213,12 +226,13 @@ class Walker(object):
                 stack.append(node)
                 node = left(node)
             else:
-                yield (node.key, node.value)
+                if in_range(node.key):
+                    yield (node.key, node.value)
                 if right(node) is not None:
                     node = right(node)
                     go_left = True
                 else:
-                    if len(stack) == 0:
+                    if not len(stack):
                         return  # all done
                     node = stack.pop()
                     go_left = False

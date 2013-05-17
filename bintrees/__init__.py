@@ -64,7 +64,7 @@ Methods
 * discard(k) -> None, remove k from T, if k is present, O(log(n))
 * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
 * is_empty() -> True if len(T) == 0, O(1)
-* items([reverse]) -> list of T's (k, v) pairs, as 2-tuples, O(n)
+* items([reverse]) -> list of T's (k, v) pairs, as 2-tuple, O(n)
 * keys([reverse]) -> list of T's keys, O(n)
 * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
 * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
@@ -81,9 +81,9 @@ walk forward/backward, O(log(n))
 
 slicing by keys
 
-* itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
-* keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
-* valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
+* itemslice(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n)
+* keyslice(s, e, reverse) -> generator for keys of T for s <= key < e, O(n)
+* valueslice(s, e, reverse) -> generator for values of T for s <= key < e, O(n)
 * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
 * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
