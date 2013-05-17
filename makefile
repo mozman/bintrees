@@ -29,11 +29,9 @@ testall: build27 test27 build33 test33 testpypy
 packages:
 	$(PYTHON27) setup.py sdist --formats=zip,gztar
 	$(PYTHON27) setup.py bdist --formats=msi,wininst
-	$(PYTHON32) setup.py bdist --formats=msi,wininst
 	$(PYTHON33) setup.py bdist --formats=msi,wininst
 
 release:
 	$(PYTHON27) setup.py sdist --formats=zip,gztar upload
 	$(PYTHON27) setup.py bdist --formats=msi,wininst upload
-	$(PYTHON32) setup.py bdist --formats=msi,wininst upload
 	$(PYTHON33) setup.py bdist --formats=msi,wininst upload
