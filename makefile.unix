@@ -5,9 +5,9 @@ FLAGS = --inplace --force
 CMD = setup.py build_ext
 RUNTESTS = -m unittest discover
 
-PYTHON27 = pyhon
+PYTHON27 = python
 PYTHON33 = python3
-PYPY = pypy.exe
+PYPY = pypy
 
 build27:
 	$(PYTHON27)  $(CMD) $(FLAGS)
