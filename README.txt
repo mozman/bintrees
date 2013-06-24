@@ -73,9 +73,9 @@ Methods
 slicing by keys
 ~~~~~~~~~~~~~~~
 
-    * itemslice(s, e) -> generator for (k, v) items of T for s <= key < e, O(n)
-    * keyslice(s, e) -> generator for keys of T for s <= key < e, O(n)
-    * valueslice(s, e) -> generator for values of T for s <= key < e, O(n)
+    * itemslice(s, e[, reverse]) -> generator for (k, v) items of T for s <= key < e, O(n)
+    * keyslice(s, e[, reverse]) -> generator for keys of T for s <= key < e, O(n)
+    * valueslice(s, e[, reverse]) -> generator for values of T for s <= key < e, O(n)
     * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
     * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
