@@ -63,6 +63,41 @@ ct_delete_tree(node_t *root)
 	ct_delete_node(root);
 }
 
+/* searching for a crash condition:
+new iterative version to avoid call stack overflow, but this seem not to be the reason for crashes.
+*/
+extern void
+ct_delete_tree_iterative(node_t *root)
+{
+    node_stack_t *stack;
+    node_t *node, *next_node;
+
+    if (root == NULL)
+        return;
+
+	stack = stack_init(128);
+	node = root;
+	while (1) {
+        if ((LEFT_NODE(node) == NULL) && (RIGHT_NODE(node) == NULL)) {
+            ct_delete_node(node);
+            if (stack_is_empty(stack))
+                break;
+            node = stack_pop(stack);
+        }
+        if (LEFT_NODE(node) != NULL) {
+            next_node = LEFT_NODE(node);
+            LEFT_NODE(node) = NULL; /* unlink */
+            stack_push(stack, node);
+            node = next_node;
+        } else if (RIGHT_NODE(node) != NULL) {
+            next_node = RIGHT_NODE(node);
+            RIGHT_NODE(node) = NULL; /* unlink */
+            stack_push(stack, node);
+            node = next_node;
+        }
+	}
+}
+
 static void
 ct_swap_data(node_t *node1, node_t *node2)
 {
@@ -90,7 +125,7 @@ ct_compare(PyObject *key1, PyObject *key2)
 	/* second compare:
 	+1 if key1 > key2
 	 0 if not -> equal
-	-1 means error, if error, it should happend at the first compare
+	-1 means error, if error, it should happen at the first compare
 	*/
 	return PyObject_RichCompareBool(key1, key2, Py_GT);
 }
