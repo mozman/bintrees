@@ -15,7 +15,7 @@ import pickle
 from random import randint, shuffle
 
 from bintrees import BinaryTree, AVLTree, RBTree
-from bintrees import FastBinaryTree, FastAVLTree, FastRBTree
+#from bintrees import FastBinaryTree, FastAVLTree, FastRBTree
 
 set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
 
@@ -784,16 +784,16 @@ class TestRBTree(CheckTree, unittest.TestCase):
     TREE_CLASS = RBTree
 
 
-class TestFastBinaryTree(CheckTree, unittest.TestCase):
-    TREE_CLASS = FastBinaryTree
-
-
-class TestFastAVLTree(CheckTree, unittest.TestCase):
-    TREE_CLASS = FastAVLTree
-
-
-class TestFastRBTree(CheckTree, unittest.TestCase):
-    TREE_CLASS = FastRBTree
+# class TestFastBinaryTree(CheckTree, unittest.TestCase):
+#     TREE_CLASS = FastBinaryTree
+#
+#
+# class TestFastAVLTree(CheckTree, unittest.TestCase):
+#     TREE_CLASS = FastAVLTree
+#
+#
+# class TestFastRBTree(CheckTree, unittest.TestCase):
+#     TREE_CLASS = FastRBTree
 
 if __name__ == '__main__':
     unittest.main()

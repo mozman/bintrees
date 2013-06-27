@@ -29,7 +29,7 @@
 
 from __future__ import absolute_import
 
-from .treemixin import TreeMixin
+from .abctree import ABCTree
 from array import array
 
 __all__ = ['AVLTree']
@@ -90,7 +90,7 @@ def jsw_double(root, direction):
     return jsw_single(root, direction)
 
 
-class AVLTree(TreeMixin):
+class AVLTree(ABCTree):
     """
     AVLTree implements a balanced binary tree with a dict-like interface.
 

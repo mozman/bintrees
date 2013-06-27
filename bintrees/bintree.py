@@ -8,7 +8,7 @@
 
 from __future__ import absolute_import
 
-from .treemixin import TreeMixin
+from .abctree import ABCTree
 
 __all__ = ['BinaryTree']
 
@@ -42,7 +42,7 @@ class Node(object):
         self.key = None
 
 
-class BinaryTree(TreeMixin):
+class BinaryTree(ABCTree):
     """
     BinaryTree implements an unbalanced binary tree with a dict-like interface.
 
@@ -151,3 +151,4 @@ class BinaryTree(TreeMixin):
                     node = node[direction]
                     if node is None:
                         raise KeyError(str(key))
+
