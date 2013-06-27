@@ -34,7 +34,7 @@
 
 from __future__ import absolute_import
 
-from .treemixin import TreeMixin
+from .abctree import ABCTree
 
 __all__ = ['RBTree']
 
@@ -91,7 +91,7 @@ def jsw_double(root, direction):
     return jsw_single(root, direction)
 
 
-class RBTree(TreeMixin):
+class RBTree(ABCTree):
     """
     RBTree implements a balanced binary tree with a dict-like interface.
 
