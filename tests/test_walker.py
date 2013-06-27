@@ -18,14 +18,14 @@ class WalkerCheck:
 
     def test_goto_key_exists(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         # returns True if key found
         self.assertTrue(walker.goto(30))
         self.assertEqual(walker.key, 30)
 
     def test_goto_key_above(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         # returns True if key found
         self.assertTrue(walker.goto(30))
         self.assertEqual(walker.key, 30)
@@ -34,7 +34,7 @@ class WalkerCheck:
 
     def test_key_value_item_properties(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(6)
         self.assertEqual(walker.key, 6)
         self.assertEqual(walker.value, 6)
@@ -42,12 +42,12 @@ class WalkerCheck:
 
     def test_goto_key_not_exists(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         self.assertFalse(walker.goto(41))
 
     def test_reset(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         self.assertTrue(walker.goto(12))
         self.assertEqual(walker.key, 12)
         self.assertEqual(walker.value, 12)
@@ -57,19 +57,19 @@ class WalkerCheck:
 
     def test_is_valid(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(30)
         self.assertTrue(walker.is_valid)
 
     def test_is_not_valid(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(41)
         self.assertFalse(walker.is_valid)
 
     def test_push_pop(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(15)
         walker.push()
         walker.go_left()
@@ -79,7 +79,7 @@ class WalkerCheck:
 
     def test_stack(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(15)
         walker.push()
         self.assertFalse(walker.stack_is_empty())
@@ -88,19 +88,19 @@ class WalkerCheck:
 
     def test_stack_error(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         self.assertTrue(walker.stack_is_empty())
         self.assertRaises(IndexError, walker.pop)
 
     def test_goto_leaf(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto_leaf()
         self.assertTrue(walker.key in [1, 4, 6, 8, 12, 30])
 
     def test_down(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.push()
         walker.down(0)  # left
         self.assertEqual(walker.key, 5)
@@ -110,7 +110,7 @@ class WalkerCheck:
 
     def test_has_left_right(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(7)
         self.assertTrue(walker.has_left())
         self.assertTrue(walker.has_right())
@@ -120,7 +120,7 @@ class WalkerCheck:
 
     def test_has_child(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         walker.goto(7)
         self.assertTrue(walker.has_child(0))
         self.assertTrue(walker.has_child(1))
@@ -130,7 +130,7 @@ class WalkerCheck:
 
     def test_prev(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         item = walker.prev_item(8)
         self.assertEqual(item[0], 7)
         item = walker.prev_item(6)
@@ -142,7 +142,7 @@ class WalkerCheck:
 
     def test_succ(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         item = walker.succ_item(7)
         self.assertEqual(item[0], 8)
         item = walker.succ_item(10)
@@ -152,7 +152,7 @@ class WalkerCheck:
 
     def test_floor_item(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         with self.assertRaises(KeyError):
             walker.floor_item(0)
         self.assertEqual(walker.floor_item(2)[0], 1)
@@ -168,7 +168,7 @@ class WalkerCheck:
 
     def test_ceiling_item(self):
         tree = self.get_tree(testitems)
-        walker = tree.get_walker()
+        walker = tree._get_walker()
         with self.assertRaises(KeyError):
             walker.ceiling_item(50)
         self.assertEqual(walker.ceiling_item(30)[0], 30)
