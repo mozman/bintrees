@@ -151,7 +151,7 @@ from .avltree import AVLTree
 from .rbtree import RBTree
 
 try:
-    from .qbintree import FastBinaryTree
+    from .cython_bintree import FastBinaryTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastBinaryTree not available, using Python version BinaryTree.")
     FastBinaryTree = BinaryTree
@@ -160,7 +160,7 @@ except ValueError:  # for pypy
     FastBinaryTree = BinaryTree
 
 try:
-    from .qavltree import FastAVLTree
+    from .cython_avltree import FastAVLTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastAVLTree not available, using Python version AVLTree.")
     FastAVLTree = AVLTree
@@ -169,7 +169,7 @@ except ValueError:  # for pypy
     FastAVLTree = AVLTree
 
 try:
-    from .qrbtree import FastRBTree
+    from .cython_rbtree import FastRBTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastRBTree not available, using Python version RBTree.")
     FastRBTree = RBTree

@@ -12,7 +12,7 @@ import unittest
 from random import randint, shuffle
 
 if not PYPY:
-    from bintrees.qavltree import FastAVLTree
+    from bintrees.cython_avltree import FastAVLTree
 
 @unittest.skipIf(PYPY, "Cython implementation not supported for pypy.")
 class TestTree(unittest.TestCase):
