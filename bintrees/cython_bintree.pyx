@@ -10,52 +10,11 @@ __all__ = ['cBinaryTree']
 
 from .abctree import ABCTree
 
-from cwalker import cWalker
+from .cython_basetree cimport _BaseTree
+from .ctrees cimport ct_bintree_insert, ct_bintree_remove
 
-from cwalker cimport *
-from ctrees cimport *
 
-cdef class _BinaryTree:
-    cdef node_t *_root
-    cdef int _count
-
-    def __cinit__(self, items=None):
-        self._root = NULL
-        self._count = 0
-        if items:
-            self.update(items)
-
-    def __dealloc__(self):
-        ct_delete_tree(self._root)
-
-    @property
-    def count(self):
-        return self._count
-
-    def __getstate__(self):
-        return dict(self.items())
-
-    def __setstate__(self, state):
-        self.update(state)
-
-    def clear(self):
-        ct_delete_tree(self._root)
-        self._count = 0
-        self._root = NULL
-
-    def get_value(self, key):
-        result = <object> ct_get_item(self._root, key)
-        if result is None:
-            raise KeyError(key)
-        else:
-            return result[1]
-
-    def _get_walker(self):
-        cdef cWalker walker
-        walker = cWalker()
-        walker.set_tree(self._root)
-        return walker
-
+cdef class _BinaryTree(_BaseTree):
     def insert(self, key, value):
         res = ct_bintree_insert(&self._root, key, value)
         if res < 0:
@@ -64,27 +23,11 @@ cdef class _BinaryTree:
 
     def remove(self, key):
         cdef int result
-        result =  ct_bintree_remove(&self._root, key)
+        result = ct_bintree_remove(&self._root, key)
         if result == 0:
             raise KeyError(str(key))
         else:
             self._count -= 1
-
-    def max_item(self):
-        """ Get item with max key of tree, raises ValueError if tree is empty. """
-        cdef node_t *node
-        node = ct_max_node(self._root)
-        if node == NULL: # root is None
-            raise ValueError("Tree is empty")
-        return <object>node.key, <object>node.value
-
-    def min_item(self):
-        """ Get item with min key of tree, raises ValueError if tree is empty. """
-        cdef node_t *node
-        node = ct_min_node(self._root)
-        if node == NULL: # root is None
-            raise ValueError("Tree is empty")
-        return <object>node.key, <object>node.value
 
 class FastBinaryTree(_BinaryTree, ABCTree):
     pass
