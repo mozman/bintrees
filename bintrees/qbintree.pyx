@@ -8,12 +8,14 @@
 
 __all__ = ['cBinaryTree']
 
+from .abctree import ABCTree
+
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cBinaryTree:
+cdef class _BinaryTree:
     cdef node_t *_root
     cdef int _count
 
@@ -74,7 +76,7 @@ cdef class cBinaryTree:
         node = ct_max_node(self._root)
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
-        return (<object>node.key, <object>node.value)
+        return <object>node.key, <object>node.value
 
     def min_item(self):
         """ Get item with min key of tree, raises ValueError if tree is empty. """
@@ -82,4 +84,7 @@ cdef class cBinaryTree:
         node = ct_min_node(self._root)
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
-        return (<object>node.key, <object>node.value)
+        return <object>node.key, <object>node.value
+
+class FastBinaryTree(_BinaryTree, ABCTree):
+    pass

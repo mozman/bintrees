@@ -8,12 +8,14 @@
 
 __all__ = ['cAVLTree']
 
+from .abctree import ABCTree
+
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cAVLTree:
+cdef class _AVLTree:
     cdef node_t *_root
     cdef int _count
 
@@ -85,3 +87,5 @@ cdef class cAVLTree:
             raise ValueError("Tree is empty")
         return (<object>node.key, <object>node.value)
 
+class FastAVLTree(_AVLTree, ABCTree):
+    pass
