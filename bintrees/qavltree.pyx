@@ -48,7 +48,7 @@ cdef class cAVLTree:
         else:
             return result[1]
 
-    def get_walker(self):
+    def _get_walker(self):
         cdef cWalker walker
         walker = cWalker()
         walker.set_tree(self._root)

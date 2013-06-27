@@ -31,7 +31,7 @@ class Walker(object):
 
     @property
     def item(self):
-        return (self._node.key, self._node.value)
+        return self._node.key, self._node.value
 
     @property
     def is_valid(self):
