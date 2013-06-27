@@ -138,11 +138,6 @@ class RBTree(ABCTree):
         """ count of items """
         return self._count
 
-    @property
-    def root(self):
-        """ root node of T """
-        return self._root
-
     def _new_node(self, key, value):
         """ Create a new treenode """
         self._count += 1

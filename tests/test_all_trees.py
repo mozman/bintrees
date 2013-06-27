@@ -15,7 +15,7 @@ import pickle
 from random import randint, shuffle
 
 from bintrees import BinaryTree, AVLTree, RBTree
-#from bintrees import FastBinaryTree, FastAVLTree, FastRBTree
+from bintrees import FastBinaryTree, FastAVLTree, FastRBTree
 
 set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
 
@@ -357,11 +357,11 @@ class CheckTree(object):
         tree = self.TREE_CLASS(self.default_values2)
         d = dict()
         while not tree.is_empty():
-            key, value = tree.popitem()
+            key, value = tree.pop_item()
             d[key] = value
         expected = {2: 12, 4: 34, 8: 45, 1: 16, 9: 35, 3: 57}
         self.assertEqual(expected, d)
-        self.assertRaises(KeyError, tree.popitem)
+        self.assertRaises(KeyError, tree.pop_item)
 
     def test_043_min_item(self):
         tree = self.TREE_CLASS(zip(set3, set3))
@@ -771,6 +771,15 @@ class CheckTree(object):
         expected_keys = sorted(set(insert_keys))
         self.assertEqual(expected_keys, list(tree.keys()), "Data corruption in %s!" % tree.__class__)
 
+    def test_098_foreach(self):
+        keys = []
+        def collect(key, value):
+            keys.append(key)
+
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        tree.foreach(collect)
+        self.assertEqual(list(tree.keys()), list(sorted(keys)))
+
 
 class TestBinaryTree(CheckTree, unittest.TestCase):
     TREE_CLASS = BinaryTree
@@ -784,16 +793,17 @@ class TestRBTree(CheckTree, unittest.TestCase):
     TREE_CLASS = RBTree
 
 
-# class TestFastBinaryTree(CheckTree, unittest.TestCase):
-#     TREE_CLASS = FastBinaryTree
-#
-#
-# class TestFastAVLTree(CheckTree, unittest.TestCase):
-#     TREE_CLASS = FastAVLTree
-#
-#
-# class TestFastRBTree(CheckTree, unittest.TestCase):
-#     TREE_CLASS = FastRBTree
+class TestFastBinaryTree(CheckTree, unittest.TestCase):
+    TREE_CLASS = FastBinaryTree
+
+
+class TestFastAVLTree(CheckTree, unittest.TestCase):
+    TREE_CLASS = FastAVLTree
+
+
+class TestFastRBTree(CheckTree, unittest.TestCase):
+    TREE_CLASS = FastRBTree
+
 
 if __name__ == '__main__':
     unittest.main()
