@@ -10,7 +10,7 @@ from __future__ import absolute_import
 
 from .treeslice import TreeSlice
 from .walker import Walker
-
+from operator import attrgetter, lt, gt
 
 class _ABCTree(object):
     """
@@ -39,11 +39,8 @@ class _ABCTree(object):
     clear(...)
         T.clear() -> None.  Remove all items from T.
 
-    items(...)
-        items([reverse]) -> iterate over all items, yielding (k, v) tuple
-
-    item_slice(...)
-        item_slice(start_key, end_key, [reverse]) -> iterate over all items, yielding (k, v) tuple
+    iter_items(...)
+        iter_items(start_key, end_key, [reverse]) -> iterate over all items, yielding (k, v) tuple
 
     foreach(...)
         foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
@@ -101,6 +98,7 @@ class _ABCTree(object):
 
     * key_slice(s, e[, reverse]) -> generator for keys of T for s <= key < e, O(n)
     * value_slice(s, e[, reverse]) -> generator for values of T for s <= key < e, O(n)
+    * item_slice(s, e[, reverse]) -> generator for items of T for s <= key < e, O(n)
     * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
     * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
@@ -226,7 +224,7 @@ class _ABCTree(object):
         order if reverse is True, iterate in descending order, reverse defaults
         to False
         """
-        return (item[0] for item in self.items(reverse))
+        return (item[0] for item in self.iter_items(reverse=reverse))
     __iter__ = keys
 
     def __reversed__(self):
@@ -236,7 +234,14 @@ class _ABCTree(object):
         """ T.values([reverse]) -> an iterator over the values of T, in ascending order
         if reverse is True, iterate in descending order, reverse defaults to False
         """
-        return (item[1] for item in self.items(reverse))
+        return (item[1] for item in self.iter_items(reverse=reverse))
+
+    def items(self, reverse=False):
+        """ T.items([reverse]) -> an iterator over the (key, value) items of T,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
+        """
+        return self.iter_items(reverse=reverse)
 
     def __getitem__(self, key):
         """ x.__getitem__(y) <==> x[y] """
@@ -266,23 +271,31 @@ class _ABCTree(object):
         for key in frozenset(keys):
             self.remove(key)
 
-    def key_slice(self, startkey, endkey, reverse=False):
-        """ T.keyslice(startkey, endkey) -> key iterator:
-        startkey <= key < endkey.
+    def key_slice(self, start_key, end_key, reverse=False):
+        """ T.key_slice(start_key, end_key) -> key iterator:
+        start_key <= key < end_key.
 
         Yields keys in ascending order if reverse is False else in descending order.
         """
-        return (k for k, v in self.item_slice(startkey, endkey, reverse=reverse))
+        return (k for k, v in self.iter_items(start_key, end_key, reverse=reverse))
     keyslice = key_slice  # for compatibility
 
-    def value_slice(self, startkey, endkey, reverse=False):
-        """ T.valueslice(startkey, endkey) -> value iterator:
-        startkey <= key < endkey.
+    def value_slice(self, start_key, end_key, reverse=False):
+        """ T.value_slice(start_key, end_key) -> value iterator:
+        start_key <= key < end_key.
 
         Yields values in ascending key order if reverse is False else in descending key order.
         """
-        return (v for k, v in self.item_slice(startkey, endkey, reverse=reverse))
+        return (v for k, v in self.iter_items(start_key, end_key, reverse=reverse))
     valueslice = value_slice  # for compatibility
+
+    def item_slice(self, start_key, end_key, reverse=False):
+        """ T.item_slice(start_key, end_key) -> item iterator:
+        start_key <= key < end_key.
+
+        Yields items in ascending key order if reverse is False else in descending key order.
+        """
+        return self.iter_items(start_key, end_key, reverse)
 
     def __getstate__(self):
         return dict(self.items())
@@ -349,6 +362,30 @@ class _ABCTree(object):
             else:
                 return args[0]
 
+    def prev_key(self, key):
+        """ Get predecessor to key, raises KeyError if key is min key
+        or key does not exist.
+        """
+        return self.prev_item(key)[0]
+
+    def succ_key(self, key):
+        """ Get successor to key, raises KeyError if key is max key
+        or key does not exist.
+        """
+        return self.succ_item(key)[0]
+
+    def floor_key(self, key):
+        """ Get the greatest key less than or equal to the given key, raises
+        KeyError if there is no such key.
+        """
+        return self.floor_item(key)[0]
+
+    def ceiling_key(self, key):
+        """ Get the smallest key greater than or equal to the given key, raises
+        KeyError if there is no such key.
+        """
+        return self.ceiling_item(key)[0]
+
     def pop_min(self):
         """ T.pop_min() -> (k, v), remove item with minimum key, raise ValueError
         if T is empty.
@@ -356,39 +393,6 @@ class _ABCTree(object):
         item = self.min_item()
         self.remove(item[0])
         return item
-
-    def min_key(self):
-        """ Get min key of tree, raises ValueError if tree is empty. """
-        key, value = self.min_item()
-        return key
-
-    def prev_key(self, key):
-        """ Get predecessor to key, raises KeyError if key is min key
-        or key does not exist.
-        """
-        key, value = self.prev_item(key)
-        return key
-
-    def succ_key(self, key):
-        """ Get successor to key, raises KeyError if key is max key
-        or key does not exist.
-        """
-        key, value = self.succ_item(key)
-        return key
-
-    def floor_key(self, key):
-        """ Get the greatest key less than or equal to the given key, raises
-        KeyError if there is no such key.
-        """
-        key, value = self.floor_item(key)
-        return key
-
-    def ceiling_key(self, key):
-        """ Get the smallest key greater than or equal to the given key, raises
-        KeyError if there is no such key.
-        """
-        key, value = self.ceiling_item(key)
-        return key
 
     def pop_max(self):
         """ T.pop_max() -> (k, v), remove item with maximum key, raise ValueError
@@ -398,10 +402,13 @@ class _ABCTree(object):
         self.remove(item[0])
         return item
 
+    def min_key(self):
+        """ Get min key of tree, raises ValueError if tree is empty. """
+        return  self.min_item()[0]
+
     def max_key(self):
         """ Get max key of tree, raises ValueError if tree is empty. """
-        key, value = self.max_item()
-        return key
+        return self.max_item()[0]
 
     def nsmallest(self, n, pop=False):
         """ T.nsmallest(n) -> get list of n smallest items (k, v).
@@ -527,7 +534,7 @@ class ABCTree(_ABCTree):
 
     """
     def get_value(self, key):
-        node = self.root
+        node = self._root
         while node is not None:
             if key == node.key:
                 return node.value
@@ -540,42 +547,24 @@ class ABCTree(_ABCTree):
     def _get_walker(self):
         return Walker(self)
 
-    def items(self, reverse=False):
-        """ T.items([reverse]) -> an iterator over the (key, value) items of T,
-        in ascending order if reverse is True, iterate in descending order,
-        reverse defaults to False
-        """
-        if self.is_empty():
-            return []
-
-        treewalker = self._get_walker()
-        return treewalker.iter_items(reverse=reverse)
-
-    def item_slice(self, start_key, end_key, reverse=False):
-        """ T.itemslice(s, e) -> item iterator: s <= key < e.
-
-        if s is None: start with min element -> T[:e]
-        if e is None: end with max element -> T[s:]
-        T[:] -> all items
-
-        Yields items in ascending key order if reverse is False else in descending key order.
-        """
-        if self.is_empty():
-            return
-        tree_walker = self._get_walker()
-        return tree_walker.iter_items(start_key, end_key, reverse=reverse)
-
     def pop_item(self):
         """ T.popitem() -> (k, v), remove and return some (key, value) pair as a
         2-tuple; but raise KeyError if T is empty
         """
         if self.is_empty():
             raise KeyError("popitem(): tree is empty")
-        walker = self._get_walker()
-        walker.goto_leaf()
-        result = walker.item
-        self.remove(walker.key)
-        return result
+        node = self._root
+        while True:
+            if node.left is not None:
+                node = node.left
+            elif node.right is not None:
+                node = node.right
+            else:
+                break
+        key = node.key
+        value = node.value
+        self.remove(key)
+        return key, value
     popitem = pop_item  # for compatibility
 
     def foreach(self, func, order=0):
@@ -585,26 +574,18 @@ class ABCTree(_ABCTree):
         param int order: inorder = 0, preorder = -1, postorder = +1
 
         """
-        def _traverse():
+        def _traverse(node):
             if order == -1:
                 func(node.key, node.value)
-            if node.has_left():
-                node.push()
-                node.go_left()
-                _traverse()
-                node.pop()
+            if node.left is not None:
+                _traverse(node.left)
             if order == 0:
                 func(node.key, node.value)
-            if node.has_right():
-                node.push()
-                node.go_right()
-                _traverse()
-                node.pop()
+            if node.right is not None:
+                _traverse(node.right)
             if order == +1:
                 func(node.key, node.value)
-
-        node = self._get_walker()
-        _traverse()
+        _traverse(self._root)
 
     def min_item(self):
         """ Get item with min key of tree, raises ValueError if tree is empty. """
@@ -624,14 +605,34 @@ class ABCTree(_ABCTree):
             node = node.right
         return node.key, node.value
 
-    def prev_item(self, key):
-        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
-        or key does not exist.
-        """
-        if self.count == 0:
-            raise KeyError("Tree is empty")
-        walker = self._get_walker()
-        return walker.prev_item(key)
+    def _next_item(self, key, left, right, less_than):
+        node = self._root
+        succ = None
+        while node is not None:
+            if key == node.key:
+                break
+            elif less_than(key, node.key):
+                if (succ is None) or less_than(node.key, succ.key):
+                    succ = node
+                node = left(node)
+            else:
+                node = right(node)
+
+        if node is None:  # stay at dead end
+            raise KeyError(str(key))
+        # found node of key
+        if right(node) is not None:
+            # find smallest node of right subtree
+            node = right(node)
+            while left(node) is not None:
+                node = left(node)
+            if succ is None:
+                succ = node
+            elif less_than(node.key, succ.key):
+                succ = node
+        elif succ is None:  # given key is biggest in tree
+            raise KeyError(str(key))
+        return succ.key, succ.value
 
     def succ_item(self, key):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
@@ -639,23 +640,120 @@ class ABCTree(_ABCTree):
         """
         if self.count == 0:
             raise KeyError("Tree is empty")
-        walker = self._get_walker()
-        return walker.succ_item(key)
+        return self._next_item(
+            key,
+            left=attrgetter("left"),
+            right=attrgetter("right"),
+            less_than=lt,
+        )
+
+    def prev_item(self, key):
+        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
+        or key does not exist.
+        """
+        if self.count == 0:
+            raise KeyError("Tree is empty")
+        return self._next_item(
+            key,
+            left=attrgetter("right"),
+            right=attrgetter("left"),
+            less_than=gt,
+        )
 
     def floor_item(self, key):
         """ Get the element (k,v) pair associated with the greatest key less
         than or equal to the given key, raises KeyError if there is no such key.
         """
-        if self.count == 0:
-            raise KeyError("Tree is empty")
-        walker = self._get_walker()
-        return walker.floor_item(key)
+        node = self._root
+        prev = None
+        while node is not None:
+            if key == node.key:
+                return node.key, node.value
+            elif key < node.key:
+                node = node.left
+            else:
+                if (prev is None) or (node.key > prev.key):
+                    prev = node
+                node = node.right
+        # node must be None here
+        if prev:
+            return prev.key, prev.value
+        raise KeyError(str(key))
 
     def ceiling_item(self, key):
         """ Get the element (k,v) pair associated with the smallest key greater
         than or equal to the given key, raises KeyError if there is no such key.
         """
-        if self.count == 0:
-            raise KeyError("Tree is empty")
-        walker = self._get_walker()
-        return walker.ceiling_item(key)
+        node = self._root
+        succ = None
+        while node is not None:
+            if key == node.key:
+                return node.key, node.value
+            elif key > node.key:
+                node = node.right
+            else:
+                if (succ is None) or (node.key < succ.key):
+                    succ = node
+                node = node.left
+            # node must be None here
+        if succ:
+            return succ.key, succ.value
+        raise KeyError(str(key))
+
+    def iter_items(self,  start_key=None, end_key=None, reverse=False):
+        if self.is_empty():
+            return []
+        if reverse:
+            return self.iter_items_backward(start_key, end_key)
+        else:
+            return self.iter_items_forward(start_key, end_key)
+
+    def iter_items_forward(self, start_key=None, end_key=None):
+        for item in self._iter_items(left=attrgetter("left"), right=attrgetter("right"),
+                                     start_key=start_key, end_key=end_key):
+            yield item
+
+    def iter_items_backward(self, start_key=None, end_key=None):
+        for item in self._iter_items(left=attrgetter("right"), right=attrgetter("left"),
+                                     start_key=start_key, end_key=end_key):
+            yield item
+
+    def _iter_items(self, left=attrgetter("left"), right=attrgetter("right"), start_key=None, end_key=None):
+        """Iterates over the (key, value) items of the associated tree,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False
+
+        optimized iterator (reduced method calls)
+        """
+        if self.is_empty():
+            return
+
+        if start_key is None and end_key is None:
+            in_range = lambda x: True
+        else:
+            if start_key is None:
+                start_key = self.min_key()
+            if end_key is None:
+                in_range = lambda x: x >= start_key
+            else:
+                in_range = lambda x: start_key <= x < end_key
+
+        node = self._root
+        stack = []
+        go_left = True
+        while True:
+            if left(node) is not None and go_left:
+                stack.append(node)
+                node = left(node)
+            else:
+                if in_range(node.key):
+                    yield node.key, node.value
+                if right(node) is not None:
+                    node = right(node)
+                    go_left = True
+                else:
+                    if not len(stack):
+                        return  # all done
+                    node = stack.pop()
+                    go_left = False
+

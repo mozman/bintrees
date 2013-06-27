@@ -77,11 +77,6 @@ class BinaryTree(ABCTree):
         self._root = None
 
     @property
-    def root(self):
-        """ root node of T """
-        return self._root
-
-    @property
     def count(self):
         """ count of items """
         return self._count
