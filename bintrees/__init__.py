@@ -151,10 +151,7 @@ from .avltree import AVLTree
 from .rbtree import RBTree
 
 try:
-    from .qbintree import cBinaryTree
-
-    class FastBinaryTree(cBinaryTree, ABCTree):
-        """ Faster unbalanced binary tree  written in Cython with C-Code. """
+    from .qbintree import FastBinaryTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastBinaryTree not available, using Python version BinaryTree.")
     FastBinaryTree = BinaryTree
@@ -163,10 +160,7 @@ except ValueError:  # for pypy
     FastBinaryTree = BinaryTree
 
 try:
-    from .qavltree import cAVLTree
-
-    class FastAVLTree(cAVLTree, ABCTree):
-        """ Faster balanced AVL-Tree written in Cython with C-Code. """
+    from .qavltree import FastAVLTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastAVLTree not available, using Python version AVLTree.")
     FastAVLTree = AVLTree
@@ -175,10 +169,7 @@ except ValueError:  # for pypy
     FastAVLTree = AVLTree
 
 try:
-    from .qrbtree import cRBTree
-
-    class FastRBTree(cRBTree, ABCTree):
-        """ Faster balanced Red-Black-Tree  written in Cython with C-Code. """
+    from .qrbtree import FastRBTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastRBTree not available, using Python version RBTree.")
     FastRBTree = RBTree

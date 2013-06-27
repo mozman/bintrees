@@ -8,12 +8,14 @@
 
 __all__ = ['cRBTree']
 
+from .abctree import ABCTree
+
 from cwalker import cWalker
 
 from cwalker cimport *
 from ctrees cimport *
 
-cdef class cRBTree:
+cdef class _RBTree:
     cdef node_t *_root
     cdef int _count
 
@@ -84,3 +86,6 @@ cdef class cRBTree:
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
         return (<object>node.key, <object>node.value)
+
+class FastRBTree(_RBTree, ABCTree):
+    pass
