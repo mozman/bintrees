@@ -29,7 +29,7 @@
 
 from __future__ import absolute_import
 
-from .treemixin import TreeMixin
+from .abctree import ABCTree
 from array import array
 
 __all__ = ['AVLTree']
@@ -38,7 +38,7 @@ MAXSTACK = 32
 
 
 class Node(object):
-    """ Internal object, represents a treenode """
+    """ Internal object, represents a tree node """
     __slots__ = ['left', 'right', 'balance', 'key', 'value']
 
     def __init__(self, key=None, value=None):
@@ -90,7 +90,7 @@ def jsw_double(root, direction):
     return jsw_single(root, direction)
 
 
-class AVLTree(TreeMixin):
+class AVLTree(ABCTree):
     """
     AVLTree implements a balanced binary tree with a dict-like interface.
 
@@ -112,39 +112,10 @@ class AVLTree(TreeMixin):
     AVLTree(mapping) -> new tree initialized from a mapping
     AVLTree(seq) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
-    see also TreeMixin() class.
-
+    see also abctree.ABCTree() class.
     """
-    def __init__(self, items=None):
-        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
-        self._root = None
-        self._count = 0
-        if items is not None:
-            self.update(items)
-
-    def clear(self):
-        """ T.clear() -> None.  Remove all items from T. """
-        def _clear(node):
-            if node is not None:
-                _clear(node.left)
-                _clear(node.right)
-                node.free()
-        _clear(self._root)
-        self._count = 0
-        self._root = None
-
-    @property
-    def count(self):
-        """ count of items """
-        return self._count
-
-    @property
-    def root(self):
-        """ root node of T """
-        return self._root
-
     def _new_node(self, key, value):
-        """ Create a new treenode """
+        """ Create a new tree node. """
         self._count += 1
         return Node(key, value)
 

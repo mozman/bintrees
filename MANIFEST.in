@@ -1,4 +1,8 @@
 include NEWS.txt README.txt LICENSE.txt
 include tests/testkey.txt
+include bintrees/stack.c
+include bintrees/stack.h
+include bintrees/ctrees.c
+include bintrees/ctrees.h
 recursive-include tests *.py
-recursive-include bintrees *.h *.c *.pyx *.pxd
+recursive-include bintrees *.pyx *.pxd

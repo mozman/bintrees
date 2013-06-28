@@ -4,7 +4,7 @@ Binary Tree Package
 Abstract
 ========
 
-This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython.
+This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython/C.
 
 This Classes are much slower than the built-in dict class, but all
 iterators/generators yielding data in sorted key order.
@@ -14,8 +14,8 @@ Source of Algorithms
 
 AVL- and RBTree algorithms taken from Julienne Walker: http://eternallyconfuzzled.com/jsw_home.aspx
 
-Trees written in Python (only standard library)
------------------------------------------------
+Trees written in Python
+-----------------------
 
     - *BinaryTree* -- unbalanced binary tree
     - *AVLTree* -- balanced AVL-Tree
@@ -30,8 +30,17 @@ Trees written with C-Functions and Cython as wrapper
 
 All trees provides the same API, the pickle protocol is supported.
 
-FastXTrees has C-structs as tree-node structure and C-implementation for low level
-operations: insert, remove, get_value, max_item, min_item.
+Cython-Trees have C-structs as tree-nodes and C-functions for low level operations:
+
+    - insert
+    - remove
+    - get_value
+    - min_item
+    - max_item
+    - prev_item
+    - succ_item
+    - floor_item
+    - ceiling_item
 
 Constructor
 ~~~~~~~~~~~
@@ -65,17 +74,18 @@ Methods
     * keys([reverse]) -> generator for keys of T, O(n)
     * values([reverse]) -> generator for values of  T, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
-    * popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
-    * setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
+    * pop_item() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
+    * set_default(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
     * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
+    * iter_items(s, e[, reverse]) -> generator for (k, v) items of T for s <= key < e, O(n)
 
 slicing by keys
 ~~~~~~~~~~~~~~~
 
-    * itemslice(s, e[, reverse]) -> generator for (k, v) items of T for s <= key < e, O(n)
-    * keyslice(s, e[, reverse]) -> generator for keys of T for s <= key < e, O(n)
-    * valueslice(s, e[, reverse]) -> generator for values of T for s <= key < e, O(n)
+    * item_slice(s, e[, reverse]) -> generator for (k, v) items of T for s <= key < e, O(n), synonym for iter_items(...)
+    * key_slice(s, e[, reverse]) -> generator for keys of T for s <= key < e, O(n)
+    * value_slice(s, e[, reverse]) -> generator for values of T for s <= key < e, O(n)
     * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
     * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
@@ -134,90 +144,14 @@ Set methods (using frozenset)
     * union(t1, t2, ...) -> Tree with keys from *either* trees
     * difference(t1, t2, ...) -> Tree with keys in T but not any of t1, t2, ...
     * symmetric_difference(t1) -> Tree with keys in either T and t1  but not both
-    * issubset(S) -> True if every element in T is in S
-    * issuperset(S) -> True if every element in S is in T
-    * isdisjoint(S) ->  True if T has a null intersection with S
+    * is_subset(S) -> True if every element in T is in S
+    * is_superset(S) -> True if every element in S is in T
+    * is_disjoint(S) ->  True if T has a null intersection with S
 
 Classmethods
 ~~~~~~~~~~~~
 
-    * fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
-
-Performance
-===========
-
-Profiling with timeit(): 5000 unique random int keys, time in seconds
-
-========================  =============  ==============  ==============  ==============
-unbalanced Trees          CPython 2.7.2  FastBinaryTree  ipy 2.7.0       pypy 1.7.0
-========================  =============  ==============  ==============  ==============
-build time 100x            7,55           0,60            2,51            0,29
-build & delete time 100x  13,34           1,48            4,45            0,47
-search 100x all keys       2,86           0,96            0,27            0,06
-========================  =============  ==============  ==============  ==============
-
-========================  =============  ==============  ==============  ==============
-AVLTrees                  CPython 2.7.2  FastAVLTree     ipy 2.7.0       pypy 1.7.0
-========================  =============  ==============  ==============  ==============
-build time 100x	          22,66           0,65           10,45            1,29
-build & delete time 100x  36,71           1,47           20,89            3,02
-search 100x all keys       2,34           0,85            0,89            0,14
-========================  =============  ==============  ==============  ==============
-
-========================  =============  ==============  ==============  ==============
-RBTrees                   CPython 2.7.2  FastRBTree      ipy 2.7.0       pypy 1.7.0
-========================  =============  ==============  ==============  ==============
-build time 100x	          14,78           0,65            4,43            0,49
-build & delete time 100x  39,34           1,63           12,43            1,32
-search 100x all keys       2,32           0,86            0,86            0,13
-========================  =============  ==============  ==============  ==============
-
-News
-====
-
-Version 1.0.3 May 2013
-
-  * extended iter_items(startkey=None, endkey=None, reverse=reverse) -> better performance for slicing
-  * Cython implementation of iter_items() for Fast_X_Trees()
-  * added key parameter *reverse* to itemslice(), keyslice(), valueslice()
-  * tested with CPython2.7, CPython3.3, pypy-2.0
-
-Version 1.0.2 April 2013
-
-  * bug fix: FastRBTree data corruption on inserting existing keys
-  * bug fix: union & symmetric_difference - copy all values to result tree
-
-Version 1.0.1 February 2013
-
-  * bug fixes
-  * refactorings by graingert
-  * skip useless tests for pypy
-  * new license: MIT License
-  * tested with CPython2.7, CPython3.2, CPython3.3, pypy-1.9, pypy-2.0-beta1
-  * unified line endings to LF
-  * PEP8 refactorings
-  * added floor_item/key, ceiling_item/key methods, thanks to Dai Mikurube
-
-Version 1.0.0
-
-  * bug fixes
-  * status: 5 - Production/Stable
-  * removed useless TreeIterator() class and T.treeiter() method.
-  * patch from Max Motovilov to use Visual Studio 2008 for building C-extensions
-
-Version 0.4.0
-
-  * API change!!!
-  * full Python 3 support, also for Cython implementations
-  * removed user defined compare() function - keys have to be comparable!
-  * removed T.has_key(), use 'key in T'
-  * keys(), items(), values() generating 'views'
-  * removed iterkeys(), itervalues(), iteritems() methods
-  * replaced index slicing by key slicing
-  * removed index() and item_at()
-  * repr() produces a correct representation
-  * installs on systems without cython (tested with pypy)
-  * new license: GNU Library or Lesser General Public License (LGPL)
+    * from_keys(S[,v]) -> New tree with keys from S and values equal to v.
 
 Installation
 ============
@@ -226,8 +160,14 @@ from source::
 
     python setup.py install
 
-Download
-========
+or from PyPI::
+
+    pip install bintrees
+
+Compiling the fast Trees requires Cython and on Windows is a C-Compiler necessary (MingW works fine).
+
+Download Binaries for Windows
+=============================
 
 http://bitbucket.org/mozman/bintrees/downloads
 
