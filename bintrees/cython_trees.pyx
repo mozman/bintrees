@@ -34,6 +34,8 @@ cdef class _BaseTree:
 
     def __dealloc__(self):
         ct_delete_tree(self.root)
+        self._count = 0
+        self.root = NULL
 
     @property
     def count(self):
