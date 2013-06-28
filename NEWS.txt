@@ -1,3 +1,7 @@
+Version 1.0.4 ...
+
+  * raises RuntimeError() if a tree is modified (insert/remove) while looping by forech().
+
 Version 1.0.3 May 2013
 
   * extended iter_items(startkey=None, endkey=None, reverse=reverse) -> better performance for slicing

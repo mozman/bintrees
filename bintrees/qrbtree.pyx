@@ -20,6 +20,7 @@ cdef class cRBTree:
     def __cinit__(self, items=None):
         self._root = NULL
         self._count = 0
+        self._lock = 0
         if items:
             self.update(items)
 
