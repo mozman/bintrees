@@ -60,11 +60,11 @@ class TreeSlice(object):
         return TreeSlice(self._tree, newstart(), newstop())
 
     def keys(self):
-        return self._tree.keyslice(self._start, self._stop)
+        return self._tree.key_slice(self._start, self._stop)
     __iter__ = keys
 
     def values(self):
-        return self._tree.valueslice(self._start, self._stop)
+        return self._tree.value_slice(self._start, self._stop)
 
     def items(self):
-        return self._tree.itemslice(self._start, self._stop)
+        return self._tree.iter_items(self._start, self._stop)

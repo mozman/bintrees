@@ -15,7 +15,7 @@ Binary Tree Package
 Python Trees
 ------------
 
-Balanced and unbalance binary trees written in pure Python with a dict-like API.
+Balanced and unbalanced binary trees written in pure Python with a dict-like API.
 
 Classes
 ~~~~~~~
@@ -26,7 +26,7 @@ Classes
 Cython Trees
 ------------
 
-Basic tree functions written in Cython, merged with TreeMixin to provide the
+Basic tree functions written in Cython/C, merged with _ABCTree() to provide the
 full API of the Python Trees.
 
 Classes
@@ -66,11 +66,12 @@ Methods
 * is_empty() -> True if len(T) == 0, O(1)
 * items([reverse]) -> list of T's (k, v) pairs, as 2-tuple, O(n)
 * keys([reverse]) -> list of T's keys, O(n)
-* pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
-* popitem() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
-* setdefault(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
-* update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
 * values([reverse]) -> list of T's values, O(n)
+* pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
+* pop_item() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
+* set_default(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
+* update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
+* iter_items(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n)
 
 walk forward/backward, O(log(n))
 
@@ -81,9 +82,9 @@ walk forward/backward, O(log(n))
 
 slicing by keys
 
-* itemslice(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n)
-* keyslice(s, e, reverse) -> generator for keys of T for s <= key < e, O(n)
-* valueslice(s, e, reverse) -> generator for values of T for s <= key < e, O(n)
+* item_slice(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n), synonym for iter_items(...)
+* key_slice(s, e, reverse) -> generator for keys of T for s <= key < e, O(n)
+* value_slice(s, e, reverse) -> generator for values of T for s <= key < e, O(n)
 * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
 * del T[s:e] -> remove items by key slicing, for s <= key < e, O(n)
 
@@ -127,13 +128,13 @@ Set methods (using frozenset)
 * union(t1, t2, ...) -> Tree with keys from *either* trees
 * difference(t1, t2, ...) -> Tree with keys in T but not any of t1, t2, ...
 * symmetric_difference(t1) -> Tree with keys in either T and t1  but not both
-* issubset(S) -> True if every element in T is in S
-* issuperset(S) -> True if every element in S is in T
-* isdisjoint(S) ->  True if T has a null intersection with S
+* is_subset(S) -> True if every element in T is in S
+* is_superset(S) -> True if every element in S is in T
+* is_disjoint(S) ->  True if T has a null intersection with S
 
 Classmethods
 
-* fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
+* from_keys(S[,v]) -> New tree with keys from S and values equal to v.
 """
 
 __all__ = [
@@ -145,37 +146,24 @@ __all__ = [
     'RBTree'
 ]
 
-from .treemixin import TreeMixin
 from .bintree import BinaryTree
 from .avltree import AVLTree
 from .rbtree import RBTree
 
 try:
-    from .qbintree import cBinaryTree
-
-    class FastBinaryTree(cBinaryTree, TreeMixin):
-        """ Faster unbalanced binary tree  written in Cython with C-Code. """
+    from .cython_trees import FastBinaryTree
 except ImportError:  # fall back to pure Python version
-    FastBinaryTree = BinaryTree
-except ValueError:  # for pypy
+    print("Warning: FastBinaryTree not available, using Python version BinaryTree.")
     FastBinaryTree = BinaryTree
 
 try:
-    from .qavltree import cAVLTree
-
-    class FastAVLTree(cAVLTree, TreeMixin):
-        """ Faster balanced AVL-Tree written in Cython with C-Code. """
+    from .cython_trees import FastAVLTree
 except ImportError:  # fall back to pure Python version
-    FastAVLTree = AVLTree
-except ValueError:  # for pypy
+    print("Warning: FastAVLTree not available, using Python version AVLTree.")
     FastAVLTree = AVLTree
 
 try:
-    from .qrbtree import cRBTree
-
-    class FastRBTree(cRBTree, TreeMixin):
-        """ Faster balanced Red-Black-Tree  written in Cython with C-Code. """
+    from .cython_trees import FastRBTree
 except ImportError:  # fall back to pure Python version
-    FastRBTree = RBTree
-except ValueError:  # for pypy
+    print("Warning: FastRBTree not available, using Python version RBTree.")
     FastRBTree = RBTree

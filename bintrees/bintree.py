@@ -8,7 +8,7 @@
 
 from __future__ import absolute_import
 
-from .treemixin import TreeMixin
+from .abctree import ABCTree
 
 __all__ = ['BinaryTree']
 
@@ -42,7 +42,7 @@ class Node(object):
         self.key = None
 
 
-class BinaryTree(TreeMixin):
+class BinaryTree(ABCTree):
     """
     BinaryTree implements an unbalanced binary tree with a dict-like interface.
 
@@ -55,37 +55,8 @@ class BinaryTree(TreeMixin):
     BinaryTree(mapping,) -> new tree initialized from a mapping
     BinaryTree(seq) -> new tree initialized from seq [(k1, v1), (k2, v2), ... (kn, vn)]
 
-    see also TreeMixin() class.
-
+    see also abctree.ABCTree() class.
     """
-    def __init__(self, items=None):
-        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
-        self._root = None
-        self._count = 0
-        if items is not None:
-            self.update(items)
-
-    def clear(self):
-        """ T.clear() -> None.  Remove all items from T. """
-        def _clear(node):
-            if node is not None:
-                _clear(node.left)
-                _clear(node.right)
-                node.free()
-        _clear(self._root)
-        self._count = 0
-        self._root = None
-
-    @property
-    def root(self):
-        """ root node of T """
-        return self._root
-
-    @property
-    def count(self):
-        """ count of items """
-        return self._count
-
     def _new_node(self, key, value):
         """ Create a new tree node. """
         self._count += 1
@@ -151,3 +122,4 @@ class BinaryTree(TreeMixin):
                     node = node[direction]
                     if node is None:
                         raise KeyError(str(key))
+
