@@ -771,6 +771,14 @@ class CheckTree(object):
         expected_keys = sorted(set(insert_keys))
         self.assertEqual(expected_keys, list(tree.keys()), "Data corruption in %s!" % tree.__class__)
 
+    def test_098_modify_tree_while_looping(self):
+        def loop_func(k, v):
+            tree.discard(57)
+
+        tree = self.TREE_CLASS(self.default_values1)  # key == value
+        with self.assertRaises(RuntimeError):
+            tree.foreach(loop_func)
+
 
 class TestBinaryTree(CheckTree, unittest.TestCase):
     TREE_CLASS = BinaryTree

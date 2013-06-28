@@ -30,15 +30,22 @@ cdef class cWalker:
 
     @property
     def key(self):
-        return <object> self.node.key
+        if self.node != NULL:
+            return <object> self.node.key
+        else:
+            raise RuntimeError("Invalid tree operation: key")
 
     @property
     def value(self):
-        return <object> self.node.value
+        if self.node != NULL:
+            return <object> self.node.value
+        else:
+            raise RuntimeError("Invalid tree operation: value")
+
 
     @property
     def item(self):
-        return (<object>self.node.key, <object>self.node.value)
+        return self.key, self.value
 
     @property
     def is_valid(self):
@@ -82,19 +89,34 @@ cdef class cWalker:
         return self.node.link[direction] != NULL
 
     cpdef down(self, int direction):
-        self.node = self.node.link[direction]
+        if self.node != NULL:
+            self.node = self.node.link[direction]
+        else:
+            raise RuntimeError("Invalid tree operation: down()")
 
     def go_left(self):
-        self.node = self.node.link[0]
+        if self.node != NULL:
+            self.node = self.node.link[0]
+        else:
+            raise RuntimeError("Invalid tree operation: go_left()")
 
     def go_right(self):
-        self.node = self.node.link[1]
+        if self.node != NULL:
+            self.node = self.node.link[1]
+        else:
+            raise RuntimeError("Invalid tree operation: go_right()")
 
     def has_left(self):
-        return self.node.link[0] != NULL
+        if self.node != NULL:
+            return self.node.link[0] != NULL
+        else:
+            raise RuntimeError("Invalid tree operation: has_left()")
 
     def has_right(self):
-        return self.node.link[1] != NULL
+        if self.node != NULL:
+            return self.node.link[1] != NULL
+        else:
+            raise RuntimeError("Invalid tree operation: has_right()")
 
     def succ_item(self, key):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key

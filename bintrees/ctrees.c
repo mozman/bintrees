@@ -27,9 +27,9 @@ ct_new_node(PyObject *key, PyObject *value, int xdata)
 	node_t *new_node = PyMem_Malloc(sizeof(node_t));
 	if (new_node != NULL) {
 		KEY(new_node) = key;
-		Py_INCREF(key);
+		Py_XINCREF(key);
 		VALUE(new_node) = value;
-		Py_INCREF(value);
+		Py_XINCREF(value);
 		LEFT_NODE(new_node) = NULL;
 		RIGHT_NODE(new_node) = NULL;
 		XDATA(new_node) = xdata;

@@ -377,11 +377,19 @@ class TreeMixin(object):
     def foreach(self, func, order=0):
         """ Visit all tree nodes and process key, value.
 
+        Warning: Do not modify tree (insert, remove) while looping!
+
         parm func: function(key, value)
         param int order: inorder = 0, preorder = -1, postorder = +1
-
         """
+        start_size = self.count
+
         def _traverse():
+            # This is just a simple check and does not cover all possible modifications like replacing one item by
+            # another and so on - to cover all modification requires a lock/unlock mechanism while looping and checks
+            # in the insert() and remove() methods of all trees.
+            if start_size != self.count:
+                raise RuntimeError("Modified tree while looping (foreach).")
             if order == -1:
                 func(node.key, node.value)
             if node.has_left():
