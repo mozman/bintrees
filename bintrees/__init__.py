@@ -26,7 +26,7 @@ Classes
 Cython Trees
 ------------
 
-Basic tree functions written in Cython, merged with TreeMixin to provide the
+Basic tree functions written in Cython/C, merged with _ABCTree() to provide the
 full API of the Python Trees.
 
 Classes
@@ -66,11 +66,12 @@ Methods
 * is_empty() -> True if len(T) == 0, O(1)
 * items([reverse]) -> list of T's (k, v) pairs, as 2-tuple, O(n)
 * keys([reverse]) -> list of T's keys, O(n)
+* values([reverse]) -> list of T's values, O(n)
 * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
 * pop_item() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
 * set_default(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
 * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
-* values([reverse]) -> list of T's values, O(n)
+* iter_items(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n)
 
 walk forward/backward, O(log(n))
 
@@ -81,7 +82,7 @@ walk forward/backward, O(log(n))
 
 slicing by keys
 
-* item_slice(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n)
+* item_slice(s, e, reverse) -> generator for (k, v) items of T for s <= key < e, O(n), synonym for iter_items(...)
 * key_slice(s, e, reverse) -> generator for keys of T for s <= key < e, O(n)
 * value_slice(s, e, reverse) -> generator for values of T for s <= key < e, O(n)
 * T[s:e] -> TreeSlice object, with keys in range s <= key < e, O(n)
@@ -145,7 +146,6 @@ __all__ = [
     'RBTree'
 ]
 
-from .abctree import ABCTree
 from .bintree import BinaryTree
 from .avltree import AVLTree
 from .rbtree import RBTree
@@ -155,24 +155,15 @@ try:
 except ImportError:  # fall back to pure Python version
     print("Warning: FastBinaryTree not available, using Python version BinaryTree.")
     FastBinaryTree = BinaryTree
-except ValueError:  # for pypy
-    print("Info: pypy using Python version BinaryTree for FastBinaryTree.")
-    FastBinaryTree = BinaryTree
 
 try:
     from .cython_trees import FastAVLTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastAVLTree not available, using Python version AVLTree.")
     FastAVLTree = AVLTree
-except ValueError:  # for pypy
-    print("Info: pypy using Python version AVLTree for FastAVLTree.")
-    FastAVLTree = AVLTree
 
 try:
     from .cython_trees import FastRBTree
 except ImportError:  # fall back to pure Python version
     print("Warning: FastRBTree not available, using Python version RBTree.")
-    FastRBTree = RBTree
-except ValueError:  # for pypy
-    print("Info: pypy using Python version RBTree for FastRBTree.")
     FastRBTree = RBTree
