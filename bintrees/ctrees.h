@@ -27,6 +27,7 @@ void ct_delete_tree(node_t *root);
 int ct_compare(PyObject *key1, PyObject *key2);
 PyObject *ct_get_item(node_t *root, PyObject *key);
 node_t *ct_find_node(node_t *root, PyObject *key);
+node_t *ct_get_leaf_node(node_t *node);
 node_t *ct_succ_node(node_t *root, PyObject *key);
 node_t *ct_prev_node(node_t *root, PyObject *key);
 node_t *ct_max_node(node_t *root);

@@ -9,32 +9,29 @@
 from .abctree import _ABCTree
 from ctrees cimport *
 
-cdef node_t* get_leaf_node(node_t *node):
-    """ get a leaf node """
-    while True:
-        if node.link[0] != NULL:
-            node = node.link[0]
-        elif node.link[1] != NULL:
-            node = node.link[1]
-        else:
-            return node
+DEF MAXSTACK = 64
 
 cdef class NodeStack:
-    cdef node_t* stack[64]
+    """Simple stack for tree nodes."""
+    cdef node_t* stack[MAXSTACK]
     cdef int stackptr
 
     def __cinit__(self):
         self.stackptr = 0
 
-    cdef inline push(self, node_t* node):
+    cdef push(self, node_t* node):
+        if self.stackptr >= MAXSTACK:
+            raise RuntimeError("Stack overflow in NodeStack.push().")
         self.stack[self.stackptr] = node
         self.stackptr += 1
 
-    cdef inline node_t *pop(self):
+    cdef node_t *pop(self):
+        if self.stackptr <= 0:
+            raise RuntimeError("Stack underflow in NodeStack.pop().")
         self.stackptr -= 1
         return self.stack[self.stackptr]
 
-    cdef inline bint is_empty(self):
+    cdef bint is_empty(self):
         return self.stackptr == 0
 
 cdef class _BaseTree:
@@ -84,7 +81,7 @@ cdef class _BaseTree:
             raise ValueError("Tree is empty")
         return <object>node.key, <object>node.value
 
-    cpdef succ_item(self, key):
+    def succ_item(self, key):
         """ Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
@@ -127,7 +124,6 @@ cdef class _BaseTree:
         """
         if self.count == 0:
             return
-        cdef bint iter_all = (start_key is None) and (end_key is None)
         cdef int direction = 1 if reverse else 0
         cdef int other = 1 - direction
         cdef bint go_down = True
@@ -140,10 +136,8 @@ cdef class _BaseTree:
                 stack.push(node)
                 node = node.link[direction]
             else:
-                if iter_all:
-                    yield <object>node.key, <object>node.value
-                elif (start_key is None or ct_compare(start_key, <object>node.key) < 1) and \
-                     (end_key is None or ct_compare(end_key, <object>node.key) > 0):
+                if (start_key is None or ct_compare(start_key, <object>node.key) < 1) and \
+                    (end_key is None or ct_compare(end_key, <object>node.key) > 0):
                     yield <object>node.key, <object>node.value
                 if node.link[other] != NULL:
                     node = node.link[other]
@@ -155,13 +149,13 @@ cdef class _BaseTree:
                     go_down = False
 
     def pop_item(self):
-        """ T.popitem() -> (k, v), remove and return some (key, value) pair as a
+        """ T.pop_item() -> (k, v), remove and return some (key, value) pair as a
         2-tuple; but raise KeyError if T is empty
         """
         if self.count == 0:
-            raise KeyError("popitem(): tree is empty")
+            raise KeyError("pop_item(): tree is empty")
 
-        cdef node_t *node = get_leaf_node(self.root)
+        cdef node_t *node = ct_get_leaf_node(self.root)
         key = <object> node.key
         value = <object> node.value
         self.remove(key)
@@ -215,8 +209,10 @@ cdef class _BinaryTree(_BaseTree):
         else:
             self.count -= 1
 
+
 class FastBinaryTree(_BinaryTree, _ABCTree):
     pass
+
 
 cdef class _AVLTree(_BaseTree):
     def insert(self, key, value):
@@ -233,8 +229,10 @@ cdef class _AVLTree(_BaseTree):
         else:
             self.count -= 1
 
+
 class FastAVLTree(_AVLTree, _ABCTree):
     pass
+
 
 cdef class _RBTree(_BaseTree):
     def insert(self, key, value):
@@ -250,6 +248,7 @@ cdef class _RBTree(_BaseTree):
             raise KeyError(str(key))
         else:
             self.count -= 1
+
 
 class FastRBTree(_RBTree, _ABCTree):
     pass

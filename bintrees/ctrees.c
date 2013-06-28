@@ -109,6 +109,20 @@ ct_find_node(node_t *root, PyObject *key)
 	return NULL; /* key not found */
 }
 
+extern node_t*
+ct_get_leaf_node(node_t *node)
+{
+    if (node == NULL)
+        return NULL;
+    for(;;) {
+        if (LEFT_NODE(node) != NULL)
+            node = LEFT_NODE(node);
+        else if (RIGHT_NODE(node) != NULL)
+            node = RIGHT_NODE(node);
+        else return node;
+    }
+}
+
 extern PyObject *
 ct_get_item(node_t *root, PyObject *key)
 {

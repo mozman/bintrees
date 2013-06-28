@@ -17,6 +17,7 @@ cdef extern from "ctrees.h":
     int ct_compare(object key1, object key2)
     void ct_delete_tree(node_t *root)
     node_t *ct_find_node(node_t *root, object key)
+    node_t *ct_get_leaf_node(node_t *node)
     PyObject *ct_get_item(node_t *root, object key)
     node_t *ct_max_node(node_t *root)
     node_t *ct_min_node(node_t *root)
