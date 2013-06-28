@@ -32,28 +32,28 @@ try:
 except IOError:
     keys = random_keys()
 
-py_searchtree = BinaryTree.fromkeys(keys)
-cy_searchtree = FastBinaryTree.fromkeys(keys)
+py_searchtree = BinaryTree.from_keys(keys)
+cy_searchtree = FastBinaryTree.from_keys(keys)
 
 
 def bintree_build_delete():
-    tree = BinaryTree.fromkeys(keys)
+    tree = BinaryTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def cbintree_build_delete():
-    tree = FastBinaryTree.fromkeys(keys)
+    tree = FastBinaryTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def bintree_build():
-    tree = BinaryTree.fromkeys(keys)
+    tree = BinaryTree.from_keys(keys)
 
 
 def cbintree_build():
-    tree = FastBinaryTree.fromkeys(keys)
+    tree = FastBinaryTree.from_keys(keys)
 
 
 def bintree_search():

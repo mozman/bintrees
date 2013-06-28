@@ -13,7 +13,7 @@ from distutils.extension import Extension
 
 try:
     from Cython.Distutils import build_ext
-    ext_modules = [Extension("bintrees.cython_trees", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cython_trees.pyx"]),
+    ext_modules = [Extension("bintrees.cython_trees", ["bintrees/ctrees.c", "bintrees/cython_trees.pyx"]),
                    ]
     commands = {'build_ext': build_ext}
 except ImportError:
@@ -26,7 +26,7 @@ def read(fname):
 
 setup(
     name='bintrees',
-    version='2.0.0b2',
+    version='2.0.0b3',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',
@@ -35,11 +35,11 @@ setup(
     cmdclass=commands,
     ext_modules=ext_modules,
     packages=['bintrees'],
-    long_description=read('README.txt')+read('NEWS.txt'),
+    long_description=read('README.rst')+read('NEWS.rst'),
     platforms="OS Independent",
     license="MIT License",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",

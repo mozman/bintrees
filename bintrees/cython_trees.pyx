@@ -8,7 +8,6 @@
 
 from .abctree import _ABCTree
 from ctrees cimport *
-from stack cimport *
 
 cdef node_t* get_leaf_node(node_t *node):
     """ get a leaf node """
@@ -21,21 +20,22 @@ cdef node_t* get_leaf_node(node_t *node):
             return node
 
 cdef class NodeStack:
-    cdef node_stack_t *stack
-    def __cinit__(self, int size):
-        self.stack = stack_init(size)
+    cdef node_t* stack[64]
+    cdef int stackptr
 
-    def __dealloc__(self):
-        stack_delete(self.stack)
+    def __cinit__(self):
+        self.stackptr = 0
 
     cdef inline push(self, node_t* node):
-        stack_push(self.stack, node)
+        self.stack[self.stackptr] = node
+        self.stackptr += 1
 
     cdef inline node_t *pop(self):
-        return stack_pop(self.stack)
+        self.stackptr -= 1
+        return self.stack[self.stackptr]
 
     cdef inline bint is_empty(self):
-        return stack_is_empty(self.stack)
+        return self.stackptr == 0
 
 cdef class _BaseTree:
     cdef node_t *root  # private (hidden) for CPython
@@ -131,7 +131,7 @@ cdef class _BaseTree:
         cdef int direction = 1 if reverse else 0
         cdef int other = 1 - direction
         cdef bint go_down = True
-        cdef NodeStack stack = NodeStack(32)
+        cdef NodeStack stack = NodeStack()
         cdef node_t *node
 
         node = self.root
@@ -150,7 +150,6 @@ cdef class _BaseTree:
                     go_down = True
                 else:
                     if stack.is_empty():
-                        del stack
                         return  # all done
                     node = stack.pop()
                     go_down = False
@@ -176,7 +175,7 @@ cdef class _BaseTree:
         """
         if self.count == 0:
             return
-        cdef NodeStack stack = NodeStack(128)
+        cdef NodeStack stack = NodeStack()
         cdef node_t *node = self.root
         cdef bint go_down = True
 
@@ -194,7 +193,6 @@ cdef class _BaseTree:
                     go_down = True
                 else:
                     if stack.is_empty():
-                        del stack
                         return  # all done
                     node = stack.pop()
                     if order == +1:
