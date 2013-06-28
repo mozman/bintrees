@@ -25,7 +25,7 @@ cdef class NodeStack:
         self.stack[self.stackptr] = node
         self.stackptr += 1
 
-    cdef node_t *pop(self):
+    cdef node_t* pop(self):
         if self.stackptr <= 0:
             raise RuntimeError("Stack underflow in NodeStack.pop().")
         self.stackptr -= 1

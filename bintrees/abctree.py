@@ -39,31 +39,31 @@ class _ABCTree(object):
         T.clear() -> None.  Remove all items from T.
 
     iter_items(...)
-        iter_items(start_key, end_key, [reverse]) -> iterate over all items, yielding (k, v) tuple
+        iter_items(s, e, [reverse]) -> iterate over all items with keys in range s <= key < e, yielding (k, v) tuple
 
     foreach(...)
-        foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
+        foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node
 
     pop_item(...)
-        T.popitem() -> (k, v), remove and return some (key, value)
+        T.pop_item() -> (k, v), remove and return some (key, value)
 
     min_item(...)
-        min_item() -> get smallest (key, value) pair of T, O(log(n))
+        min_item() -> get smallest (key, value) pair of T
 
     max_item(...)
-        max_item() -> get largest (key, value) pair of T, O(log(n))
+        max_item() -> get largest (key, value) pair of T
 
     prev_item(...)
-        prev_item(key) -> get (k, v) pair, where k is predecessor to key, O(log(n))
+        prev_item(key) -> get (k, v) pair, where k is predecessor to key
 
     succ_item(...)
-        succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
+        succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key
 
     floor_item(...)
-        floor_item(key) -> get (k, v) pair, where k is the greatest key less than or equal to key, O(log(n))
+        floor_item(key) -> get (k, v) pair, where k is the greatest key less than or equal to key
 
     ceiling_item(...)
-        ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key, O(log(n))
+        ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key
 
     Methods defined here
     --------------------
@@ -157,19 +157,19 @@ class _ABCTree(object):
     """
 
     def __repr__(self):
-        """ x.__repr__(...) <==> repr(x) """
+        """T.__repr__(...) <==> repr(x)"""
         tpl = "%s({%s})" % (self.__class__.__name__, '%s')
         return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
 
     def copy(self):
-        """ T.copy() -> get a shallow copy of T. """
+        """T.copy() -> get a shallow copy of T."""
         tree = self.__class__()
         self.foreach(tree.insert, order=-1)
         return tree
     __copy__ = copy
 
     def __contains__(self, key):
-        """ k in T -> True if T has a key k, else False """
+        """k in T -> True if T has a key k, else False"""
         try:
             self.get_value(key)
             return True
@@ -177,35 +177,35 @@ class _ABCTree(object):
             return False
 
     def __len__(self):
-        """ x.__len__() <==> len(x) """
+        """T.__len__() <==> len(x)"""
         return self.count
 
     def __min__(self):
-        """ x.__min__() <==> min(x) """
+        """T.__min__() <==> min(x)"""
         return self.min_item()
 
     def __max__(self):
-        """ x.__max__() <==> max(x) """
+        """T.__max__() <==> max(x)"""
         return self.max_item()
 
     def __and__(self, other):
-        """ x.__and__(other) <==> self & other """
+        """T.__and__(other) <==> self & other"""
         return self.intersection(other)
 
     def __or__(self, other):
-        """ x.__or__(other) <==> self | other """
+        """T.__or__(other) <==> self | other"""
         return self.union(other)
 
     def __sub__(self, other):
-        """ x.__sub__(other) <==> self - other """
+        """T.__sub__(other) <==> self - other"""
         return self.difference(other)
 
     def __xor__(self, other):
-        """ x.__xor__(other) <==> self ^ other """
+        """T.__xor__(other) <==> self ^ other"""
         return self.symmetric_difference(other)
 
     def discard(self, key):
-        """ x.discard(k) -> None, remove k from T, if k is present """
+        """T.discard(k) -> None, remove k from T, if k is present"""
         try:
             self.remove(key)
         except KeyError:
@@ -215,11 +215,11 @@ class _ABCTree(object):
         self.clear()
 
     def is_empty(self):
-        """ x.is_empty() -> False if T contains any items else True"""
+        """T.is_empty() -> False if T contains any items else True"""
         return self.count == 0
 
     def keys(self, reverse=False):
-        """ T.iterkeys([reverse]) -> an iterator over the keys of T, in ascending
+        """T.keys([reverse]) -> an iterator over the keys of T, in ascending
         order if reverse is True, iterate in descending order, reverse defaults
         to False
         """
@@ -230,48 +230,47 @@ class _ABCTree(object):
         return self.keys(reverse=True)
 
     def values(self, reverse=False):
-        """ T.values([reverse]) -> an iterator over the values of T, in ascending order
+        """T.values([reverse]) -> an iterator over the values of T, in ascending order
         if reverse is True, iterate in descending order, reverse defaults to False
         """
         return (item[1] for item in self.iter_items(reverse=reverse))
 
     def items(self, reverse=False):
-        """ T.items([reverse]) -> an iterator over the (key, value) items of T,
+        """T.items([reverse]) -> an iterator over the (key, value) items of T,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False
         """
         return self.iter_items(reverse=reverse)
 
     def __getitem__(self, key):
-        """ x.__getitem__(y) <==> x[y] """
+        """T.__getitem__(y) <==> x[y]"""
         if isinstance(key, slice):
             return TreeSlice(self, key.start, key.stop)
         else:
             return self.get_value(key)
 
     def __setitem__(self, key, value):
-        """ x.__setitem__(i, y) <==> x[i]=y """
+        """T.__setitem__(i, y) <==> x[i]=y"""
         if isinstance(key, slice):
             raise ValueError('setslice is not supported')
         self.insert(key, value)
 
     def __delitem__(self, key):
-        """ x.__delitem__(y) <==> del x[y] """
+        """T.__delitem__(y) <==> del x[y]"""
         if isinstance(key, slice):
-            self.remove_items(self.keyslice(key.start, key.stop))
+            self.remove_items(self.key_slice(key.start, key.stop))
         else:
             self.remove(key)
 
     def remove_items(self, keys):
-        """ T.remove_items(keys) -> remove items by keys
-        """
+        """T.remove_items(keys) -> remove items by keys"""
         # convert generator to a set, because the content of the
         # tree will be modified!
         for key in frozenset(keys):
             self.remove(key)
 
     def key_slice(self, start_key, end_key, reverse=False):
-        """ T.key_slice(start_key, end_key) -> key iterator:
+        """T.key_slice(start_key, end_key) -> key iterator:
         start_key <= key < end_key.
 
         Yields keys in ascending order if reverse is False else in descending order.
@@ -280,7 +279,7 @@ class _ABCTree(object):
     keyslice = key_slice  # for compatibility
 
     def value_slice(self, start_key, end_key, reverse=False):
-        """ T.value_slice(start_key, end_key) -> value iterator:
+        """T.value_slice(start_key, end_key) -> value iterator:
         start_key <= key < end_key.
 
         Yields values in ascending key order if reverse is False else in descending key order.
@@ -289,7 +288,7 @@ class _ABCTree(object):
     valueslice = value_slice  # for compatibility
 
     def item_slice(self, start_key, end_key, reverse=False):
-        """ T.item_slice(start_key, end_key) -> item iterator:
+        """T.item_slice(start_key, end_key) -> item iterator:
         start_key <= key < end_key.
 
         Yields items in ascending key order if reverse is False else in descending key order.
@@ -307,7 +306,7 @@ class _ABCTree(object):
         self.update(state)
 
     def set_default(self, key, default=None):
-        """ T.setdefault(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T """
+        """T.set_default(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T"""
         try:
             return self.get_value(key)
         except KeyError:
@@ -316,7 +315,7 @@ class _ABCTree(object):
     setdefault = set_default  # for compatibility
 
     def update(self, *args):
-        """ T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v """
+        """T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v"""
         for items in args:
             try:
                 generator = items.items()
@@ -328,10 +327,7 @@ class _ABCTree(object):
 
     @classmethod
     def from_keys(cls, iterable, value=None):
-        """ T.fromkeys(S[,v]) -> New tree with keys from S and values equal to v.
-
-        v defaults to None.
-        """
+        """T.fromkeys(S[,v]) -> New tree with keys from S and values equal to v."""
         tree = cls()
         for key in iterable:
             tree.insert(key, value)
@@ -339,14 +335,14 @@ class _ABCTree(object):
     fromkeys = from_keys  # for compatibility
 
     def get(self, key, default=None):
-        """ T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None. """
+        """T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None."""
         try:
             return self.get_value(key)
         except KeyError:
             return default
 
     def pop(self, key, *args):
-        """ T.pop(k[,d]) -> v, remove specified key and return the corresponding value
+        """T.pop(k[,d]) -> v, remove specified key and return the corresponding value.
         If key is not found, d is returned if given, otherwise KeyError is raised
         """
         if len(args) > 1:
@@ -362,31 +358,31 @@ class _ABCTree(object):
                 return args[0]
 
     def prev_key(self, key):
-        """ Get predecessor to key, raises KeyError if key is min key
+        """Get predecessor to key, raises KeyError if key is min key
         or key does not exist.
         """
         return self.prev_item(key)[0]
 
     def succ_key(self, key):
-        """ Get successor to key, raises KeyError if key is max key
+        """Get successor to key, raises KeyError if key is max key
         or key does not exist.
         """
         return self.succ_item(key)[0]
 
     def floor_key(self, key):
-        """ Get the greatest key less than or equal to the given key, raises
+        """Get the greatest key less than or equal to the given key, raises
         KeyError if there is no such key.
         """
         return self.floor_item(key)[0]
 
     def ceiling_key(self, key):
-        """ Get the smallest key greater than or equal to the given key, raises
+        """Get the smallest key greater than or equal to the given key, raises
         KeyError if there is no such key.
         """
         return self.ceiling_item(key)[0]
 
     def pop_min(self):
-        """ T.pop_min() -> (k, v), remove item with minimum key, raise ValueError
+        """T.pop_min() -> (k, v), remove item with minimum key, raise ValueError
         if T is empty.
         """
         item = self.min_item()
@@ -394,7 +390,7 @@ class _ABCTree(object):
         return item
 
     def pop_max(self):
-        """ T.pop_max() -> (k, v), remove item with maximum key, raise ValueError
+        """T.pop_max() -> (k, v), remove item with maximum key, raise ValueError
         if T is empty.
         """
         item = self.max_item()
@@ -402,15 +398,15 @@ class _ABCTree(object):
         return item
 
     def min_key(self):
-        """ Get min key of tree, raises ValueError if tree is empty. """
+        """Get min key of tree, raises ValueError if tree is empty. """
         return  self.min_item()[0]
 
     def max_key(self):
-        """ Get max key of tree, raises ValueError if tree is empty. """
+        """Get max key of tree, raises ValueError if tree is empty. """
         return self.max_item()[0]
 
     def nsmallest(self, n, pop=False):
-        """ T.nsmallest(n) -> get list of n smallest items (k, v).
+        """T.nsmallest(n) -> get list of n smallest items (k, v).
         If pop is True, remove items from T.
         """
         if pop:
@@ -420,7 +416,7 @@ class _ABCTree(object):
             return [next(items) for _ in range(min(len(self), n))]
 
     def nlargest(self, n, pop=False):
-        """ T.nlargest(n) -> get list of n largest items (k, v).
+        """T.nlargest(n) -> get list of n largest items (k, v).
         If pop is True remove items from T.
         """
         if pop:
@@ -430,7 +426,7 @@ class _ABCTree(object):
             return [next(items) for _ in range(min(len(self), n))]
 
     def intersection(self, *trees):
-        """ x.intersection(t1, t2, ...) -> Tree, with keys *common* to all trees
+        """T.intersection(t1, t2, ...) -> Tree, with keys *common* to all trees
         """
         thiskeys = frozenset(self.keys())
         sets = _build_sets(trees)
@@ -438,7 +434,7 @@ class _ABCTree(object):
         return self.__class__(((key, self.get(key)) for key in rkeys))
 
     def union(self, *trees):
-        """ x.union(t1, t2, ...) -> Tree with keys from *either* trees
+        """T.union(t1, t2, ...) -> Tree with keys from *either* trees
         """
         thiskeys = frozenset(self.keys())
         rkeys = thiskeys.union(*_build_sets(trees))
@@ -447,7 +443,7 @@ class _ABCTree(object):
         return self.__class__(((key, _multi_tree_get(all_trees, key)) for key in rkeys))
 
     def difference(self, *trees):
-        """ x.difference(t1, t2, ...) -> Tree with keys in T but not any of t1,
+        """T.difference(t1, t2, ...) -> Tree with keys in T but not any of t1,
         t2, ...
         """
         thiskeys = frozenset(self.keys())
@@ -455,7 +451,7 @@ class _ABCTree(object):
         return self.__class__(((key, self.get(key)) for key in rkeys))
 
     def symmetric_difference(self, tree):
-        """ x.symmetric_difference(t1) -> Tree with keys in either T and t1  but
+        """T.symmetric_difference(t1) -> Tree with keys in either T and t1 but
         not both
         """
         thiskeys = frozenset(self.keys())
@@ -464,19 +460,19 @@ class _ABCTree(object):
         return self.__class__(((key, _multi_tree_get(all_trees, key)) for key in rkeys))
 
     def is_subset(self, tree):
-        """ x.issubset(tree) -> True if every element in x is in tree """
+        """T.issubset(tree) -> True if every element in x is in tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.issubset(frozenset(tree.keys()))
     issubset = is_subset  # for compatibility
 
     def is_superset(self, tree):
-        """ x.issubset(tree) -> True if every element in tree is in x """
+        """T.issubset(tree) -> True if every element in tree is in x """
         thiskeys = frozenset(self.keys())
         return thiskeys.issuperset(frozenset(tree.keys()))
     issuperset = is_superset  # for compatibility
 
     def is_disjoint(self, tree):
-        """ x.isdisjoint(S) ->  True if x has a null intersection with tree """
+        """T.isdisjoint(S) ->  True if x has a null intersection with tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.isdisjoint(frozenset(tree.keys()))
     isdisjoint = is_disjoint  # for compatibility
@@ -528,14 +524,14 @@ class ABCTree(_ABCTree):
     * ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key, O(log(n))
     """
     def __init__(self, items=None):
-        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
+        """T.__init__(...) initializes T; see T.__class__.__doc__ for signature"""
         self._root = None
         self._count = 0
         if items is not None:
             self.update(items)
 
     def clear(self):
-        """ T.clear() -> None.  Remove all items from T. """
+        """T.clear() -> None.  Remove all items from T."""
         def _clear(node):
             if node is not None:
                 _clear(node.left)
@@ -547,7 +543,7 @@ class ABCTree(_ABCTree):
 
     @property
     def count(self):
-        """ count of items """
+        """Get items count."""
         return self._count
 
     def get_value(self, key):
@@ -562,11 +558,11 @@ class ABCTree(_ABCTree):
         raise KeyError(str(key))
 
     def pop_item(self):
-        """ T.popitem() -> (k, v), remove and return some (key, value) pair as a
-        2-tuple; but raise KeyError if T is empty
+        """T.pop_item() -> (k, v), remove and return some (key, value) pair as a
+        2-tuple; but raise KeyError if T is empty.
         """
         if self.is_empty():
-            raise KeyError("popitem(): tree is empty")
+            raise KeyError("pop_item(): tree is empty")
         node = self._root
         while True:
             if node.left is not None:
@@ -582,11 +578,10 @@ class ABCTree(_ABCTree):
     popitem = pop_item  # for compatibility
 
     def foreach(self, func, order=0):
-        """ Visit all tree nodes and process key, value.
+        """Visit all tree nodes and process key, value.
 
         parm func: function(key, value)
         param int order: inorder = 0, preorder = -1, postorder = +1
-
         """
         def _traverse(node):
             if order == -1:
@@ -602,7 +597,7 @@ class ABCTree(_ABCTree):
         _traverse(self._root)
 
     def min_item(self):
-        """ Get item with min key of tree, raises ValueError if tree is empty. """
+        """Get item with min key of tree, raises ValueError if tree is empty."""
         if self.count == 0:
             raise ValueError("Tree is empty")
         node = self._root
@@ -611,7 +606,7 @@ class ABCTree(_ABCTree):
         return node.key, node.value
 
     def max_item(self):
-        """ Get item with max key of tree, raises ValueError if tree is empty. """
+        """Get item with max key of tree, raises ValueError if tree is empty."""
         if self.count == 0:
             raise ValueError("Tree is empty")
         node = self._root
@@ -649,7 +644,7 @@ class ABCTree(_ABCTree):
         return succ.key, succ.value
 
     def succ_item(self, key):
-        """ Get successor (k,v) pair of key, raises KeyError if key is max key
+        """Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
         if self.count == 0:
@@ -662,7 +657,7 @@ class ABCTree(_ABCTree):
         )
 
     def prev_item(self, key):
-        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
+        """Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
         if self.count == 0:
@@ -675,7 +670,7 @@ class ABCTree(_ABCTree):
         )
 
     def floor_item(self, key):
-        """ Get the element (k,v) pair associated with the greatest key less
+        """Get the element (k,v) pair associated with the greatest key less
         than or equal to the given key, raises KeyError if there is no such key.
         """
         node = self._root
@@ -695,7 +690,7 @@ class ABCTree(_ABCTree):
         raise KeyError(str(key))
 
     def ceiling_item(self, key):
-        """ Get the element (k,v) pair associated with the smallest key greater
+        """Get the element (k,v) pair associated with the smallest key greater
         than or equal to the given key, raises KeyError if there is no such key.
         """
         node = self._root
