@@ -1,6 +1,12 @@
-Version 1.0.4 ...
 
-  * raises RuntimeError() if a tree is modified (insert/remove) while looping by forech().
+NEWS
+====
+
+Version 2.0.0 July 2013
+
+  * code base refactoring
+  * removed tree walkers
+  * API change: consistent method naming, synonyms for dict/set compatibility exists, like fromkeys() for from_keys()
 
 Version 1.0.3 May 2013
 
