@@ -67,4 +67,4 @@ class TreeSlice(object):
         return self._tree.value_slice(self._start, self._stop)
 
     def items(self):
-        return self._tree.item_slice(self._start, self._stop)
+        return self._tree.iter_items(self._start, self._stop)

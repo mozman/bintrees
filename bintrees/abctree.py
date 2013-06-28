@@ -9,7 +9,6 @@
 from __future__ import absolute_import
 
 from .treeslice import TreeSlice
-from .walker import Walker
 from operator import attrgetter, lt, gt
 
 class _ABCTree(object):
@@ -543,9 +542,6 @@ class ABCTree(_ABCTree):
             else:
                 node = node.right
         raise KeyError(str(key))
-
-    def _get_walker(self):
-        return Walker(self)
 
     def pop_item(self):
         """ T.popitem() -> (k, v), remove and return some (key, value) pair as a

@@ -28,8 +28,8 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-ptree = PTree.fromkeys(keys)
-ftree = FTree.fromkeys(keys)
+ptree = PTree.from_keys(keys)
+ftree = FTree.from_keys(keys)
 sorted_keys = list(ftree.keys())
 median_key = sorted_keys[int(len(sorted_keys) / 2)]
 
@@ -53,12 +53,12 @@ def rb_iter_by_succ_item():
 
 
 def rb_iter_by_item_slice_prev():
-    for item in ptree.itemslice(None, median_key):
+    for item in ptree.iter_items(None, median_key):
         pass
 
 
 def rb_iter_by_item_slice_succ():
-    for item in ptree.itemslice(median_key, None):
+    for item in ptree.iter_items(median_key, None):
         pass
 
 
@@ -81,12 +81,12 @@ def crb_iter_by_succ_item():
 
 
 def crb_iter_by_item_slice_prev():
-    for item in ftree.itemslice(None, median_key):
+    for item in ftree.iter_items(None, median_key):
         pass
 
 
 def crb_iter_by_item_slice_succ():
-    for item in ftree.itemslice(median_key, None):
+    for item in ftree.iter_items(median_key, None):
         pass
 
 
