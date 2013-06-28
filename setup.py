@@ -26,7 +26,7 @@ def read(fname):
 
 setup(
     name='bintrees',
-    version='2.0.0b1',
+    version='2.0.0b2',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',
