@@ -10,7 +10,6 @@ from .abctree import _ABCTree
 from ctrees cimport *
 from stack cimport *
 
-
 cdef node_t* get_leaf_node(node_t *node):
     """ get a leaf node """
     while True:
@@ -21,25 +20,37 @@ cdef node_t* get_leaf_node(node_t *node):
         else:
             return node
 
+cdef class NodeStack:
+    cdef node_stack_t *stack
+    def __cinit__(self, int size):
+        self.stack = stack_init(size)
+
+    def __dealloc__(self):
+        stack_delete(self.stack)
+
+    cdef inline push(self, node_t* node):
+        stack_push(self.stack, node)
+
+    cdef inline node_t *pop(self):
+        return stack_pop(self.stack)
+
+    cdef inline bint is_empty(self):
+        return stack_is_empty(self.stack)
 
 cdef class _BaseTree:
-    cdef node_t *root
-    cdef int _count
+    cdef node_t *root  # private (hidden) for CPython
+    cdef readonly int count  # public readonly access for CPython
 
     def __cinit__(self, items=None):
         self.root = NULL
-        self._count = 0
+        self.count = 0
+
+    def __init__(self, items=None):
         if items is not None:
             self.update(items)
 
     def __dealloc__(self):
         ct_delete_tree(self.root)
-        self._count = 0
-        self.root = NULL
-
-    @property
-    def count(self):
-        return self._count
 
     def __getstate__(self):
         return dict(self.items())
@@ -49,15 +60,15 @@ cdef class _BaseTree:
 
     def clear(self):
         ct_delete_tree(self.root)
-        self._count = 0
+        self.count = 0
         self.root = NULL
 
     def get_value(self, key):
-        result = <object> ct_get_item(self.root, key)
-        if result is None:
+        cdef node_t *result = ct_find_node(self.root, key)
+        if result == NULL:
             raise KeyError(key)
         else:
-            return result[1]
+            return <object> result.value
 
     def max_item(self):
         """ Get item with max key of tree, raises ValueError if tree is empty. """
@@ -114,19 +125,19 @@ cdef class _BaseTree:
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False
         """
-        if self._count == 0:
+        if self.count == 0:
             return
         cdef bint iter_all = (start_key is None) and (end_key is None)
         cdef int direction = 1 if reverse else 0
         cdef int other = 1 - direction
         cdef bint go_down = True
-        cdef node_stack_t *st = stack_init(32)
+        cdef NodeStack stack = NodeStack(32)
         cdef node_t *node
 
         node = self.root
         while True:
             if node.link[direction] != NULL and go_down:
-                stack_push(st, node)
+                stack.push(node)
                 node = node.link[direction]
             else:
                 if iter_all:
@@ -138,10 +149,10 @@ cdef class _BaseTree:
                     node = node.link[other]
                     go_down = True
                 else:
-                    if stack_is_empty(st):
-                        stack_delete(st)
+                    if stack.is_empty():
+                        del stack
                         return  # all done
-                    node = stack_pop(st)
+                    node = stack.pop()
                     go_down = False
 
     def pop_item(self):
@@ -163,9 +174,9 @@ cdef class _BaseTree:
         parm func: function(key, value)
         param int order: inorder = 0, preorder = -1, postorder = +1
         """
-        if self._count == 0:
+        if self.count == 0:
             return
-        cdef node_stack_t *st = stack_init(128)
+        cdef NodeStack stack = NodeStack(128)
         cdef node_t *node = self.root
         cdef bint go_down = True
 
@@ -173,7 +184,7 @@ cdef class _BaseTree:
             if order == -1:
                 func(<object>node.key, <object>node.value)
             if node.link[0] != NULL and go_down:
-                stack_push(st, node)
+                stack.push(node)
                 node = node.link[0]
             else:
                 if order == 0:
@@ -182,10 +193,10 @@ cdef class _BaseTree:
                     node = node.link[1]
                     go_down = True
                 else:
-                    if stack_is_empty(st):
-                        stack_delete(st)
+                    if stack.is_empty():
+                        del stack
                         return  # all done
-                    node = stack_pop(st)
+                    node = stack.pop()
                     if order == +1:
                         func(<object>node.key, <object>node.value)
                     go_down = False
@@ -193,10 +204,10 @@ cdef class _BaseTree:
 
 cdef class _BinaryTree(_BaseTree):
     def insert(self, key, value):
-        res = ct_bintree_insert(&self.root, key, value)
-        if res < 0:
+        cdef int result = ct_bintree_insert(&self.root, key, value)
+        if result < 0:
             raise MemoryError('Can not allocate memory for node structure.')
-        self._count += res
+        self.count += result
 
     def remove(self, key):
         cdef int result
@@ -204,45 +215,43 @@ cdef class _BinaryTree(_BaseTree):
         if result == 0:
             raise KeyError(str(key))
         else:
-            self._count -= 1
+            self.count -= 1
 
 class FastBinaryTree(_BinaryTree, _ABCTree):
     pass
 
 cdef class _AVLTree(_BaseTree):
     def insert(self, key, value):
-        res = avl_insert(&self.root, key, value)
-        if res < 0:
+        cdef int result = avl_insert(&self.root, key, value)
+        if result < 0:
             raise MemoryError('Can not allocate memory for node structure.')
         else:
-            self._count += res
+            self.count += result
 
     def remove(self, key):
-        cdef int result
-        result =  avl_remove(&self.root, key)
+        cdef int result = avl_remove(&self.root, key)
         if result == 0:
             raise KeyError(str(key))
         else:
-            self._count -= 1
+            self.count -= 1
 
 class FastAVLTree(_AVLTree, _ABCTree):
     pass
 
 cdef class _RBTree(_BaseTree):
     def insert(self, key, value):
-        res = rb_insert(&self.root, key, value)
-        if res < 0:
+        cdef int result = rb_insert(&self.root, key, value)
+        if result < 0:
             raise MemoryError('Can not allocate memory for node structure.')
         else:
-            self._count += res
+            self.count += result
 
     def remove(self, key):
-        cdef int result
-        result =  rb_remove(&self.root, key)
+        cdef int result = rb_remove(&self.root, key)
         if result == 0:
             raise KeyError(str(key))
         else:
-            self._count -= 1
+            self.count -= 1
 
 class FastRBTree(_RBTree, _ABCTree):
     pass
