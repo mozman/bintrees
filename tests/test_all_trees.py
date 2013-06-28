@@ -357,11 +357,11 @@ class CheckTree(object):
         tree = self.TREE_CLASS(self.default_values2)
         d = dict()
         while not tree.is_empty():
-            key, value = tree.popitem()
+            key, value = tree.pop_item()
             d[key] = value
         expected = {2: 12, 4: 34, 8: 45, 1: 16, 9: 35, 3: 57}
         self.assertEqual(expected, d)
-        self.assertRaises(KeyError, tree.popitem)
+        self.assertRaises(KeyError, tree.pop_item)
 
     def test_043_min_item(self):
         tree = self.TREE_CLASS(zip(set3, set3))
@@ -771,13 +771,14 @@ class CheckTree(object):
         expected_keys = sorted(set(insert_keys))
         self.assertEqual(expected_keys, list(tree.keys()), "Data corruption in %s!" % tree.__class__)
 
-    def test_098_modify_tree_while_looping(self):
-        def loop_func(k, v):
-            tree.discard(57)
+    def test_098_foreach(self):
+        keys = []
+        def collect(key, value):
+            keys.append(key)
 
         tree = self.TREE_CLASS(self.default_values1)  # key == value
-        with self.assertRaises(RuntimeError):
-            tree.foreach(loop_func)
+        tree.foreach(collect)
+        self.assertEqual(list(tree.keys()), list(sorted(keys)))
 
 
 class TestBinaryTree(CheckTree, unittest.TestCase):
@@ -802,6 +803,7 @@ class TestFastAVLTree(CheckTree, unittest.TestCase):
 
 class TestFastRBTree(CheckTree, unittest.TestCase):
     TREE_CLASS = FastRBTree
+
 
 if __name__ == '__main__':
     unittest.main()
