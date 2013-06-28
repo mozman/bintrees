@@ -115,7 +115,7 @@ class RBTree(ABCTree):
     see also abctree.ABCTree() class.
     """
     def _new_node(self, key, value):
-        """ Create a new treenode """
+        """ Create a new tree node. """
         self._count += 1
         return Node(key, value)
 
