@@ -163,7 +163,7 @@ cdef class _BaseTree:
         """
         if self._count == 0:
             return
-        cdef node_stack_t *stack = stack_init(128)
+        cdef node_stack_t *st = stack_init(128)
         cdef node_t *node = self.root
         cdef bint go_down = True
 
@@ -171,7 +171,7 @@ cdef class _BaseTree:
             if order == -1:
                 func(<object>node.key, <object>node.value)
             if node.link[0] != NULL and go_down:
-                stack_push(stack, node)
+                stack_push(st, node)
                 node = node.link[0]
             else:
                 if order == 0:
@@ -180,10 +180,10 @@ cdef class _BaseTree:
                     node = node.link[1]
                     go_down = True
                 else:
-                    if stack_is_empty(stack):
-                        stack_delete(stack)
+                    if stack_is_empty(st):
+                        stack_delete(st)
                         return  # all done
-                    node = stack_pop(stack)
+                    node = stack_pop(st)
                     if order == +1:
                         func(<object>node.key, <object>node.value)
                     go_down = False

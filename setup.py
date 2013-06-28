@@ -13,8 +13,7 @@ from distutils.extension import Extension
 
 try:
     from Cython.Distutils import build_ext
-    ext_modules = [Extension("bintrees.cwalker", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cwalker.pyx"]),
-                   Extension("bintrees.cython_trees", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cython_trees.pyx"]),
+    ext_modules = [Extension("bintrees.cython_trees", ["bintrees/ctrees.c", "bintrees/stack.c", "bintrees/cython_trees.pyx"]),
                    ]
     commands = {'build_ext': build_ext}
 except ImportError:
