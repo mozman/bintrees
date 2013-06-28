@@ -13,10 +13,10 @@ from operator import attrgetter, lt, gt
 
 class _ABCTree(object):
     """
-    Abstract-Base-Class for the pure Python Trees: BinaryTree, AVLTree and RBTree
+    Abstract-Base-Class for ABCTree and Cython trees.
 
-    The ABCTree Class
-    =================
+    The _ABCTree Class
+    ==================
 
     T has to implement following properties
     ---------------------------------------
@@ -496,13 +496,7 @@ def _multi_tree_get(trees, key):
 
 
 class ABCTree(_ABCTree):
-    """ Base class for the pure Python implementation of trees.
-
-    T has to implement following properties
-    ---------------------------------------
-
-    count -- get node count
-    root -- get root node
+    """ Base class for the Python implementation of trees.
 
     T has to implement following methods
     ------------------------------------
@@ -513,25 +507,49 @@ class ABCTree(_ABCTree):
     remove(...)
         remove(key) <==> del T[key], remove key from T
 
-    clear(...)
-        T.clear() -> None.  Remove all items from T.
+    Properties defined here
+    --------------------
+
+    * count -> get item count of tree
 
     Methods defined here
     --------------------
-
+    * __init__() Tree initializer
     * get_value(key) -> returns value for key
-    * items([reverse]) -> iterate over all items, yielding (k, v) tuple
-    * item_slice(start_key, end_key, [reverse]) -> iterate over all items, yielding (k, v) tuple
+    * clear() -> None.  Remove all items from tree.
+    * iter_items(start_key, end_key, [reverse]) -> iterate over all items, yielding (k, v) tuple
     * foreach(f, [order]) -> visit all nodes of tree and call f(k, v) for each node, O(n)
-    * popitem() -> (k, v), remove and return some (key, value)
+    * pop_item() -> (k, v), remove and return some (key, value)
     * min_item() -> get smallest (key, value) pair of T, O(log(n))
     * max_item() -> get largest (key, value) pair of T, O(log(n))
     * prev_item(key) -> get (k, v) pair, where k is predecessor to key, O(log(n))
     * succ_item(key) -> get (k,v) pair as a 2-tuple, where k is successor to key, O(log(n))
     * floor_item(key) -> get (k, v) pair, where k is the greatest key less than or equal to key, O(log(n))
     * ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key, O(log(n))
-
     """
+    def __init__(self, items=None):
+        """ x.__init__(...) initializes x; see x.__class__.__doc__ for signature """
+        self._root = None
+        self._count = 0
+        if items is not None:
+            self.update(items)
+
+    def clear(self):
+        """ T.clear() -> None.  Remove all items from T. """
+        def _clear(node):
+            if node is not None:
+                _clear(node.left)
+                _clear(node.right)
+                node.free()
+        _clear(self._root)
+        self._count = 0
+        self._root = None
+
+    @property
+    def count(self):
+        """ count of items """
+        return self._count
+
     def get_value(self, key):
         node = self._root
         while node is not None:
@@ -700,16 +718,16 @@ class ABCTree(_ABCTree):
         if self.is_empty():
             return []
         if reverse:
-            return self.iter_items_backward(start_key, end_key)
+            return self._iter_items_backward(start_key, end_key)
         else:
-            return self.iter_items_forward(start_key, end_key)
+            return self._iter_items_forward(start_key, end_key)
 
-    def iter_items_forward(self, start_key=None, end_key=None):
+    def _iter_items_forward(self, start_key=None, end_key=None):
         for item in self._iter_items(left=attrgetter("left"), right=attrgetter("right"),
                                      start_key=start_key, end_key=end_key):
             yield item
 
-    def iter_items_backward(self, start_key=None, end_key=None):
+    def _iter_items_backward(self, start_key=None, end_key=None):
         for item in self._iter_items(left=attrgetter("right"), right=attrgetter("left"),
                                      start_key=start_key, end_key=end_key):
             yield item
