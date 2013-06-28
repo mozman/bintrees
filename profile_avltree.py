@@ -30,28 +30,28 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-py_searchtree = AVLTree.fromkeys(keys)
-cy_searchtree = FastAVLTree.fromkeys(keys)
+py_searchtree = AVLTree.from_keys(keys)
+cy_searchtree = FastAVLTree.from_keys(keys)
 
 
 def avl_build_delete():
-    tree = AVLTree.fromkeys(keys)
+    tree = AVLTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def cavl_build_delete():
-    tree = FastAVLTree.fromkeys(keys)
+    tree = FastAVLTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def avl_build():
-    tree = AVLTree.fromkeys(keys)
+    tree = AVLTree.from_keys(keys)
 
 
 def cavl_build():
-    tree = FastAVLTree.fromkeys(keys)
+    tree = FastAVLTree.from_keys(keys)
 
 
 def avl_search():

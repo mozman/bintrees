@@ -31,28 +31,28 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-py_searchtree = RBTree.fromkeys(keys)
-cy_searchtree = FastRBTree.fromkeys(keys)
+py_searchtree = RBTree.from_keys(keys)
+cy_searchtree = FastRBTree.from_keys(keys)
 
 
 def rb_build_delete():
-    tree = RBTree.fromkeys(keys)
+    tree = RBTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def crb_build_delete():
-    tree = FastRBTree.fromkeys(keys)
+    tree = FastRBTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def rb_build():
-    tree = RBTree.fromkeys(keys)
+    tree = RBTree.from_keys(keys)
 
 
 def crb_build():
-    tree = FastRBTree.fromkeys(keys)
+    tree = FastRBTree.from_keys(keys)
 
 
 def rb_search():

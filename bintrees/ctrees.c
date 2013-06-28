@@ -7,7 +7,6 @@
  */
 
 #include "ctrees.h"
-#include "stack.h"
 #include <Python.h>
 
 #define LEFT 0
