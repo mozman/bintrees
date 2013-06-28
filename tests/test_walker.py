@@ -179,9 +179,9 @@ class TestPythonWalker(WalkerCheck, unittest.TestCase):
         return BinaryTree(items)
 
 
-class TestWalker(WalkerCheck, unittest.TestCase):
-    def get_tree(self, items):
-        return FastBinaryTree(items)
+# class TestWalker(WalkerCheck, unittest.TestCase):
+#     def get_tree(self, items):
+#         return FastBinaryTree(items)
 
 if __name__ == '__main__':
     unittest.main()

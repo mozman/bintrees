@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman
-# Purpose: cython unbalanced binary tree module
+# Purpose: Binary trees implemented in Cython/C
 # Created: 28.04.2010
 # Copyright (c) 2010-2013 by Manfred Moitzi
 # License: MIT License
 
 from .abctree import _ABCTree
-from cwalker import cWalker
-from cwalker cimport *
 from ctrees cimport *
+from stack cimport *
 
 
 cdef node_t* get_leaf_node(node_t *node):
@@ -57,12 +56,6 @@ cdef class _BaseTree:
             raise KeyError(key)
         else:
             return result[1]
-
-    def _get_walker(self):
-        cdef cWalker walker
-        walker = cWalker()
-        walker.set_tree(self.root)
-        return walker
 
     def max_item(self):
         """ Get item with max key of tree, raises ValueError if tree is empty. """
@@ -125,25 +118,28 @@ cdef class _BaseTree:
         cdef int direction = 1 if reverse else 0
         cdef int other = 1 - direction
         cdef bint go_down = True
-        cdef cWalker walker = self._get_walker()
+        cdef node_stack_t *st = stack_init(32)
+        cdef node_t *node
 
+        node = self.root
         while True:
-            if walker.has_child(direction) and go_down:
-                walker.push()
-                walker.down(direction)
+            if node.link[direction] != NULL and go_down:
+                stack_push(st, node)
+                node = node.link[direction]
             else:
                 if iter_all:
-                    yield walker.item
-                elif (start_key is None or ct_compare(start_key, <object> walker.node.key) < 1) and \
-                     (end_key is None or ct_compare(end_key, <object> walker.node.key) > 0):
-                    yield walker.item
-                if walker.has_child(other):
-                    walker.down(other)
+                    yield <object>node.key, <object>node.value
+                elif (start_key is None or ct_compare(start_key, <object>node.key) < 1) and \
+                     (end_key is None or ct_compare(end_key, <object>node.key) > 0):
+                    yield <object>node.key, <object>node.value
+                if node.link[other] != NULL:
+                    node = node.link[other]
                     go_down = True
                 else:
-                    if walker.stack_is_empty():
+                    if stack_is_empty(st):
+                        stack_delete(st)
                         return  # all done
-                    walker.pop()
+                    node = stack_pop(st)
                     go_down = False
 
     def pop_item(self):
@@ -164,28 +160,34 @@ cdef class _BaseTree:
 
         parm func: function(key, value)
         param int order: inorder = 0, preorder = -1, postorder = +1
-
         """
-        def _traverse():
-            if order == -1:
-                func(node.key, node.value)
-            if node.has_left():
-                node.push()
-                node.go_left()
-                _traverse()
-                node.pop()
-            if order == 0:
-                func(node.key, node.value)
-            if node.has_right():
-                node.push()
-                node.go_right()
-                _traverse()
-                node.pop()
-            if order == +1:
-                func(node.key, node.value)
+        if self._count == 0:
+            return
+        cdef node_stack_t *stack = stack_init(128)
+        cdef node_t *node = self.root
+        cdef bint go_down = True
 
-        cdef cWalker node = self._get_walker()
-        _traverse()
+        while True:
+            if order == -1:
+                func(<object>node.key, <object>node.value)
+            if node.link[0] != NULL and go_down:
+                stack_push(stack, node)
+                node = node.link[0]
+            else:
+                if order == 0:
+                    func(<object>node.key, <object>node.value)
+                if node.link[1] != NULL:
+                    node = node.link[1]
+                    go_down = True
+                else:
+                    if stack_is_empty(stack):
+                        stack_delete(stack)
+                        return  # all done
+                    node = stack_pop(stack)
+                    if order == +1:
+                        func(<object>node.key, <object>node.value)
+                    go_down = False
+
 
 cdef class _BinaryTree(_BaseTree):
     def insert(self, key, value):
