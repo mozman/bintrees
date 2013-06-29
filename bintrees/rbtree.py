@@ -120,7 +120,7 @@ class RBTree(ABCTree):
         return Node(key, value)
 
     def insert(self, key, value):
-        """T.insert(key, value) <==> T[key] = value, insert key, value into Tree"""
+        """T.insert(key, value) <==> T[key] = value, insert key, value into tree."""
         if self._root is None:  # Empty tree case
             self._root = self._new_node(key, value)
             self._root.red = False  # make root black
@@ -172,7 +172,7 @@ class RBTree(ABCTree):
         self._root.red = False  # make root black
 
     def remove(self, key):
-        """T.remove(key) <==> del T[key], remove item <key> from tree"""
+        """T.remove(key) <==> del T[key], remove item <key> from tree."""
         if self._root is None:
             raise KeyError(str(key))
         head = Node()  # False tree root

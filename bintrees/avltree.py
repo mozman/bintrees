@@ -38,7 +38,7 @@ MAXSTACK = 32
 
 
 class Node(object):
-    """Internal object, represents a tree node"""
+    """Internal object, represents a tree node."""
     __slots__ = ['left', 'right', 'balance', 'key', 'value']
 
     def __init__(self, key=None, value=None):
@@ -49,11 +49,11 @@ class Node(object):
         self.balance = 0
 
     def __getitem__(self, key):
-        """N.__getitem__(key) <==> x[key], where key is 0 (left) or 1 (right)"""
+        """N.__getitem__(key) <==> x[key], where key is 0 (left) or 1 (right)."""
         return self.left if key == 0 else self.right
 
     def __setitem__(self, key, value):
-        """N.__setitem__(key, value) <==> x[key]=value, where key is 0 (left) or 1 (right)"""
+        """N.__setitem__(key, value) <==> x[key]=value, where key is 0 (left) or 1 (right)."""
         if key == 0:
             self.left = value
         else:
@@ -120,7 +120,7 @@ class AVLTree(ABCTree):
         return Node(key, value)
 
     def insert(self, key, value):
-        """T.insert(key, value) <==> T[key] = value, insert key, value into Tree."""
+        """T.insert(key, value) <==> T[key] = value, insert key, value into tree."""
         if self._root is None:
             self._root = self._new_node(key, value)
         else:
@@ -149,21 +149,21 @@ class AVLTree(ABCTree):
             while (top >= 0) and not done:
                 direction = dir_stack[top]
                 other_side = 1 - direction
-                topnode = node_stack[top]
-                left_height = height(topnode[direction])
-                right_height = height(topnode[other_side])
+                top_node = node_stack[top]
+                left_height = height(top_node[direction])
+                right_height = height(top_node[other_side])
 
                 # Terminate or rebalance as necessary */
                 if left_height - right_height == 0:
                     done = True
                 if left_height - right_height >= 2:
-                    a = topnode[direction][direction]
-                    b = topnode[direction][other_side]
+                    a = top_node[direction][direction]
+                    b = top_node[direction][other_side]
 
                     if height(a) >= height(b):
-                        node_stack[top] = jsw_single(topnode, other_side)
+                        node_stack[top] = jsw_single(top_node, other_side)
                     else:
-                        node_stack[top] = jsw_double(topnode, other_side)
+                        node_stack[top] = jsw_double(top_node, other_side)
 
                     # Fix parent
                     if top != 0:
@@ -173,11 +173,11 @@ class AVLTree(ABCTree):
                     done = True
 
                 # Update balance factors
-                topnode = node_stack[top]
-                left_height = height(topnode[direction])
-                right_height = height(topnode[other_side])
+                top_node = node_stack[top]
+                left_height = height(top_node[direction])
+                right_height = height(top_node[other_side])
 
-                topnode.balance = max(left_height, right_height) + 1
+                top_node.balance = max(left_height, right_height) + 1
                 top -= 1
 
     def remove(self, key):
@@ -247,24 +247,24 @@ class AVLTree(ABCTree):
             while top >= 0:
                 direction = dir_stack[top]
                 other_side = 1 - direction
-                topnode = node_stack[top]
-                left_height = height(topnode[direction])
-                right_height = height(topnode[other_side])
+                top_node = node_stack[top]
+                left_height = height(top_node[direction])
+                right_height = height(top_node[other_side])
                 b_max = max(left_height, right_height)
 
                 # Update balance factors
-                topnode.balance = b_max + 1
+                top_node.balance = b_max + 1
 
                 # Terminate or rebalance as necessary
                 if (left_height - right_height) == -1:
                     break
                 if (left_height - right_height) <= -2:
-                    a = topnode[other_side][direction]
-                    b = topnode[other_side][other_side]
+                    a = top_node[other_side][direction]
+                    b = top_node[other_side][other_side]
                     if height(a) <= height(b):
-                        node_stack[top] = jsw_single(topnode, direction)
+                        node_stack[top] = jsw_single(top_node, direction)
                     else:
-                        node_stack[top] = jsw_double(topnode, direction)
+                        node_stack[top] = jsw_double(top_node, direction)
                     # Fix parent
                     if top != 0:
                         node_stack[top - 1][dir_stack[top - 1]] = node_stack[top]

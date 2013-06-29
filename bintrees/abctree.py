@@ -84,8 +84,8 @@ class _ABCTree(object):
     * __xor__(other) <==> T ^ other, symmetric_difference
     * __repr__() <==> repr(T)
     * __setitem__(k, v) <==> T[k] = v, O(log(n))
-    * clear() -> None, Remove all items from T, , O(n)
-    * remove_items(keys) -> remove items by keys
+    * clear() -> None, remove all items from T, , O(n)
+    * remove_items(keys) -> None, remove items by keys
     * copy() -> a shallow copy of T, O(n*log(n))
     * discard(k) -> None, remove k from T, if k is present, O(log(n))
     * get(k[,d]) -> T[k] if k in T, else d, O(log(n))
@@ -93,7 +93,7 @@ class _ABCTree(object):
     * keys([reverse]) -> generator for keys of T, O(n)
     * values([reverse]) -> generator for values of  T, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
-    * set_default(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
+    * set_default(k[,d]) -> value, T.get(k, d), also set T[k]=d if k not in T, O(log(n))
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
 
     slicing by keys
@@ -108,7 +108,7 @@ class _ABCTree(object):
     if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key()
     T[:] is a TreeSlice which represents the whole tree.
 
-    TreeSlice is a tree wrapper with range check, and contains no references
+    TreeSlice is a tree wrapper with range check and contains no references
     to objects, deleting objects in the associated tree also deletes the object
     in the TreeSlice.
 
@@ -266,10 +266,10 @@ class _ABCTree(object):
             self.remove(key)
 
     def remove_items(self, keys):
-        """T.remove_items(keys) -> remove items by keys"""
-        # convert generator to a set, because the content of the
+        """T.remove_items(keys) -> None, remove items by keys"""
+        # convert generator to a tuple, because the content of the
         # tree will be modified!
-        for key in frozenset(keys):
+        for key in tuple(keys):
             self.remove(key)
 
     def key_slice(self, start_key, end_key, reverse=False):
@@ -330,7 +330,7 @@ class _ABCTree(object):
 
     @classmethod
     def from_keys(cls, iterable, value=None):
-        """T.fromkeys(S[,v]) -> New tree with keys from S and values equal to v."""
+        """T.from_keys(S[,v]) -> New tree with keys from S and values equal to v."""
         tree = cls()
         for key in iterable:
             tree.insert(key, value)
@@ -618,7 +618,7 @@ class CPYTHON_ABCTree(_ABCTree):
         return node.key, node.value
 
     def succ_item(self, key):
-        """ Get successor (k,v) pair of key, raises KeyError if key is max key
+        """Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist. optimized for pypy.
         """
         # removed graingets version, because it was little slower on CPython and much slower on pypy
@@ -653,7 +653,7 @@ class CPYTHON_ABCTree(_ABCTree):
         return succ_node.key, succ_node.value
 
     def prev_item(self, key):
-        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
+        """Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist. optimized for pypy.
         """
         # removed graingets version, because it was little slower on CPython and much slower on pypy

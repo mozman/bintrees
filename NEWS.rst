@@ -6,7 +6,10 @@ Version 2.0.0 July 2013
 
   * code base refactoring
   * removed tree walkers
+  * removed low level node stack implementation -> caused crashes
   * API change: consistent method naming, synonyms for dict/set compatibility exists, like fromkeys() for from_keys()
+  * optimizations for pypy: iter_items(), succ_item(), prev_item()
+  * tested with CPython2.7, CPython3.3, pypy-2.0
 
 Version 1.0.3 May 2013
 

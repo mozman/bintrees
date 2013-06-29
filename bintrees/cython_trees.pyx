@@ -68,21 +68,21 @@ cdef class _BaseTree:
             return <object> result.value
 
     def max_item(self):
-        """ Get item with max key of tree, raises ValueError if tree is empty. """
+        """Get item with max key of tree, raises ValueError if tree is empty."""
         cdef node_t *node = ct_max_node(self.root)
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
         return <object>node.key, <object>node.value
 
     def min_item(self):
-        """ Get item with min key of tree, raises ValueError if tree is empty. """
+        """Get item with min key of tree, raises ValueError if tree is empty."""
         cdef node_t *node = ct_min_node(self.root)
         if node == NULL: # root is None
             raise ValueError("Tree is empty")
         return <object>node.key, <object>node.value
 
     def succ_item(self, key):
-        """ Get successor (k,v) pair of key, raises KeyError if key is max key
+        """Get successor (k,v) pair of key, raises KeyError if key is max key
         or key does not exist.
         """
         cdef node_t *node = ct_succ_node(self.root, key)
@@ -91,7 +91,7 @@ cdef class _BaseTree:
         return <object> node.key, <object> node.value
 
     def prev_item(self, key):
-        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
+        """Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist.
         """
         cdef node_t *node = ct_prev_node(self.root, key)
@@ -100,8 +100,8 @@ cdef class _BaseTree:
         return <object> node.key, <object> node.value
 
     def floor_item(self, key):
-        """ Get the element (k,v) pair associated with the greatest key less
-        than or equal to the given key, raises KeyError if there is no such key.
+        """Get (k,v) pair associated with the greatest key less than or equal to
+        the given key, raises KeyError if there is no such key.
         """
         cdef node_t *node = ct_floor_node(self.root, key)
         if node == NULL:  # given key is smaller than min-key in tree
@@ -109,8 +109,8 @@ cdef class _BaseTree:
         return <object> node.key, <object> node.value
 
     def ceiling_item(self, key):
-        """ Get the element (k,v) pair associated with the smallest key greater
-        than or equal to the given key, raises KeyError if there is no such key.
+        """Get (k,v) pair associated with the smallest key greater than or equal to
+        the given key, raises KeyError if there is no such key.
         """
         cdef node_t *node = ct_ceiling_node(self.root, key)
         if node == NULL:  # given key is greater than max-key in tree
@@ -118,9 +118,8 @@ cdef class _BaseTree:
         return <object> node.key, <object> node.value
 
     def iter_items(self, start_key=None, end_key=None, reverse=False):
-        """Iterates over the (key, value) items of the associated tree,
-        in ascending order if reverse is True, iterate in descending order,
-        reverse defaults to False
+        """Iterate over the (key, value) items in ascending order
+        if reverse is True iterate in descending order.
         """
         if self.count == 0:
             return
@@ -150,7 +149,7 @@ cdef class _BaseTree:
 
     def pop_item(self):
         """ T.pop_item() -> (k, v), remove and return some (key, value) pair as a
-        2-tuple; but raise KeyError if T is empty
+        2-tuple; but raise KeyError if T is empty.
         """
         if self.count == 0:
             raise KeyError("pop_item(): tree is empty")
@@ -162,7 +161,7 @@ cdef class _BaseTree:
         return key, value
 
     def foreach(self, func, int order=0):
-        """ Visit all tree nodes and process key, value.
+        """Visit all tree nodes and process tree data by func(key, Value).
 
         parm func: function(key, value)
         param int order: inorder = 0, preorder = -1, postorder = +1
