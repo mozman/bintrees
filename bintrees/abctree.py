@@ -8,6 +8,9 @@
 
 from __future__ import absolute_import
 
+import sys
+PYPY = hasattr(sys, 'pypy_version_info')
+
 from .treeslice import TreeSlice
 from operator import attrgetter, lt, gt
 
@@ -491,7 +494,7 @@ def _multi_tree_get(trees, key):
     raise KeyError(key)
 
 
-class ABCTree(_ABCTree):
+class CPYTHON_ABCTree(_ABCTree):
     """ Base class for the Python implementation of trees.
 
     T has to implement following methods
@@ -614,60 +617,71 @@ class ABCTree(_ABCTree):
             node = node.right
         return node.key, node.value
 
-    def _next_item(self, key, left, right, less_than):
+    def succ_item(self, key):
+        """ Get successor (k,v) pair of key, raises KeyError if key is max key
+        or key does not exist. optimized for pypy.
+        """
+        # removed graingets version, because it was little slower on CPython and much slower on pypy
         node = self._root
         succ = None
         while node is not None:
             if key == node.key:
                 break
-            elif less_than(key, node.key):
-                if (succ is None) or less_than(node.key, succ.key):
-                    succ = node
-                node = left(node)
+            elif key < node.key:
+                if (succ is None) or (node.key < succ[0]):
+                    succ = (node.key, node.value)
+                node = node.left
             else:
-                node = right(node)
+                node = node.right
 
-        if node is None:  # stay at dead end
+        if node is None: # stay at dead end
             raise KeyError(str(key))
         # found node of key
-        if right(node) is not None:
+        if node.right is not None:
             # find smallest node of right subtree
-            node = right(node)
-            while left(node) is not None:
-                node = left(node)
+            node = node.right
+            while node.left is not None:
+                node = node.left
             if succ is None:
-                succ = node
-            elif less_than(node.key, succ.key):
-                succ = node
-        elif succ is None:  # given key is biggest in tree
+                succ = (node.key, node.value)
+            elif node.key < succ[0]:
+                succ = (node.key, node.value)
+        elif succ is None: # given key is biggest in tree
             raise KeyError(str(key))
-        return succ.key, succ.value
-
-    def succ_item(self, key):
-        """Get successor (k,v) pair of key, raises KeyError if key is max key
-        or key does not exist.
-        """
-        if self.count == 0:
-            raise KeyError("Tree is empty")
-        return self._next_item(
-            key,
-            left=attrgetter("left"),
-            right=attrgetter("right"),
-            less_than=lt,
-        )
+        return succ
 
     def prev_item(self, key):
-        """Get predecessor (k,v) pair of key, raises KeyError if key is min key
-        or key does not exist.
+        """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
+        or key does not exist. optimized for pypy.
         """
-        if self.count == 0:
-            raise KeyError("Tree is empty")
-        return self._next_item(
-            key,
-            left=attrgetter("right"),
-            right=attrgetter("left"),
-            less_than=gt,
-        )
+        # removed graingets version, because it was little slower on CPython and much slower on pypy
+        node = self._root
+        prev = None
+        while node is not None:
+            if key == node.key:
+                break
+            elif key < node.key:
+                node = node.left
+            else:
+                if (prev is None) or (node.key > prev[0]):
+                    prev = (node.key, node.value)
+                node = node.right
+
+        if node is None: # stay at dead end (None)
+            raise KeyError(str(key))
+        # found node of key
+        if node.left is not None:
+            # find biggest node of left subtree
+            node = node.left
+            while node.right is not None:
+                node = node.right
+            if prev is None:
+                prev = (node.key, node.value)
+            elif node.key > prev[0]:
+                prev = (node.key, node.value)
+        elif prev is None: # given key is smallest in tree
+            raise KeyError(str(key))
+        return prev
 
     def floor_item(self, key):
         """Get the element (k,v) pair associated with the greatest key less
@@ -710,6 +724,11 @@ class ABCTree(_ABCTree):
         raise KeyError(str(key))
 
     def iter_items(self,  start_key=None, end_key=None, reverse=False):
+        """Iterates over the (key, value) items of the associated tree,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False"""
+        # optimized iterator (reduced method calls) - but much slower on pypy
+
         if self.is_empty():
             return []
         if reverse:
@@ -728,28 +747,13 @@ class ABCTree(_ABCTree):
             yield item
 
     def _iter_items(self, left=attrgetter("left"), right=attrgetter("right"), start_key=None, end_key=None):
-        """Iterates over the (key, value) items of the associated tree,
-        in ascending order if reverse is True, iterate in descending order,
-        reverse defaults to False
-
-        optimized iterator (reduced method calls)
-        """
-        if self.is_empty():
+        if self._count == 0:
             return
-
-        if start_key is None and end_key is None:
-            in_range = lambda x: True
-        else:
-            if start_key is None:
-                start_key = self.min_key()
-            if end_key is None:
-                in_range = lambda x: x >= start_key
-            else:
-                in_range = lambda x: start_key <= x < end_key
-
         node = self._root
         stack = []
         go_left = True
+        in_range = self._get_in_range_func(start_key, end_key)
+
         while True:
             if left(node) is not None and go_left:
                 stack.append(node)
@@ -766,3 +770,50 @@ class ABCTree(_ABCTree):
                     node = stack.pop()
                     go_left = False
 
+    def _get_in_range_func(self, start_key, end_key):
+        if start_key is None and end_key is None:
+            return lambda x: True
+        else:
+            if start_key is None:
+                start_key = self.min_key()
+            if end_key is None:
+                return lambda x: x >= start_key
+            else:
+                return lambda x: start_key <= x < end_key
+
+
+class PYPY_ABCTree(CPYTHON_ABCTree):
+    def iter_items(self, start_key=None, end_key=None, reverse=False):
+        """Iterates over the (key, value) items of the associated tree,
+        in ascending order if reverse is True, iterate in descending order,
+        reverse defaults to False"""
+        # optimized for pypy
+        if self._count == 0:
+            return
+        direction = 1 if reverse else 0
+        other = 1 - direction
+        go_down = True
+        stack = []
+        node = self._root
+        in_range = self._get_in_range_func(start_key, end_key)
+
+        while True:
+            if node[direction] is not None and go_down:
+                stack.append(node)
+                node = node[direction]
+            else:
+                if in_range(node.key):
+                    yield node.key, node.value
+                if node[other] is not None:
+                    node = node[other]
+                    go_down = True
+                else:
+                    if not len(stack):
+                        return  # all done
+                    node = stack.pop()
+                    go_down = False
+
+if PYPY:
+    ABCTree = PYPY_ABCTree
+else:
+    ABCTree = CPYTHON_ABCTree

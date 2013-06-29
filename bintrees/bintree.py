@@ -14,7 +14,7 @@ __all__ = ['BinaryTree']
 
 
 class Node(object):
-    """ Internal object, represents a treenode """
+    """Internal object, represents a treenode."""
     __slots__ = ['key', 'value', 'left', 'right']
 
     def __init__(self, key, value):
@@ -24,18 +24,18 @@ class Node(object):
         self.right = None
 
     def __getitem__(self, key):
-        """ x.__getitem__(key) <==> x[key], where key is 0 (left) or 1 (right) """
+        """N.__getitem__(key) <==> x[key], where key is 0 (left) or 1 (right)."""
         return self.left if key == 0 else self.right
 
     def __setitem__(self, key, value):
-        """ x.__setitem__(key, value) <==> x[key]=value, where key is 0 (left) or 1 (right) """
+        """N.__setitem__(key, value) <==> x[key]=value, where key is 0 (left) or 1 (right)."""
         if key == 0:
             self.left = value
         else:
             self.right = value
 
     def free(self):
-        """ Set references to None """
+        """Set references to None."""
         self.left = None
         self.right = None
         self.value = None
@@ -58,12 +58,12 @@ class BinaryTree(ABCTree):
     see also abctree.ABCTree() class.
     """
     def _new_node(self, key, value):
-        """ Create a new tree node. """
+        """Create a new tree node."""
         self._count += 1
         return Node(key, value)
 
     def insert(self, key, value):
-        """ T.insert(key, value) <==> T[key] = value, insert key, value into Tree """
+        """T.insert(key, value) <==> T[key] = value, insert key, value into Tree."""
         if self._root is None:
             self._root = self._new_node(key, value)
         else:
@@ -83,7 +83,7 @@ class BinaryTree(ABCTree):
                     node = node[direction]
 
     def remove(self, key):
-        """ T.remove(key) <==> del T[key], remove item <key> from tree """
+        """T.remove(key) <==> del T[key], remove item <key> from tree"""
         node = self._root
         if node is None:
             raise KeyError(str(key))
