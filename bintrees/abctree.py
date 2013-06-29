@@ -601,7 +601,7 @@ class CPYTHON_ABCTree(_ABCTree):
 
     def min_item(self):
         """Get item with min key of tree, raises ValueError if tree is empty."""
-        if self.count == 0:
+        if self.is_empty():
             raise ValueError("Tree is empty")
         node = self._root
         while node.left is not None:
@@ -610,7 +610,7 @@ class CPYTHON_ABCTree(_ABCTree):
 
     def max_item(self):
         """Get item with max key of tree, raises ValueError if tree is empty."""
-        if self.count == 0:
+        if self.is_empty():
             raise ValueError("Tree is empty")
         node = self._root
         while node.right is not None:
@@ -622,14 +622,16 @@ class CPYTHON_ABCTree(_ABCTree):
         or key does not exist. optimized for pypy.
         """
         # removed graingets version, because it was little slower on CPython and much slower on pypy
+        # this version runs about 4x faster with pypy than the Cython version
+        # Note: Code sharing of succ_item() and ceiling_item() is possible, but has always a speed penalty.
         node = self._root
-        succ = None
+        succ_node = None
         while node is not None:
             if key == node.key:
                 break
             elif key < node.key:
-                if (succ is None) or (node.key < succ[0]):
-                    succ = (node.key, node.value)
+                if (succ_node is None) or (node.key < succ_node.key):
+                    succ_node = node
                 node = node.left
             else:
                 node = node.right
@@ -642,29 +644,32 @@ class CPYTHON_ABCTree(_ABCTree):
             node = node.right
             while node.left is not None:
                 node = node.left
-            if succ is None:
-                succ = (node.key, node.value)
-            elif node.key < succ[0]:
-                succ = (node.key, node.value)
-        elif succ is None: # given key is biggest in tree
+            if succ_node is None:
+                succ_node = node
+            elif node.key < succ_node.key:
+                succ_node = node
+        elif succ_node is None: # given key is biggest in tree
             raise KeyError(str(key))
-        return succ
+        return succ_node.key, succ_node.value
 
     def prev_item(self, key):
         """ Get predecessor (k,v) pair of key, raises KeyError if key is min key
         or key does not exist. optimized for pypy.
         """
         # removed graingets version, because it was little slower on CPython and much slower on pypy
+        # this version runs about 4x faster with pypy than the Cython version
+        # Note: Code sharing of prev_item() and floor_item() is possible, but has always a speed penalty.
         node = self._root
-        prev = None
+        prev_node = None
+
         while node is not None:
             if key == node.key:
                 break
             elif key < node.key:
                 node = node.left
             else:
-                if (prev is None) or (node.key > prev[0]):
-                    prev = (node.key, node.value)
+                if (prev_node is None) or (node.key > prev_node.key):
+                    prev_node = node
                 node = node.right
 
         if node is None: # stay at dead end (None)
@@ -675,59 +680,61 @@ class CPYTHON_ABCTree(_ABCTree):
             node = node.left
             while node.right is not None:
                 node = node.right
-            if prev is None:
-                prev = (node.key, node.value)
-            elif node.key > prev[0]:
-                prev = (node.key, node.value)
-        elif prev is None: # given key is smallest in tree
+            if prev_node is None:
+                prev_node = node
+            elif node.key > prev_node.key:
+                prev_node = node
+        elif prev_node is None: # given key is smallest in tree
             raise KeyError(str(key))
-        return prev
+        return prev_node.key, prev_node.value
 
     def floor_item(self, key):
         """Get the element (k,v) pair associated with the greatest key less
         than or equal to the given key, raises KeyError if there is no such key.
         """
+        # Note: Code sharing of prev_item() and floor_item() is possible, but has always a speed penalty.
         node = self._root
-        prev = None
+        prev_node = None
         while node is not None:
             if key == node.key:
                 return node.key, node.value
             elif key < node.key:
                 node = node.left
             else:
-                if (prev is None) or (node.key > prev.key):
-                    prev = node
+                if (prev_node is None) or (node.key > prev_node.key):
+                    prev_node = node
                 node = node.right
         # node must be None here
-        if prev:
-            return prev.key, prev.value
+        if prev_node:
+            return prev_node.key, prev_node.value
         raise KeyError(str(key))
 
     def ceiling_item(self, key):
         """Get the element (k,v) pair associated with the smallest key greater
         than or equal to the given key, raises KeyError if there is no such key.
         """
+        # Note: Code sharing of succ_item() and ceiling_item() is possible, but has always a speed penalty.
         node = self._root
-        succ = None
+        succ_node = None
         while node is not None:
             if key == node.key:
                 return node.key, node.value
             elif key > node.key:
                 node = node.right
             else:
-                if (succ is None) or (node.key < succ.key):
-                    succ = node
+                if (succ_node is None) or (node.key < succ_node.key):
+                    succ_node = node
                 node = node.left
             # node must be None here
-        if succ:
-            return succ.key, succ.value
+        if succ_node:
+            return succ_node.key, succ_node.value
         raise KeyError(str(key))
 
     def iter_items(self,  start_key=None, end_key=None, reverse=False):
         """Iterates over the (key, value) items of the associated tree,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False"""
-        # optimized iterator (reduced method calls) - but much slower on pypy
+        # optimized iterator (reduced method calls) - faster on CPython but slower on pypy
 
         if self.is_empty():
             return []
@@ -747,8 +754,6 @@ class CPYTHON_ABCTree(_ABCTree):
             yield item
 
     def _iter_items(self, left=attrgetter("left"), right=attrgetter("right"), start_key=None, end_key=None):
-        if self._count == 0:
-            return
         node = self._root
         stack = []
         go_left = True
@@ -787,8 +792,8 @@ class PYPY_ABCTree(CPYTHON_ABCTree):
         """Iterates over the (key, value) items of the associated tree,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False"""
-        # optimized for pypy
-        if self._count == 0:
+        # optimized for pypy, but slower on CPython
+        if self.is_empty():
             return
         direction = 1 if reverse else 0
         other = 1 - direction
