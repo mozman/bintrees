@@ -6,8 +6,9 @@ Abstract
 
 This package provides Binary- RedBlack- and AVL-Trees written in Python and Cython/C.
 
-This Classes are much slower than the built-in dict class, but all
-iterators/generators yielding data in sorted key order.
+This Classes are much slower than the built-in *dict* class, but all
+iterators/generators yielding data in sorted key order. Trees can be
+uses as drop in replacement for *dicts* in most cases.
 
 Source of Algorithms
 --------------------
@@ -74,11 +75,12 @@ Methods
     * keys([reverse]) -> generator for keys of T, O(n)
     * values([reverse]) -> generator for values of  T, O(n)
     * pop(k[,d]) -> v, remove specified key and return the corresponding value, O(log(n))
-    * pop_item() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n))
-    * set_default(k[,d]) -> T.get(k, d), also set T[k]=d if k not in T, O(log(n))
+    * pop_item() -> (k, v), remove and return some (key, value) pair as a 2-tuple, O(log(n)) (synonym popitem() exist)
+    * set_default(k[,d]) -> value, T.get(k, d), also set T[k]=d if k not in T, O(log(n)) (synonym setdefault() exist)
     * update(E) -> None.  Update T from dict/iterable E, O(E*log(n))
     * foreach(f, [order]) -> visit all nodes of tree (0 = 'inorder', -1 = 'preorder' or +1 = 'postorder') and call f(k, v) for each node, O(n)
     * iter_items(s, e[, reverse]) -> generator for (k, v) items of T for s <= key < e, O(n)
+    * remove_items(keys) -> None, remove items by keys, O(n)
 
 slicing by keys
 ~~~~~~~~~~~~~~~
@@ -95,7 +97,7 @@ slicing by keys
     * if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key();
     * T[:] is a TreeSlice which represents the whole tree;
 
-    TreeSlice is a tree wrapper with range check, and contains no references
+    TreeSlice is a tree wrapper with range check and contains no references
     to objects, deleting objects in the associated tree also deletes the object
     in the TreeSlice.
 
@@ -144,14 +146,14 @@ Set methods (using frozenset)
     * union(t1, t2, ...) -> Tree with keys from *either* trees
     * difference(t1, t2, ...) -> Tree with keys in T but not any of t1, t2, ...
     * symmetric_difference(t1) -> Tree with keys in either T and t1  but not both
-    * is_subset(S) -> True if every element in T is in S
-    * is_superset(S) -> True if every element in S is in T
-    * is_disjoint(S) ->  True if T has a null intersection with S
+    * is_subset(S) -> True if every element in T is in S (synonym issubset() exist)
+    * is_superset(S) -> True if every element in S is in T (synonym issuperset() exist)
+    * is_disjoint(S) ->  True if T has a null intersection with S (synonym isdisjoint() exist)
 
 Classmethods
 ~~~~~~~~~~~~
 
-    * from_keys(S[,v]) -> New tree with keys from S and values equal to v.
+    * from_keys(S[,v]) -> New tree with keys from S and values equal to v. (synonym fromkeys() exist)
 
 Installation
 ============
@@ -174,7 +176,7 @@ http://bitbucket.org/mozman/bintrees/downloads
 Documentation
 =============
 
-this README.txt
+this README.rst
 
 bintrees can be found on bitbucket.org at:
 
