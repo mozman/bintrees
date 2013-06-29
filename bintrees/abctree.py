@@ -279,7 +279,6 @@ class _ABCTree(object):
         Yields keys in ascending order if reverse is False else in descending order.
         """
         return (k for k, v in self.iter_items(start_key, end_key, reverse=reverse))
-    keyslice = key_slice  # for compatibility
 
     def value_slice(self, start_key, end_key, reverse=False):
         """T.value_slice(start_key, end_key) -> value iterator:
@@ -288,7 +287,6 @@ class _ABCTree(object):
         Yields values in ascending key order if reverse is False else in descending key order.
         """
         return (v for k, v in self.iter_items(start_key, end_key, reverse=reverse))
-    valueslice = value_slice  # for compatibility
 
     def item_slice(self, start_key, end_key, reverse=False):
         """T.item_slice(start_key, end_key) -> item iterator:
@@ -315,7 +313,7 @@ class _ABCTree(object):
         except KeyError:
             self.insert(key, default)
             return default
-    setdefault = set_default  # for compatibility
+    setdefault = set_default  # for compatibility to dict()
 
     def update(self, *args):
         """T.update(E) -> None. Update T from E : for (k, v) in E: T[k] = v"""
@@ -335,7 +333,7 @@ class _ABCTree(object):
         for key in iterable:
             tree.insert(key, value)
         return tree
-    fromkeys = from_keys  # for compatibility
+    fromkeys = from_keys  # for compatibility t dict()
 
     def get(self, key, default=None):
         """T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None."""
@@ -466,19 +464,19 @@ class _ABCTree(object):
         """T.issubset(tree) -> True if every element in x is in tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.issubset(frozenset(tree.keys()))
-    issubset = is_subset  # for compatibility
+    issubset = is_subset  # for compatibility to set()
 
     def is_superset(self, tree):
         """T.issubset(tree) -> True if every element in tree is in x """
         thiskeys = frozenset(self.keys())
         return thiskeys.issuperset(frozenset(tree.keys()))
-    issuperset = is_superset  # for compatibility
+    issuperset = is_superset  # for compatibility to set()
 
     def is_disjoint(self, tree):
         """T.isdisjoint(S) ->  True if x has a null intersection with tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.isdisjoint(frozenset(tree.keys()))
-    isdisjoint = is_disjoint  # for compatibility
+    isdisjoint = is_disjoint  # for compatibility to set()
 
 
 def _build_sets(trees):
@@ -578,7 +576,7 @@ class CPYTHON_ABCTree(_ABCTree):
         value = node.value
         self.remove(key)
         return key, value
-    popitem = pop_item  # for compatibility
+    popitem = pop_item  # for compatibility  to dict()
 
     def foreach(self, func, order=0):
         """Visit all tree nodes and process key, value.

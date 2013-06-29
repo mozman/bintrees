@@ -61,17 +61,17 @@ try:
 except IOError:
     keys = random_keys()
 
-py_searchtree = BinaryTree.fromkeys(keys)
+py_searchtree = BinaryTree.from_keys(keys)
 
 
 def bintree_build_delete():
-    tree = BinaryTree.fromkeys(keys)
+    tree = BinaryTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def bintree_build():
-    tree = BinaryTree.fromkeys(keys)
+    tree = BinaryTree.from_keys(keys)
 
 
 def bintree_search():
@@ -80,13 +80,13 @@ def bintree_search():
 
 
 def avl_build_delete():
-    tree = AVLTree.fromkeys(keys)
+    tree = AVLTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def avl_build():
-    tree = AVLTree.fromkeys(keys)
+    tree = AVLTree.from_keys(keys)
 
 
 def avl_search():
@@ -95,13 +95,13 @@ def avl_search():
 
 
 def rb_build_delete():
-    tree = RBTree.fromkeys(keys)
+    tree = RBTree.from_keys(keys)
     for key in keys:
         del tree[key]
 
 
 def rb_build():
-    tree = RBTree.fromkeys(keys)
+    tree = RBTree.from_keys(keys)
 
 
 def rb_search():

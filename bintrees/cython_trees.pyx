@@ -159,6 +159,7 @@ cdef class _BaseTree:
         value = <object> node.value
         self.remove(key)
         return key, value
+    popitem = pop_item  # for compatibility to dict()
 
     def foreach(self, func, int order=0):
         """Visit all tree nodes and process tree data by func(key, Value).
@@ -173,22 +174,22 @@ cdef class _BaseTree:
         cdef bint go_down = True
 
         while True:
-            if order == -1:
+            if order == -1:  # preorder call
                 func(<object>node.key, <object>node.value)
             if node.link[0] != NULL and go_down:
                 stack.push(node)
-                node = node.link[0]
+                node = node.link[0]  # go left
             else:
-                if order == 0:
+                if order == 0:  # inorder call
                     func(<object>node.key, <object>node.value)
                 if node.link[1] != NULL:
-                    node = node.link[1]
+                    node = node.link[1]  # go right
                     go_down = True
                 else:
                     if stack.is_empty():
                         return  # all done
                     node = stack.pop()
-                    if order == +1:
+                    if order == +1:  # postorder call
                         func(<object>node.key, <object>node.value)
                     go_down = False
 
