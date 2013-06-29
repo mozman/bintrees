@@ -31,8 +31,8 @@ except IOError:
     print("create 'testkeys.txt' with profile_bintree.py\n")
     sys.exit()
 
-ptree = PTree.fromkeys(keys)
-ftree = FTree.fromkeys(keys)
+ptree = PTree.from_keys(keys)
+ftree = FTree.from_keys(keys)
 
 
 def rb_prev():

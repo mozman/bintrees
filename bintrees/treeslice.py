@@ -20,12 +20,12 @@ class TreeSlice(object):
         return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
 
     def __contains__(self, key):
-        if self._inrange(key):
+        if self._is_in_range(key):
             return key in self._tree
         else:
             return False
 
-    def _inrange(self, key):
+    def _is_in_range(self, key):
         if self._start is not None and key < self._start:
                 return False
         if self._stop is not None and key >= self._stop:
@@ -34,13 +34,13 @@ class TreeSlice(object):
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            return self._subslice(key.start, key.stop)
-        if self._inrange(key):
+            return self._sub_slice(key.start, key.stop)
+        if self._is_in_range(key):
             return self._tree[key]
         else:
             raise KeyError(key)
 
-    def _subslice(self, start, stop):
+    def _sub_slice(self, start, stop):
         def newstart():
             if start is None:
                 return self._start
