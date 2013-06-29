@@ -137,9 +137,6 @@ Classmethods
 * from_keys(S[,v]) -> New tree with keys from S and values equal to v.
 """
 
-import sys
-PYPY = hasattr(sys, 'pypy_version_info')
-
 __all__ = [
     'FastBinaryTree',
     'FastAVLTree',

@@ -196,6 +196,12 @@ class CheckTree(object):
         self.assertEqual(result, list(sorted(self.default_values1)))
         self.assertEqual(result, list(tree.items()))
 
+    def test_020a_items_of_empty_tree(self):
+        tree = self.TREE_CLASS()
+        # empty tree also has to return an iterable
+        result = [item for item in tree.items()]
+        self.assertEqual(0, len(result))
+
     def test_021_keys_reverse(self):
         tree = self.TREE_CLASS(self.default_values1)
         result = list(tree.keys(reverse=True))
@@ -353,7 +359,7 @@ class CheckTree(object):
         self.assertRaises(KeyError, tree.pop, 8)
         self.assertEqual(tree.pop(8, 99), 99)
 
-    def test_042_popitem(self):
+    def test_042_pop_item(self):
         tree = self.TREE_CLASS(self.default_values2)
         d = dict()
         while not tree.is_empty():
