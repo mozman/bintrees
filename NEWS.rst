@@ -2,14 +2,14 @@
 NEWS
 ====
 
-Version 2.0.0 July 2013
+Version 2.0.0 June 2013
 
+  * API change: consistent method naming with synonyms for dict/set compatibility
   * code base refactoring
   * removed tree walkers
   * removed low level node stack implementation -> caused crashes
-  * API change: consistent method naming, synonyms for dict/set compatibility exists, like fromkeys() for from_keys()
   * optimizations for pypy: iter_items(), succ_item(), prev_item()
-  * tested with CPython2.7, CPython3.3, pypy-2.0
+  * tested with CPython2.7, CPython3.3, pypy-2.0 on Win7 and Linux Mint 15 x64 (pypy-1.9)
 
 Version 1.0.3 May 2013
 
