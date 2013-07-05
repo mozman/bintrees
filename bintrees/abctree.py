@@ -333,7 +333,7 @@ class _ABCTree(object):
         for key in iterable:
             tree.insert(key, value)
         return tree
-    fromkeys = from_keys  # for compatibility t dict()
+    fromkeys = from_keys  # for compatibility to dict()
 
     def get(self, key, default=None):
         """T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None."""
