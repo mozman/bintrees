@@ -70,14 +70,14 @@ cdef class _BaseTree:
     def max_item(self):
         """Get item with max key of tree, raises ValueError if tree is empty."""
         cdef node_t *node = ct_max_node(self.root)
-        if node == NULL: # root is None
+        if node == NULL:
             raise ValueError("Tree is empty")
         return <object>node.key, <object>node.value
 
     def min_item(self):
         """Get item with min key of tree, raises ValueError if tree is empty."""
         cdef node_t *node = ct_min_node(self.root)
-        if node == NULL: # root is None
+        if node == NULL:
             raise ValueError("Tree is empty")
         return <object>node.key, <object>node.value
 
