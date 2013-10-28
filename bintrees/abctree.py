@@ -12,7 +12,8 @@ import sys
 PYPY = hasattr(sys, 'pypy_version_info')
 
 from .treeslice import TreeSlice
-from operator import attrgetter, lt, gt
+from operator import attrgetter
+
 
 class _ABCTree(object):
     """
@@ -213,9 +214,6 @@ class _ABCTree(object):
             self.remove(key)
         except KeyError:
             pass
-
-    def __del__(self):
-        self.clear()
 
     def is_empty(self):
         """T.is_empty() -> False if T contains any items else True"""

@@ -22,11 +22,12 @@ except ImportError:
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    with open(os.path.join(os.path.dirname(__file__), fname)) as f:
+        return f.read()
 
 setup(
     name='bintrees',
-    version='2.0.0',
+    version='2.0.1',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='http://bitbucket.org/mozman/bintrees',

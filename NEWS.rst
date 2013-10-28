@@ -2,6 +2,10 @@
 NEWS
 ====
 
+Version 2.0.1 October 2013
+
+  * removed __del__() method to avoid problems with garbage collection
+
 Version 2.0.0 June 2013
 
   * API change: consistent method naming with synonyms for dict/set compatibility
