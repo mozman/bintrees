@@ -8,6 +8,7 @@ RUNTESTS = -m unittest discover
 PYTHON27 = py -2.7
 PYTHON33 = py -3.3
 PYPY = pypy.exe
+PYPY3 = C:\pypy3-2.1\pypy.exe
 
 build27:
 	$(PYTHON27)  $(CMD) $(FLAGS)
@@ -24,7 +25,10 @@ test33:
 testpypy:
 	$(PYPY) $(RUNTESTS)
 
-testall: build27 test27 build33 test33 testpypy
+testpypy3:
+	$(PYPY3) $(RUNTESTS)
+
+testall: build27 test27 build33 test33 testpypy testpypy3
 
 packages:
 	$(PYTHON27) setup.py sdist --formats=zip,gztar
