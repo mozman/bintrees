@@ -62,6 +62,10 @@ class CheckTree(object):
         tree2 = self.TREE_CLASS(tree1)
         self.assertEqual(len(tree2), 6)
 
+    def test_005_iter_empty_tree(self):
+        tree = self.TREE_CLASS()
+        self.assertEqual([], list(tree))
+
     def test_006_copy(self):
         tree1 = self.TREE_CLASS(self.default_values1)
         tree2 = tree1.copy()

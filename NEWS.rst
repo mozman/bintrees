@@ -2,11 +2,11 @@
 NEWS
 ====
 
-Version 2.0.1 October 2013
+Version 2.0.1 - 2013-10-01
 
   * removed __del__() method to avoid problems with garbage collection
 
-Version 2.0.0 June 2013
+Version 2.0.0 - 2013-06-01
 
   * API change: consistent method naming with synonyms for dict/set compatibility
   * code base refactoring
@@ -15,19 +15,19 @@ Version 2.0.0 June 2013
   * optimizations for pypy: iter_items(), succ_item(), prev_item()
   * tested with CPython2.7, CPython3.3, pypy-2.0 on Win7 and Linux Mint 15 x64 (pypy-1.9)
 
-Version 1.0.3 May 2013
+Version 1.0.3 - 2013-05-01
 
   * extended iter_items(startkey=None, endkey=None, reverse=reverse) -> better performance for slicing
   * Cython implementation of iter_items() for Fast_X_Trees()
   * added key parameter *reverse* to itemslice(), keyslice(), valueslice()
   * tested with CPython2.7, CPython3.3, pypy-2.0
 
-Version 1.0.2 April 2013
+Version 1.0.2 - 2013-04-01
 
   * bug fix: FastRBTree data corruption on inserting existing keys
   * bug fix: union & symmetric_difference - copy all values to result tree
 
-Version 1.0.1 February 2013
+Version 1.0.1 - 2013-02-01
 
   * bug fixes
   * refactorings by graingert
@@ -38,14 +38,14 @@ Version 1.0.1 February 2013
   * PEP8 refactorings
   * added floor_item/key, ceiling_item/key methods, thanks to Dai Mikurube
 
-Version 1.0.0 29.12.2011
+Version 1.0.0 - 2011-12-29
 
   * bug fixes
   * status: 5 - Production/Stable
   * removed useless TreeIterator() class and T.treeiter() method.
   * patch from Max Motovilov to use Visual Studio 2008 for building C-extensions
 
-Version 0.4.0 14.04.2011
+Version 0.4.0 - 2011-04-14
 
   * API change!!!
   * full Python 3 support, also for Cython implementations
@@ -59,7 +59,7 @@ Version 0.4.0 14.04.2011
   * installs on systems without cython (tested with pypy)
   * new license: GNU Library or Lesser General Public License (LGPL)
 
-Version 0.3.2 09.04.2011
+Version 0.3.2 - 2011-04-09
 
   * added itemslice(startkey, endkey), keyslice(startkey, endkey),
     valueslice(startkey, endkey) - slicing by keys
@@ -67,17 +67,17 @@ Version 0.3.2 09.04.2011
   * Pure Python trees are working with Python 3
   * No Cython implementation for Python 3
 
-Version 0.3.1 10.09.2010
+Version 0.3.1 - 2010-09-10
 
   * runs with Python 2.7
 
-Version 0.3.0 11.05.2010
+Version 0.3.0 - 2010-05-11
 
   * low level functions written as c-module only interface to python is a cython
     module
   * support for the pickle protocol
 
-Version 0.2.1 06.05.2010
+Version 0.2.1 - 2010-05-06
 
   * added delslice del T[0:3] -> remove treenodes 0, 1, 2
   * added discard -> remove key without KeyError if not found
@@ -89,11 +89,11 @@ Version 0.2.1 06.05.2010
   * added item_at: T.item_at(0) -> get item at position (not key!) 0
           T.item_at(0) O(n)! <==> T.min_item() O(log(n))
 
-Version 0.2.0 - 03.05.2010
+Version 0.2.0 - 2010-05-03
 
   * TreeMixin Class as base for Python-Trees and as Mixin for Cython-Trees
 
-Version 0.1.0 - 27.04.2010
+Version 0.1.0 - 2010-04-27
 
   * Alpha status
   * Initial release
