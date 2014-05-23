@@ -32,10 +32,15 @@ testall: build2 test2 build3 test3 testpypy testpypy3
 
 packages:
 	$(PYTHON2) setup.py sdist --formats=zip,gztar
-	$(PYTHON2) setup.py bdist --formats=msi,wininst
-	$(PYTHON3) setup.py bdist --formats=msi,wininst
+	$(PYTHON2) setup.py bdist_wheel
+	$(PYTHON2) setup.py bdist --formats=wininst
+	$(PYTHON3) setup.py bdist_wheel
+	$(PYTHON3) setup.py bdist --formats=wininst
+
 
 release:
 	$(PYTHON2) setup.py sdist --formats=zip,gztar upload
-	$(PYTHON2) setup.py bdist --formats=msi,wininst upload
-	$(PYTHON3) setup.py bdist --formats=msi,wininst upload
+	$(PYTHON2) setup.py bdist_wheel upload
+	$(PYTHON2) setup.py bdist --formats=wininst upload
+	$(PYTHON3) setup.py bdist_wheel upload
+	$(PYTHON3) setup.py bdist --formats=wininst upload
