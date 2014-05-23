@@ -8,8 +8,8 @@
 # setup.py build_ext --inplace --force
 
 import os
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import setup
+from setuptools import Extension
 
 try:
     from Cython.Distutils import build_ext
@@ -45,7 +45,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Cython",
         "Programming Language :: Python :: Implementation :: CPython",
