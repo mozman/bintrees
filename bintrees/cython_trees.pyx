@@ -170,28 +170,39 @@ cdef class _BaseTree:
         if self.count == 0:
             return
         cdef NodeStack stack = NodeStack()
+        cdef NodeStack tempstack = NodeStack()
         cdef node_t *node = self.root
-        cdef bint go_down = True
 
-        while True:
-            if order == -1:  # preorder call
-                func(<object>node.key, <object>node.value)
-            if node.link[0] != NULL and go_down:
-                stack.push(node)
-                node = node.link[0]  # go left
-            else:
-                if order == 0:  # inorder call
-                    func(<object>node.key, <object>node.value)
-                if node.link[1] != NULL:
-                    node = node.link[1]  # go right
-                    go_down = True
+        if order == 0:
+            while not stack.is_empty() or node:
+                if node:
+                    stack.push(node)
+                    node = node.link[0]
                 else:
-                    if stack.is_empty():
-                        return  # all done
                     node = stack.pop()
-                    if order == +1:  # postorder call
-                        func(<object>node.key, <object>node.value)
-                    go_down = False
+                    func(<object>node.key, <object>node.value)
+                    node = node.link[1]
+        elif order == -1:
+            stack.push(node)
+            while not stack.is_empty():
+                node = stack.pop()
+                func(<object>node.key, <object>node.value)
+                if node.link[1]:
+                    stack.push(node.link[1])
+                if node.link[0]:
+                    stack.push(node.link[0])
+        elif order == +1:
+            tempstack.push(node)
+            while not tempstack.is_empty():
+                node = tempstack.pop()
+                stack.push(node)
+                if node.link[0]:
+                    tempstack.push(node.link[0])
+                if node.link[1]:
+                    tempstack.push(node.link[1])
+            while not stack.is_empty():
+                node = stack.pop()
+                func(<object>node.key, <object>node.value)
 
 
 cdef class _BinaryTree(_BaseTree):
