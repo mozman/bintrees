@@ -2,6 +2,10 @@
 NEWS
 ====
 
+Version 2.0.2 - 2015-02-12
+
+  * fixed foreach cython-function by Sam Yaple
+
 Version 2.0.1 - 2013-10-01
 
   * removed __del__() method to avoid problems with garbage collection
