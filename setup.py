@@ -4,8 +4,7 @@
 # Copyright (c) 2010-2013 by Manfred Moitzi
 # License: MIT License
 
-# to build c-extension:
-# setup.py build_ext --inplace --force
+# `python setup.py install` should build the C extension if you have Cython
 
 import os
 from setuptools import setup
