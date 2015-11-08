@@ -97,6 +97,8 @@ slicing by keys
     * if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key();
     * T[:] is a TreeSlice which represents the whole tree;
 
+    The step argument of the regular slicing syntax T[s:e:step] will silently ignored.
+
     TreeSlice is a tree wrapper with range check and contains no references
     to objects, deleting objects in the associated tree also deletes the object
     in the TreeSlice.

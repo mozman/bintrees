@@ -92,6 +92,8 @@ if 's' is None or T[:e] TreeSlice/iterator starts with value of min_key()
 if 'e' is None or T[s:] TreeSlice/iterator ends with value of max_key()
 T[:] is a TreeSlice which represents the whole tree.
 
+The step argument of the regular slicing syntax T[s:e:step] will silently ignored.
+
 TreeSlice is a tree wrapper with range check, and contains no references
 to objects, deleting objects in the associated tree also deletes the object
 in the TreeSlice.
@@ -150,20 +152,22 @@ from .bintree import BinaryTree
 from .avltree import AVLTree
 from .rbtree import RBTree
 
+import logging
+
 try:
     from .cython_trees import FastBinaryTree
 except ImportError:  # fall back to pure Python version
-    print("Warning: FastBinaryTree not available, using Python version BinaryTree.")
+    logging.warning("FastBinaryTree not available, using Python version BinaryTree.")
     FastBinaryTree = BinaryTree
 
 try:
     from .cython_trees import FastAVLTree
 except ImportError:  # fall back to pure Python version
-    print("Warning: FastAVLTree not available, using Python version AVLTree.")
+    logging.warning("FastAVLTree not available, using Python version AVLTree.")
     FastAVLTree = AVLTree
 
 try:
     from .cython_trees import FastRBTree
 except ImportError:  # fall back to pure Python version
-    print("Warning: FastRBTree not available, using Python version RBTree.")
+    logging.warning("FastRBTree not available, using Python version RBTree.")
     FastRBTree = RBTree

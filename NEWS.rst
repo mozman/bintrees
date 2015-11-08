@@ -2,6 +2,10 @@
 NEWS
 ====
 
+Version 2.0.3 - ...
+
+  * replaced print function by logging.warning for import warning messages
+
 Version 2.0.2 - 2015-02-12
 
   * fixed foreach cython-function by Sam Yaple
