@@ -168,7 +168,8 @@ or from PyPI::
 
     pip install bintrees
 
-Compiling the fast Trees requires Cython and on Windows is a C-Compiler necessary (MingW works fine).
+Compiling the fast Trees requires Cython and on Windows is a C-Compiler necessary (MingW32 works fine, except for
+CPython 2.7.10 & CPython 3.5).
 
 Download Binaries for Windows
 =============================
