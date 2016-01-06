@@ -2,9 +2,10 @@
 NEWS
 ====
 
-Version 2.0.3 - ...
+Version 2.0.3 - 2015-01-06
 
   * replaced print function by logging.warning for import warning messages
+  * KNOWN ISSUE: unable to build Cython extension with MingW32 and CPython 3.5 & CPython 2.7.10
 
 Version 2.0.2 - 2015-02-12
 
