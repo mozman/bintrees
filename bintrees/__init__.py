@@ -154,20 +154,32 @@ from .rbtree import RBTree
 
 import logging
 
+from functools import wraps
+
+logger = logging.getLogger('bintrees')
+
+
+def generate_warning_class(superklass, desired_klassname):
+    @wraps(superklass.__init__)
+    def warning_init(*args, **kwargs):
+        logger.warning('%s not available, using Python version %s.', desired_klassname,
+                       superklass.__name__)
+        superklass.__init__(*args, **kwargs)
+
+    overrides = {'__init__': warning_init}
+    return type(desired_klassname, (superklass,), overrides)
+
 try:
     from .cython_trees import FastBinaryTree
 except ImportError:  # fall back to pure Python version
-    logging.warning("FastBinaryTree not available, using Python version BinaryTree.")
-    FastBinaryTree = BinaryTree
+    FastBinaryTree = generate_warning_class(BinaryTree, 'FastBinaryTree')
 
 try:
     from .cython_trees import FastAVLTree
 except ImportError:  # fall back to pure Python version
-    logging.warning("FastAVLTree not available, using Python version AVLTree.")
-    FastAVLTree = AVLTree
+    FastAVLTree = generate_warning_class(AVLTree, 'FastAVLTree')
 
 try:
     from .cython_trees import FastRBTree
 except ImportError:  # fall back to pure Python version
-    logging.warning("FastRBTree not available, using Python version RBTree.")
-    FastRBTree = RBTree
+    FastRBTree = generate_warning_class(RBTree, 'FastRBTree')
