@@ -2,13 +2,13 @@
 NEWS
 ====
 
-Version 2.0.4 - 2015-01-09
+Version 2.0.4 - 2016-01-09
 
   * removed logging statements on import
   * added helper function bintrees.has_fast_free_support()
   * HINT: pypy runs faster than CPython with Cython extension
 
-Version 2.0.3 - 2015-01-06
+Version 2.0.3 - 2016-01-06
 
   * replaced print function by logging.warning for import warning messages
   * KNOWN ISSUE: unable to build Cython extension with MingW32 and CPython 3.5 & CPython 2.7.10
