@@ -1,0 +1,43 @@
+# Author:  mozman
+# License: MIT-License
+
+FLAGS = --inplace --force
+CMD = setup.py build_ext
+RUNTESTS = -m unittest discover
+
+PYTHON2 = python
+PYTHON3 = python3
+PYPY = pypy
+
+build2:
+	$(PYTHON2)  $(CMD) $(FLAGS)
+
+build3:
+	$(PYTHON3) $(CMD) $(FLAGS)
+
+test2:
+	$(PYTHON2) $(RUNTESTS)
+
+test3:
+	$(PYTHON3) $(RUNTESTS)
+	
+testpypy:
+	$(PYPY) $(RUNTESTS)
+
+testall: build2 test2 build3 test3 testpypy
+
+packages:
+	$(PYTHON2) setup.py sdist --formats=zip,gztar
+	$(PYTHON2) setup.py bdist_wheel
+	$(PYTHON2) setup.py bdist --formats=wininst
+	$(PYTHON3) setup.py bdist_wheel
+	$(PYTHON3) setup.py bdist --formats=wininst
+
+
+release:
+	$(PYTHON2) setup.py sdist --formats=zip,gztar upload
+	$(PYTHON2) setup.py bdist_wheel upload
+	$(PYTHON2) setup.py bdist --formats=wininst upload
+	$(PYTHON3) setup.py bdist_wheel upload
+	$(PYTHON3) setup.py bdist --formats=wininst upload
+

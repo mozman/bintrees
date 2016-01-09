@@ -1,0 +1,6 @@
+include NEWS.rst README.rst LICENSE.txt
+include tests/testkey.txt
+include bintrees/ctrees.c
+include bintrees/ctrees.h
+recursive-include tests *.py
+recursive-include bintrees *.pyx *.pxd
