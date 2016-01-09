@@ -11,7 +11,7 @@ from timeit import Timer
 from random import shuffle
 
 from bintrees import RBTree
-from bintrees import FastRBTree
+from bintrees import FastRBTree, has_fast_tree_support
 
 COUNT = 100
 
@@ -81,4 +81,8 @@ def main():
     print_result(t.timeit(COUNT), 'FastRBTree pop_max')
 
 if __name__ == '__main__':
+    if not has_fast_tree_support():
+        print("Cython extension for FastRBTree is NOT working.")
+    else:
+        print("Cython extension for FastRBTree is working.")
     main()

@@ -10,7 +10,7 @@ import sys
 from timeit import Timer
 from random import shuffle
 
-from bintrees import AVLTree
+from bintrees import AVLTree, has_fast_tree_support
 from bintrees import FastAVLTree
 
 COUNT = 100
@@ -95,4 +95,8 @@ def main():
     print_result(t.timeit(COUNT), 'FastAVLTree search')
 
 if __name__ == '__main__':
+    if not has_fast_tree_support():
+        print("Cython extension for FastAVLTree is NOT working.")
+    else:
+        print("Cython extension for FastAVLTree is working.")
     main()

@@ -157,6 +157,11 @@ Classmethods
 
     * from_keys(S[,v]) -> New tree with keys from S and values equal to v. (synonym fromkeys() exist)
 
+Helper functions
+~~~~~~~~~~~~~~~~
+
+    * bintrees.has_fast_tree_support() -> True if Cython extension is working else False (False = using pure Python implementation)
+
 Installation
 ============
 

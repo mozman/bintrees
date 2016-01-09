@@ -10,7 +10,7 @@ import sys
 from timeit import Timer
 
 from bintrees import RBTree as PTree
-from bintrees import FastRBTree as FTree
+from bintrees import FastRBTree as FTree, has_fast_tree_support
 
 COUNT = 100
 
@@ -122,4 +122,8 @@ def main():
     print_result(t.timeit(COUNT), 'FastRBTree itemslice(median_key, None)')
 
 if __name__ == '__main__':
+    if not has_fast_tree_support():
+        print("Cython extension for FastRBTree is NOT working.")
+    else:
+        print("Cython extension for FastRBTree is working.")
     main()

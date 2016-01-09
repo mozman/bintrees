@@ -137,37 +137,33 @@ Set methods (using frozenset)
 Classmethods
 
 * from_keys(S[,v]) -> New tree with keys from S and values equal to v.
-"""
 
-__all__ = [
-    'FastBinaryTree',
-    'FastAVLTree',
-    'FastRBTree',
-    'BinaryTree',
-    'AVLTree',
-    'RBTree'
-]
+Helper functions
+
+* bintrees.has_fast_tree_support() -> True if Cython extension is working else False (False = using pure Python implementation)
+
+"""
 
 from .bintree import BinaryTree
 from .avltree import AVLTree
 from .rbtree import RBTree
 
-import logging
+
+def has_fast_tree_support():
+    return FastBinaryTree is not BinaryTree
+
 
 try:
     from .cython_trees import FastBinaryTree
 except ImportError:  # fall back to pure Python version
-    logging.warning("FastBinaryTree not available, using Python version BinaryTree.")
     FastBinaryTree = BinaryTree
 
 try:
     from .cython_trees import FastAVLTree
 except ImportError:  # fall back to pure Python version
-    logging.warning("FastAVLTree not available, using Python version AVLTree.")
     FastAVLTree = AVLTree
 
 try:
     from .cython_trees import FastRBTree
 except ImportError:  # fall back to pure Python version
-    logging.warning("FastRBTree not available, using Python version RBTree.")
     FastRBTree = RBTree

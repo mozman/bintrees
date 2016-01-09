@@ -8,7 +8,7 @@
 
 from timeit import Timer
 from bintrees import BinaryTree
-from bintrees import FastBinaryTree
+from bintrees import FastBinaryTree, has_fast_tree_support
 from random import shuffle
 
 COUNT = 100
@@ -111,4 +111,8 @@ def main():
     print_result(t.timeit(COUNT), 'FastBinaryTree iter all items')
 
 if __name__ == '__main__':
+    if not has_fast_tree_support():
+        print("Cython extension for FastBinaryTree is NOT working.")
+    else:
+        print("Cython extension for FastBinaryTree is working.")
     main()

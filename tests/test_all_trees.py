@@ -14,7 +14,7 @@ import pickle
 
 from random import randint, shuffle
 
-from bintrees import BinaryTree, AVLTree, RBTree
+from bintrees import BinaryTree, AVLTree, RBTree, has_fast_tree_support
 from bintrees import FastBinaryTree, FastAVLTree, FastRBTree
 
 set3 = [34, 67, 89, 123, 3, 7, 9, 2, 0, 999]
@@ -37,6 +37,12 @@ def randomkeys(num, maxnum=100000):
         keys.add(randint(0, maxnum))
     return list(keys)
 
+class TestCythonSupport(unittest.TestCase):
+    def test_cython_support(self):
+        if PYPY:
+            self.assertFalse(has_fast_tree_support())
+        else:
+            self.assertTrue(has_fast_tree_support())
 
 class CheckTree(object):
     default_values1 = list(zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57]))

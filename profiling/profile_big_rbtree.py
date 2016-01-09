@@ -9,7 +9,7 @@
 from timeit import Timer
 from random import shuffle
 
-from bintrees import FastRBTree
+from bintrees import FastRBTree, has_fast_tree_support
 
 COUNT = 1
 ITEMS = 2**22
@@ -87,4 +87,8 @@ def main():
     print_result(t.timeit(COUNT), 'FastRBTree search')
 
 if __name__ == '__main__':
+    if not has_fast_tree_support():
+        print("Cython extension for FastRBTree is NOT working.")
+    else:
+        print("Cython extension for FastRBTree is working.")
     main()
