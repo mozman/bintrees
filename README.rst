@@ -1,6 +1,20 @@
 Binary Tree Package
 ===================
 
+Bintrees Development Stopped
+----------------------------
+
+Use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
+
+see also PyCon 2016 presentation: https://www.youtube.com/watch?v=7z2Ki44Vs4E
+
+Advantages:
+
+    - pure Python no Cython/C dependencies
+    - faster
+    - active development
+    - more & better testing/profiling
+
 Abstract
 ========
 

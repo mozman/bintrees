@@ -2,6 +2,8 @@
 NEWS
 ====
 
+bintrees development stopped, use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
+
 Version 2.0.4 - 2016-01-09
 
   * removed logging statements on import
