@@ -187,8 +187,7 @@ or from PyPI::
 
     pip install bintrees
 
-Compiling the fast Trees requires Cython and on Windows is a C-Compiler necessary (MingW32 works fine, except for
-CPython 2.7.10 & CPython 3.5).
+Compiling the fast Trees requires Cython and on Windows is a C-Compiler necessary.
 
 Download Binaries for Windows
 =============================
@@ -200,6 +199,6 @@ Documentation
 
 this README.rst
 
-bintrees can be found on bitbucket.org at:
+bintrees can be found on GitHub.com at:
 
-http://bitbucket.org/mozman/bintrees
+https://github.com/mozman/bintrees.git

@@ -5,42 +5,58 @@ FLAGS = --inplace --force
 CMD = setup.py build_ext
 RUNTESTS = -m unittest discover
 
-PYTHON2 = py -2.7
-PYTHON3 = py -3.4
-PYPY = pypy.exe
-PYPY3 = C:\pypy3-2.4.0\pypy.exe
+PYTHON27 = py -2.7
+PYTHON35 = py -3.5
+PYTHON36 = py -3.6
+PYPY = C:\pypy2-5.6.0\pypy.exe
 
-build2:
-	$(PYTHON2)  $(CMD) $(FLAGS)
+build27:
+	$(PYTHON27)  $(CMD) $(FLAGS)
 
-build3:
-	$(PYTHON3) $(CMD) $(FLAGS)
+build35:
+	$(PYTHON35) $(CMD) $(FLAGS)
 
-test2:
-	$(PYTHON2) $(RUNTESTS)
+build36:
+	$(PYTHON36) $(CMD) $(FLAGS)
 
-test3:
-	$(PYTHON3) $(RUNTESTS)
-	
+test27:
+	$(PYTHON27) $(RUNTESTS)
+
+test35:
+	$(PYTHON35) $(RUNTESTS)
+
+test36:
+	$(PYTHON36) $(RUNTESTS)
+
 testpypy:
 	$(PYPY) $(RUNTESTS)
 
-testpypy3:
-	$(PYPY3) $(RUNTESTS)
-
-testall: build2 test2 build3 test3 testpypy testpypy3
+testall: build27 test27 build35 test35 build36 test36 testpypy
 
 packages:
-	$(PYTHON2) setup.py sdist --formats=zip,gztar
-	$(PYTHON2) setup.py bdist_wheel
-	$(PYTHON2) setup.py bdist --formats=wininst
-	$(PYTHON3) setup.py bdist_wheel
-	$(PYTHON3) setup.py bdist --formats=wininst
+	$(PYTHON27) setup.py sdist --formats=zip,gztar
+	$(PYTHON27) setup.py bdist_wheel
+	$(PYTHON27) setup.py bdist --formats=wininst
+	$(PYTHON35) setup.py bdist_wheel
+	$(PYTHON35) setup.py bdist --formats=wininst
+	$(PYTHON36) setup.py bdist_wheel
+	$(PYTHON36) setup.py bdist --formats=wininst
 
 
 release:
-	$(PYTHON2) setup.py sdist --formats=zip,gztar upload
-	$(PYTHON2) setup.py bdist_wheel upload
-	$(PYTHON2) setup.py bdist --formats=wininst upload
-	$(PYTHON3) setup.py bdist_wheel upload
-	$(PYTHON3) setup.py bdist --formats=wininst upload
+	$(PYTHON27) setup.py sdist --formats=zip,gztar upload
+	$(PYTHON27) setup.py bdist_wheel upload
+	$(PYTHON27) setup.py bdist --formats=wininst upload
+	$(PYTHON35) setup.py bdist_wheel upload
+	$(PYTHON35) setup.py bdist --formats=wininst upload
+	$(PYTHON36) setup.py bdist_wheel upload
+	$(PYTHON36) setup.py bdist --formats=wininst upload
+
+# just add 64-bit binary packages for a release
+add64:
+	$(PYTHON27) setup.py bdist_wheel upload
+	$(PYTHON27) setup.py bdist --formats=wininst upload
+	$(PYTHON35) setup.py bdist_wheel upload
+	$(PYTHON35) setup.py bdist --formats=wininst upload
+	$(PYTHON36) setup.py bdist_wheel upload
+	$(PYTHON36) setup.py bdist --formats=wininst upload

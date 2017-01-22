@@ -4,6 +4,8 @@ NEWS
 
 bintrees development stopped, use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
 
+Repository moved to GitHub: https://github.com/mozman/bintrees.git
+
 Version 2.0.4 - 2016-01-09
 
   * removed logging statements on import
