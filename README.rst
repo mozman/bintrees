@@ -192,7 +192,7 @@ Compiling the fast Trees requires Cython and on Windows is a C-Compiler necessar
 Download Binaries for Windows
 =============================
 
-http://bitbucket.org/mozman/bintrees/downloads
+https://github.com/mozman/bintrees/releases
 
 Documentation
 =============

@@ -31,10 +31,12 @@ test36:
 testpypy:
 	$(PYPY) $(RUNTESTS)
 
-testall: build27 test27 build35 test35 build36 test36 testpypy
+buildall: build27 build35 build36
+
+testall: test27 test35 test36 testpypy
 
 packages:
-	$(PYTHON27) setup.py sdist --formats=zip,gztar
+	$(PYTHON27) setup.py sdist --formats=zip
 	$(PYTHON27) setup.py bdist_wheel
 	$(PYTHON27) setup.py bdist --formats=wininst
 	$(PYTHON35) setup.py bdist_wheel
@@ -44,16 +46,7 @@ packages:
 
 
 release:
-	$(PYTHON27) setup.py sdist --formats=zip,gztar upload
-	$(PYTHON27) setup.py bdist_wheel upload
-	$(PYTHON27) setup.py bdist --formats=wininst upload
-	$(PYTHON35) setup.py bdist_wheel upload
-	$(PYTHON35) setup.py bdist --formats=wininst upload
-	$(PYTHON36) setup.py bdist_wheel upload
-	$(PYTHON36) setup.py bdist --formats=wininst upload
-
-# just add 64-bit binary packages for a release
-add64:
+	$(PYTHON27) setup.py sdist --formats=zip upload
 	$(PYTHON27) setup.py bdist_wheel upload
 	$(PYTHON27) setup.py bdist --formats=wininst upload
 	$(PYTHON35) setup.py bdist_wheel upload
