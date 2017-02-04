@@ -5,13 +5,12 @@
 # Created: 28.04.2010
 # Copyright (c) 2010-2017 by Manfred Moitzi
 # License: MIT License
-
 import sys
 PYPY = hasattr(sys, 'pypy_version_info')
 
 import unittest
 import pickle
-
+from copy import deepcopy
 from random import randint, shuffle
 
 from bintrees import BinaryTree, AVLTree, RBTree, has_fast_tree_support
@@ -799,7 +798,6 @@ class CheckTree(object):
         self.assertEqual(list(tree.keys()), list(sorted(keys)))
 
     def test_099_deepcopy(self):
-        from copy import deepcopy
         data = {
             2: 2,
             3: 3,
@@ -816,7 +814,6 @@ class CheckTree(object):
         self.assertEqual(tree[1][-1], 9)
 
     def test_100_deepcopy_tree_in_container(self):
-        from copy import deepcopy
         data = {
             2: 2,
             3: 3,
@@ -840,6 +837,36 @@ class CheckTree(object):
         treecopy1[17] = 17
         self.assertTrue(17 in treecopy3)
         self.assertFalse(17 in tree)
+
+    def test_101_deepcopy_tree_in_tree(self):
+        data1 = {
+            2: 2,
+            3: 3,
+            1: list(range(10)),
+            4: 4,
+            5: 5,
+        }
+        data2 = {
+            7: 7,
+            3: 3,
+            5: list(range(10)),
+            4: 4,
+            9: 9,
+        }
+        tree1 = self.TREE_CLASS(data1)
+        tree2 = self.TREE_CLASS(data2)
+        tree1[6] = tree2  # 21
+        tree1[8] = tree2  # 22
+        tree1[1][5] = tree2  # 23
+        copytree1 = deepcopy(tree1)
+        copytree21 = copytree1[6]
+        copytree22 = copytree1[8]
+        copytree23 = copytree1[1][5]
+        self.assertNotEqual(id(tree2), id(copytree21))
+        self.assertEqual(id(copytree21), id(copytree22))  # copied only once?
+        self.assertEqual(id(copytree21), id(copytree23))  # tree in sublist, copied only once?
+        self.assertEqual(id(copytree21[5]), id(copytree22[5]))  # sublist copied only once?
+        self.assertEqual(id(copytree21[5]), id(copytree23[5]))  # sublist copied only once?
 
 
 class TestBinaryTree(CheckTree, unittest.TestCase):

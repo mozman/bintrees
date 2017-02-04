@@ -4,6 +4,10 @@ NEWS
 
 bintrees development stopped, use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
 
+Version 2.0.6 - 2017-02-04
+
+  * BUGFIX: correct deepcopy() for tree in tree
+
 Version 2.0.5 - 2017-02-04
 
   * support for copy.deepcopy()

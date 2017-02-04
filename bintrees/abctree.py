@@ -226,7 +226,7 @@ class _ABCTree(object):
     def __deepcopy__(self, memo):
         """copy.deepcopy(T) -> get a deep copy of T."""
         def _deepcopy(key, value):
-            value_copy = deepcopy(value)
+            value_copy = deepcopy(value, memo)
             tree.insert(key, value_copy)
 
         tree = type(self)()
