@@ -5,7 +5,6 @@
 # Created: 03.05.2010
 # Copyright (c) 2010-2013 by Manfred Moitzi
 # License: MIT License
-
 from __future__ import absolute_import
 
 import sys
@@ -13,6 +12,9 @@ PYPY = hasattr(sys, 'pypy_version_info')
 
 from .treeslice import TreeSlice
 from operator import attrgetter
+from copy import deepcopy
+
+from abc import abstractmethod, abstractproperty
 
 
 class _ABCTree(object):
@@ -85,6 +87,8 @@ class _ABCTree(object):
     * __xor__(other) <==> T ^ other, symmetric_difference
     * __repr__() <==> repr(T)
     * __setitem__(k, v) <==> T[k] = v, O(log(n))
+    * __copy__() -> shallow copy support, copy.copy(T)
+    * __deepcopy__() -> deep copy support, copy.deepcopy(T)
     * clear() -> None, remove all items from T, , O(n)
     * remove_items(keys) -> None, remove items by keys
     * copy() -> a shallow copy of T, O(n*log(n))
@@ -159,11 +163,58 @@ class _ABCTree(object):
     * from_keys(S[,v]) -> New tree with keys from S and values equal to v.
 
     """
+    @abstractmethod
+    def insert(self, key, value):
+        pass
+
+    @abstractmethod
+    def remove(self, key):
+        pass
+
+    @abstractmethod
+    def get_value(self, key):
+        pass
+
+    @abstractmethod
+    def min_item(self):
+        pass
+
+    @abstractmethod
+    def max_item(self):
+        pass
+
+    @abstractmethod
+    def prev_item(self):
+        pass
+
+    @abstractmethod
+    def succ_item(self):
+        pass
+
+    @abstractmethod
+    def floor_item(self):
+        pass
+
+    @abstractmethod
+    def ceiling_item(self):
+        pass
+
+    @abstractmethod
+    def iter_items(self, start_key=None, end_key=None, reverse=False):
+        return []
+
+    @abstractmethod
+    def foreach(self, func, order=0):
+        pass
+
+    @abstractproperty
+    def count(self):
+        pass
 
     def __repr__(self):
         """T.__repr__(...) <==> repr(x)"""
         tpl = "%s({%s})" % (self.__class__.__name__, '%s')
-        return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
+        return tpl % ", ".join(("%r: %r" % item for item in self.items()))
 
     def copy(self):
         """T.copy() -> get a shallow copy of T."""
@@ -171,6 +222,17 @@ class _ABCTree(object):
         self.foreach(tree.insert, order=-1)
         return tree
     __copy__ = copy
+
+    def __deepcopy__(self, memo):
+        """copy.deepcopy(T) -> get a deep copy of T."""
+        def _deepcopy(key, value):
+            value_copy = deepcopy(value)
+            tree.insert(key, value_copy)
+
+        tree = type(self)()
+        memo[id(self)] = tree
+        self.foreach(_deepcopy, order=-1)
+        return tree
 
     def __contains__(self, key):
         """k in T -> True if T has a key k, else False"""

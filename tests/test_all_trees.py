@@ -3,7 +3,7 @@
 # Author:  mozman
 # Purpose: test binary trees
 # Created: 28.04.2010
-# Copyright (c) 2010-2013 by Manfred Moitzi
+# Copyright (c) 2010-2017 by Manfred Moitzi
 # License: MIT License
 
 import sys
@@ -37,12 +37,14 @@ def randomkeys(num, maxnum=100000):
         keys.add(randint(0, maxnum))
     return list(keys)
 
+
 class TestCythonSupport(unittest.TestCase):
     def test_cython_support(self):
         if PYPY:
             self.assertFalse(has_fast_tree_support())
         else:
             self.assertTrue(has_fast_tree_support())
+
 
 class CheckTree(object):
     default_values1 = list(zip([12, 34, 45, 16, 35, 57], [12, 34, 45, 16, 35, 57]))
@@ -795,6 +797,49 @@ class CheckTree(object):
         tree = self.TREE_CLASS(self.default_values1)  # key == value
         tree.foreach(collect)
         self.assertEqual(list(tree.keys()), list(sorted(keys)))
+
+    def test_099_deepcopy(self):
+        from copy import deepcopy
+        data = {
+            2: 2,
+            3: 3,
+            1: list(range(10)),
+            4: 4,
+            5: 5,
+        }
+        tree = self.TREE_CLASS(data)
+        deep_copy_tree = deepcopy(tree)
+        self.assertEqual(tree[1], deep_copy_tree[1])
+        # change deep copy
+        deep_copy_tree[1].append(99)
+        self.assertNotEqual(tree[1], deep_copy_tree[1])
+        self.assertEqual(tree[1][-1], 9)
+
+    def test_100_deepcopy_tree_in_container(self):
+        from copy import deepcopy
+        data = {
+            2: 2,
+            3: 3,
+            1: list(range(10)),
+            4: 4,
+            5: 5,
+        }
+        tree = self.TREE_CLASS(data)
+        container = [0, 1, tree, tree, [0, 1, tree]]
+        copy = deepcopy(container)
+        treecopy1 = copy[2]
+        self.assertNotEqual(id(tree), id(treecopy1))
+        self.assertTrue(0 in copy)
+        self.assertTrue(1 in treecopy1)
+        treecopy2 = copy[3]
+        treecopy3 = copy[4][2]
+        # test if all three copies reference the same object
+        # only one real copy of tree exists
+        self.assertEqual(id(treecopy1), id(treecopy2))
+        self.assertEqual(id(treecopy1), id(treecopy3))
+        treecopy1[17] = 17
+        self.assertTrue(17 in treecopy3)
+        self.assertFalse(17 in tree)
 
 
 class TestBinaryTree(CheckTree, unittest.TestCase):

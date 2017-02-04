@@ -4,6 +4,13 @@ NEWS
 
 bintrees development stopped, use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
 
+Version 2.0.5 - 2017-02-04
+
+  * support for copy.deepcopy()
+  * changed status back to `Mature`, there will be: bugfixes, compatibility checks and simple additions like this deep
+    copy support, because I got feedback, that there are some special cases in which `bintrees` can be useful.
+  * switched development to 64bit only & MS compilers - on Windows 7 everything works fine now with CPython 2.7/3.5/3.6
+
 Repository moved to GitHub: https://github.com/mozman/bintrees.git
 
 Version 2.0.4 - 2016-01-09

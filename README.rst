@@ -80,6 +80,8 @@ Methods
     * __xor__(other) <==> T ^ other, symmetric_difference
     * __repr__() <==> repr(T)
     * __setitem__(k, v) <==> T[k] = v, O(log(n))
+    * __copy__() -> shallow copy support, copy.copy(T)
+    * __deepcopy__() -> deep copy support, copy.deepcopy(T)
     * clear() -> None, remove all items from T, O(n)
     * copy() -> a shallow copy of T, O(n*log(n))
     * discard(k) -> None, remove k from T, if k is present, O(log(n))
