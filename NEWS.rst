@@ -4,6 +4,10 @@ NEWS
 
 bintrees development stopped, use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
 
+Version 2.0.7 - ...
+
+  * acquire GIL for PyMem_Malloc() and PyMem_Free() calls
+
 Version 2.0.6 - 2017-02-04
 
   * BUGFIX: correct deepcopy() for tree in tree

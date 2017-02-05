@@ -23,7 +23,9 @@
 static node_t *
 ct_new_node(PyObject *key, PyObject *value, int xdata)
 {
+    PyGILState_STATE state = PyGILState_Ensure();
 	node_t *new_node = PyMem_Malloc(sizeof(node_t));
+	PyGILState_Release(state);
 	if (new_node != NULL) {
 		KEY(new_node) = key;
 		Py_INCREF(key);
@@ -39,12 +41,15 @@ ct_new_node(PyObject *key, PyObject *value, int xdata)
 static void
 ct_delete_node(node_t *node)
 {
+    PyGILState_STATE state;
 	if (node != NULL) {
 		Py_XDECREF(KEY(node));
 		Py_XDECREF(VALUE(node));
 		LEFT_NODE(node) = NULL;
 		RIGHT_NODE(node) = NULL;
+		state = PyGILState_Ensure();
 		PyMem_Free(node);
+		PyGILState_Release(state);
 	}
 }
 
@@ -152,7 +157,7 @@ ct_max_node(node_t *root)
 
 extern node_t *
 ct_min_node(node_t *root)
-// get node with smallest key
+/* get node with smallest key */
 {
 	if (root == NULL)
 		return NULL;
@@ -329,7 +334,7 @@ rb_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 				new_node = 1;
 				p->link[dir] = q;
 				if (q == NULL)
-					return -1; // get no memory
+					return -1; /* get no memory */
 			}
 			else if (is_red(q->link[0]) && is_red(q->link[1])) {
 				/* Simple red violation: color flip */
@@ -478,7 +483,7 @@ rb_remove(node_t **rootaddr, PyObject *key)
 static node_t *
 avl_single(node_t *root, int dir)
 {
-  node_t *save = root->link[!dir];
+    node_t *save = root->link[!dir];
 	int rlh, rrh, slh;
 
 	/* Rotate */
@@ -511,7 +516,7 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 	if (root == NULL) {
 		root = avl_new_node(key, value);
 		if (root == NULL)
-			return -1; // got no memory
+			return -1; /* got no memory */
 	}
 	else {
 		node_t *it, *up[32];
@@ -525,12 +530,12 @@ avl_insert(node_t **rootaddr, PyObject *key, PyObject *value)
 			/* Push direction and node onto stack */
 			cmp_res = ct_compare(KEY(it), key);
 			if (cmp_res == 0) {
-				Py_XDECREF(VALUE(it)); // release old value object
-				VALUE(it) = value; // set new value object
-				Py_INCREF(value); // take new value object
+				Py_XDECREF(VALUE(it)); /* release old value object */
+				VALUE(it) = value; /* set new value object */
+				Py_INCREF(value); /* take new value object */
 				return 0;
 			}
-			// upd[top] = it->data < data;
+			/* upd[top] = it->data < data; */
 			upd[top] = (cmp_res < 0);
 			up[top++] = it;
 
