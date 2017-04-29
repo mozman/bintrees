@@ -2,10 +2,9 @@
 NEWS
 ====
 
-bintrees development stopped, use `sortedcontainers` instead: https://pypi.python.org/pypi/sortedcontainers
+Version 2.0.7 - 2017-04-28
 
-Version 2.0.7 - ...
-
+  * BUGFIX: foreach (pure Python implementation) works with empty trees
   * acquire GIL for PyMem_Malloc() and PyMem_Free() calls
 
 Version 2.0.6 - 2017-02-04

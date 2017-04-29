@@ -644,6 +644,9 @@ class CPYTHON_ABCTree(_ABCTree):
         parm func: function(key, value)
         param int order: inorder = 0, preorder = -1, postorder = +1
         """
+        if self.count == 0:
+            return
+
         def _traverse(node):
             if order == -1:
                 func(node.key, node.value)

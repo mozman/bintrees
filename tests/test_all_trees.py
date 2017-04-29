@@ -868,6 +868,17 @@ class CheckTree(object):
         self.assertEqual(id(copytree21[5]), id(copytree22[5]))  # sublist copied only once?
         self.assertEqual(id(copytree21[5]), id(copytree23[5]))  # sublist copied only once?
 
+    def test_102_deepcopy_empty_tree(self):
+        tree1 = self.TREE_CLASS()
+        tree2 = deepcopy(tree1)
+        self.assertEqual(len(tree2), 0)
+
+    def test_103_foreach_with_empty_tree(self):
+        tree1 = self.TREE_CLASS()
+        # does not raise any exception
+        tree1.foreach(lambda k, v: None)
+        self.assertTrue(True)
+
 
 class TestBinaryTree(CheckTree, unittest.TestCase):
     TREE_CLASS = BinaryTree
