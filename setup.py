@@ -4,7 +4,7 @@
 # Copyright (c) 2010-2013 by Manfred Moitzi
 # License: MIT License
 
-# `python setup.py install` should build the C extension if you have Cython
+# `python setup.py install` should build the C extension if you have installed Cython
 
 import os
 from setuptools import setup
@@ -26,12 +26,13 @@ def read(fname):
 
 setup(
     name='bintrees',
-    version='2.0.7',
+    version='2.1.0',
     description='Package provides Binary-, RedBlack- and AVL-Trees in Python and Cython.',
     author='mozman',
     url='https://github.com/mozman/bintrees.git',
     download_url='https://github.com/mozman/bintrees/releases',
-    author_email='mozman@gmx.at',
+    author_email='me@mozman.at',
+    python_requires='>=3.5',
     cmdclass=commands,
     ext_modules=ext_modules,
     packages=['bintrees'],
@@ -42,10 +43,10 @@ setup(
         "Development Status :: 6 - Mature",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Cython",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",

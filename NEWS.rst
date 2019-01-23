@@ -2,6 +2,10 @@
 NEWS
 ====
 
+Version 2.1.0 - dev
+
+  * removed official Python 2 support
+
 Version 2.0.7 - 2017-04-28
 
   * BUGFIX: foreach (pure Python implementation) works with empty trees
