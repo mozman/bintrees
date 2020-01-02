@@ -1,6 +1,8 @@
 .idea
+.tox
 build/
 bintrees.egg-info/
 dist/
 /bintrees/cython_trees.c
 /gc_check.py
+tox.ini

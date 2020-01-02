@@ -2,8 +2,10 @@
 NEWS
 ====
 
-Version 2.1.0 - dev
+Version 2.1.0 - 2020-01-02
 
+  * Use ``sortedcontainers`` instead: https://pypi.python.org/pypi/sortedcontainers
+  * Project Status: Inactive
   * removed official Python 2 support
 
 Version 2.0.7 - 2017-04-28

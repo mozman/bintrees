@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 # Author:  mozman (python version)
 # Purpose: avl tree module (Julienne Walker's unbounded none recursive algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_avl.aspx
@@ -114,6 +114,7 @@ class AVLTree(ABCTree):
 
     see also abctree.ABCTree() class.
     """
+
     def _new_node(self, key, value):
         """Create a new tree node."""
         self._count += 1

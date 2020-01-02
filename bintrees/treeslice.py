@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 # Author:  mozman -- <mozman@gmx.at>
 # Purpose: TreeSlice
 # Created: 11.04.2011
@@ -17,7 +17,7 @@ class TreeSlice(object):
 
     def __repr__(self):
         tpl = "%s({%s})" % (self._tree.__class__.__name__, '%s')
-        return tpl % ", ".join( ("%r: %r" % item for item in self.items()) )
+        return tpl % ", ".join(("%r: %r" % item for item in self.items()))
 
     def __contains__(self, key):
         if self._is_in_range(key):
@@ -27,9 +27,9 @@ class TreeSlice(object):
 
     def _is_in_range(self, key):
         if self._start is not None and key < self._start:
-                return False
+            return False
         if self._stop is not None and key >= self._stop:
-                return False
+            return False
         return True
 
     def __getitem__(self, key):
@@ -61,6 +61,7 @@ class TreeSlice(object):
 
     def keys(self):
         return self._tree.key_slice(self._start, self._stop)
+
     __iter__ = keys
 
     def values(self):

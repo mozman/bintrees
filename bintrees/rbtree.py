@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 # Author:  mozman (python version)
 # Purpose: red-black tree module (Julienne Walker's none recursive algorithm)
 # source: http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
@@ -114,6 +114,7 @@ class RBTree(ABCTree):
 
     see also abctree.ABCTree() class.
     """
+
     def _new_node(self, key, value):
         """Create a new tree node."""
         self._count += 1
@@ -215,7 +216,7 @@ class RBTree(ABCTree):
                             direction2 = 1 if grand_parent.right is parent else 0
                             if is_red(sibling[last]):
                                 grand_parent[direction2] = jsw_double(parent, last)
-                            elif is_red(sibling[1-last]):
+                            elif is_red(sibling[1 - last]):
                                 grand_parent[direction2] = jsw_single(parent, last)
                             # Ensure correct coloring
                             grand_parent[direction2].red = True

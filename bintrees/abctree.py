@@ -1,20 +1,18 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 # Author:  Mozman
 # Purpose: abstract base class for all binary trees
 # Created: 03.05.2010
 # Copyright (c) 2010-2013 by Manfred Moitzi
 # License: MIT License
 from __future__ import absolute_import
-
 import sys
-PYPY = hasattr(sys, 'pypy_version_info')
-
 from .treeslice import TreeSlice
 from operator import attrgetter
 from copy import deepcopy
-
 from abc import abstractmethod, abstractproperty
+
+PYPY = hasattr(sys, 'pypy_version_info')
 
 
 class _ABCTree(object):
@@ -163,6 +161,7 @@ class _ABCTree(object):
     * from_keys(S[,v]) -> New tree with keys from S and values equal to v.
 
     """
+
     @abstractmethod
     def insert(self, key, value):
         pass
@@ -207,9 +206,9 @@ class _ABCTree(object):
     def foreach(self, func, order=0):
         pass
 
-    @abstractproperty
+    @property
     def count(self):
-        pass
+        return 0
 
     def __repr__(self):
         """T.__repr__(...) <==> repr(x)"""
@@ -221,10 +220,12 @@ class _ABCTree(object):
         tree = self.__class__()
         self.foreach(tree.insert, order=-1)
         return tree
+
     __copy__ = copy
 
     def __deepcopy__(self, memo):
         """copy.deepcopy(T) -> get a deep copy of T."""
+
         def _deepcopy(key, value):
             value_copy = deepcopy(value, memo)
             tree.insert(key, value_copy)
@@ -287,6 +288,7 @@ class _ABCTree(object):
         to False
         """
         return (item[0] for item in self.iter_items(reverse=reverse))
+
     __iter__ = keys
 
     def __reversed__(self):
@@ -373,6 +375,7 @@ class _ABCTree(object):
         except KeyError:
             self.insert(key, default)
             return default
+
     setdefault = set_default  # for compatibility to dict()
 
     def update(self, *args):
@@ -393,6 +396,7 @@ class _ABCTree(object):
         for key in iterable:
             tree.insert(key, value)
         return tree
+
     fromkeys = from_keys  # for compatibility to dict()
 
     def get(self, key, default=None):
@@ -460,7 +464,7 @@ class _ABCTree(object):
 
     def min_key(self):
         """Get min key of tree, raises ValueError if tree is empty. """
-        return  self.min_item()[0]
+        return self.min_item()[0]
 
     def max_key(self):
         """Get max key of tree, raises ValueError if tree is empty. """
@@ -524,18 +528,21 @@ class _ABCTree(object):
         """T.issubset(tree) -> True if every element in x is in tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.issubset(frozenset(tree.keys()))
+
     issubset = is_subset  # for compatibility to set()
 
     def is_superset(self, tree):
         """T.issubset(tree) -> True if every element in tree is in x """
         thiskeys = frozenset(self.keys())
         return thiskeys.issuperset(frozenset(tree.keys()))
+
     issuperset = is_superset  # for compatibility to set()
 
     def is_disjoint(self, tree):
         """T.isdisjoint(S) ->  True if x has a null intersection with tree """
         thiskeys = frozenset(self.keys())
         return thiskeys.isdisjoint(frozenset(tree.keys()))
+
     isdisjoint = is_disjoint  # for compatibility to set()
 
 
@@ -584,6 +591,7 @@ class CPYTHON_ABCTree(_ABCTree):
     * floor_item(key) -> get (k, v) pair, where k is the greatest key less than or equal to key, O(log(n))
     * ceiling_item(key) -> get (k, v) pair, where k is the smallest key greater than or equal to key, O(log(n))
     """
+
     def __init__(self, items=None):
         """T.__init__(...) initializes T; see T.__class__.__doc__ for signature"""
         self._root = None
@@ -593,11 +601,13 @@ class CPYTHON_ABCTree(_ABCTree):
 
     def clear(self):
         """T.clear() -> None.  Remove all items from T."""
+
         def _clear(node):
             if node is not None:
                 _clear(node.left)
                 _clear(node.right)
                 node.free()
+
         _clear(self._root)
         self._count = 0
         self._root = None
@@ -636,6 +646,7 @@ class CPYTHON_ABCTree(_ABCTree):
         value = node.value
         self.remove(key)
         return key, value
+
     popitem = pop_item  # for compatibility  to dict()
 
     def foreach(self, func, order=0):
@@ -658,6 +669,7 @@ class CPYTHON_ABCTree(_ABCTree):
                 _traverse(node.right)
             if order == +1:
                 func(node.key, node.value)
+
         _traverse(self._root)
 
     def min_item(self):
@@ -697,7 +709,7 @@ class CPYTHON_ABCTree(_ABCTree):
             else:
                 node = node.right
 
-        if node is None: # stay at dead end
+        if node is None:  # stay at dead end
             raise KeyError(str(key))
         # found node of key
         if node.right is not None:
@@ -709,7 +721,7 @@ class CPYTHON_ABCTree(_ABCTree):
                 succ_node = node
             elif node.key < succ_node.key:
                 succ_node = node
-        elif succ_node is None: # given key is biggest in tree
+        elif succ_node is None:  # given key is biggest in tree
             raise KeyError(str(key))
         return succ_node.key, succ_node.value
 
@@ -733,7 +745,7 @@ class CPYTHON_ABCTree(_ABCTree):
                     prev_node = node
                 node = node.right
 
-        if node is None: # stay at dead end (None)
+        if node is None:  # stay at dead end (None)
             raise KeyError(str(key))
         # found node of key
         if node.left is not None:
@@ -745,7 +757,7 @@ class CPYTHON_ABCTree(_ABCTree):
                 prev_node = node
             elif node.key > prev_node.key:
                 prev_node = node
-        elif prev_node is None: # given key is smallest in tree
+        elif prev_node is None:  # given key is smallest in tree
             raise KeyError(str(key))
         return prev_node.key, prev_node.value
 
@@ -791,7 +803,7 @@ class CPYTHON_ABCTree(_ABCTree):
             return succ_node.key, succ_node.value
         raise KeyError(str(key))
 
-    def iter_items(self,  start_key=None, end_key=None, reverse=False):
+    def iter_items(self, start_key=None, end_key=None, reverse=False):
         """Iterates over the (key, value) items of the associated tree,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False"""
@@ -878,6 +890,7 @@ class PYPY_ABCTree(CPYTHON_ABCTree):
                         return  # all done
                     node = stack.pop()
                     go_down = False
+
 
 if PYPY:
     ABCTree = PYPY_ABCTree
