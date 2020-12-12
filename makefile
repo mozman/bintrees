@@ -24,4 +24,4 @@ clean:
 
 packages: test
 	$(PYTHON3) setup.py bdist_wheel
-	$(PYTHON3) setup.py sdist --formats=zip,gztar
+	$(PYTHON3) setup.py sdist --formats=zip

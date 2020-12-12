@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Create source distribution
-        run: python setup.py sdist
+        run: python setup.py sdist --formats=zip
       - name: Upload source distribution
         run: |
           pip install twine
@@ -32,7 +32,7 @@ jobs:
       TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
     strategy:
       matrix:
-        # ignore linux, requires a many-linux builds
+        # ignore linux, requires a many-linux build
         os: [windows-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
