@@ -25,7 +25,7 @@ jobs:
         python -m pip install cython
     - name: Install with C-extensions
       run: |
-        python setup.py install
+        python setup.py build_ext -i
     - name: Test with C-extensions
       run: |
         python -m unittest discover
